@@ -30,7 +30,6 @@ class SetupWizardCommand(var gameManager: GameManager) : CommandExecutor {
             val gameWorld = GameWorld(mapName)
             gameWorld.loadWorld(gameManager, false) { gameManager.setupWizardManager.activateSetupWizard(player, gameWorld) }
 
-
         } else {
             sender.sendMessage("Only players can execute this command!")
         }
