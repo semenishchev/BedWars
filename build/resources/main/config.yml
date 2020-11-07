@@ -1,0 +1,12 @@
+maps:
+  - lighthouse:
+      upgradeLocation:
+        x: 0
+        y: 0
+        z: 0
+      generators:
+        - type: IRON
+          location:
+            x: 0
+            y: 0
+            z: 0

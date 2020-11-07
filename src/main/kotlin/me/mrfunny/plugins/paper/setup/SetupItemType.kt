@@ -1,0 +1,5 @@
+package me.mrfunny.plugins.paper.setup
+
+enum class SetupItemType {
+    EMERALD_GENERATOR, DIAMOND_GENERATOR, GENERATOR_LOCATION, SHOP_LOCATION, BED_LOCATION, CORNER_ONE, CORNER_TWO
+}
