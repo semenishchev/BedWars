@@ -2,10 +2,7 @@ package me.mrfunny.plugins.paper.worlds
 
 import me.mrfunny.plugins.paper.manager.GameManager
 import me.mrfunny.plugins.paper.worlds.generators.Generator
-import org.bukkit.Bukkit
-import org.bukkit.Location
-import org.bukkit.World
-import org.bukkit.WorldCreator
+import org.bukkit.*
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import java.io.*
@@ -14,12 +11,7 @@ import java.util.stream.Collectors
 import kotlin.collections.ArrayList
 
 class GameWorld(var name: String) {
-    var world: World = if(Bukkit.getWorld(name) != null) {
-        Bukkit.getWorld(name)!!
-    } else {
-        Bukkit.getWorld("world")!!
-    }
-
+    lateinit var world: World
     var islands = arrayListOf<Island>()
     var generators: ArrayList<Generator> = arrayListOf()
     lateinit var lobbyPosition: Location
@@ -35,6 +27,7 @@ class GameWorld(var name: String) {
 
         val creator = WorldCreator(if (loadingIntoPlaying) "${sourceFolder.path}_playing" else "")
         world = creator.createWorld()!!
+        world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false)
 
         val section: ConfigurationSection = gameManager.configurationManager.configuration
 
@@ -127,7 +120,7 @@ class GameWorld(var name: String) {
         return islandOptional.orElse(null)
     }
 
-    fun getSpawnForTeamColor(color: TeamColor): Location? {
+    fun getSpawnForTeamColor(color: IslandColor): Location? {
         val optional: Optional<Island> = islands.stream().filter{
             it.color == color
         }.findFirst()
@@ -149,5 +142,4 @@ class GameWorld(var name: String) {
         return islands.stream().filter{ island -> island.isBedPlaced() && island.alivePlayerCount() != 0}.collect(
             Collectors.toList())
     }
-
 }

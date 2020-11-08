@@ -1,6 +1,6 @@
 package me.mrfunny.plugins.paper.setup
 
-import me.mrfunny.plugins.paper.worlds.TeamColor
+import me.mrfunny.plugins.paper.worlds.IslandColor
 import me.mrfunny.plugins.paper.util.ItemBuilder
 import me.mrfunny.plugins.paper.worlds.GameWorld
 import me.mrfunny.plugins.paper.worlds.Island
@@ -44,7 +44,7 @@ object SetupWizardManager {
         playerToStartLocationMap[player] = player.location
     }
 
-    fun teamSetupWizard(player: Player, teamColor: TeamColor){
+    fun teamSetupWizard(player: Player, islandColor: IslandColor){
         player.inventory.clear()
 
         player.inventory.addItem(
@@ -69,14 +69,14 @@ object SetupWizardManager {
             ItemBuilder(Material.MAGMA_CREAM).setName("&aSet bed location").toItemStack()
         )
         player.inventory.addItem(
-            ItemBuilder(teamColor.woolMaterial()).setName("&aChange island").toItemStack()
+            ItemBuilder(islandColor.woolMaterial()).setName("&aChange island").toItemStack()
         )
         player.inventory.addItem(
             ItemBuilder(Material.RED_MUSHROOM).setName("&aSave island").toItemStack()
 
         )
         if(getWorld(player) != null){
-            playerToIslandMap[player] = Island(getWorld(player)!!, teamColor)
+            playerToIslandMap[player] = Island(getWorld(player)!!, islandColor)
         }
     }
 

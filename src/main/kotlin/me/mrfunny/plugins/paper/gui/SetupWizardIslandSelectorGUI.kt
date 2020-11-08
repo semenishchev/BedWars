@@ -1,7 +1,7 @@
 package me.mrfunny.plugins.paper.gui
 
 import me.mrfunny.plugins.paper.manager.GameManager
-import me.mrfunny.plugins.paper.worlds.TeamColor
+import me.mrfunny.plugins.paper.worlds.IslandColor
 import me.mrfunny.plugins.paper.util.ItemBuilder
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -22,7 +22,7 @@ class SetupWizardIslandSelectorGUI(var gameManager: GameManager) : GUI {
     override val inventory: Inventory = Bukkit.createInventory(null, 27, name)
 
     init {
-        TeamColor.values().forEach {
+        IslandColor.values().forEach {
             inventory.addItem(
                 ItemBuilder(it.woolMaterial()).setName("${it.getChatColor()} ${it.formattedName()}").toItemStack()
             )
@@ -32,13 +32,13 @@ class SetupWizardIslandSelectorGUI(var gameManager: GameManager) : GUI {
     }
 
     override fun handleClick(player: Player, itemStack: ItemStack, view: InventoryView): GUI? {
-        lateinit var clickedColor: TeamColor
+        lateinit var clickedColor: IslandColor
 
         if(!gameManager.setupWizardManager.isInWizard(player)) return null
 
         val itemName: String = ChatColor.stripColor(itemStack.itemMeta.displayName)!!.substring(1)
 
-        for(color: TeamColor in TeamColor.values()){
+        for(color: IslandColor in IslandColor.values()){
             if(itemName.equals(color.formattedName(), true)){
                 clickedColor = color
                 break

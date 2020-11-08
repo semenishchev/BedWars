@@ -3,13 +3,16 @@ package me.mrfunny.plugins.paper.worlds
 import com.sk89q.worldedit.math.BlockVector3
 import com.sk89q.worldedit.regions.CuboidRegion
 import me.mrfunny.plugins.paper.worlds.generators.Generator
+import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Location
+import org.bukkit.OfflinePlayer
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
+import java.util.*
 import java.util.stream.Collectors
 
-class Island(var gameWorld: GameWorld, var color: TeamColor) {
+class Island(var gameWorld: GameWorld, var color: IslandColor) {
 
     var protectedCorner1: Location? = null
     var protectedCorner2: Location? = null
@@ -20,7 +23,8 @@ class Island(var gameWorld: GameWorld, var color: TeamColor) {
 
     var islandGenerators = arrayListOf<Generator>()
 
-    private var players = arrayListOf<Player>()
+    var players = arrayListOf<Player>()
+    var absolutelyAlive = arrayListOf<UUID>()
     var isAlive: Boolean = true
 
     fun isMember(player: Player): Boolean{
@@ -49,7 +53,19 @@ class Island(var gameWorld: GameWorld, var color: TeamColor) {
             return players.size
         }
 
-        return players.stream().filter{player -> player.gameMode != GameMode.SPECTATOR}.collect(Collectors.toList()).size
+        val alive: List<Player> = players.stream().filter{player -> player.gameMode != GameMode.SPECTATOR}.collect(Collectors.toList())
+        var count = alive.size
+        for(absolutelyAlivePlayer: UUID in absolutelyAlive){
+            if(alive.stream().noneMatch { player -> player.uniqueId == absolutelyAlivePlayer }){
+                val oPlayer: OfflinePlayer = Bukkit.getOfflinePlayer(absolutelyAlivePlayer)
+                if(oPlayer.isOnline){
+                    count++
+                } else {
+                    absolutelyAlive.remove(absolutelyAlivePlayer)
+                }
+            }
+        }
+        return count
     }
 
 }

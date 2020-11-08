@@ -1,7 +1,7 @@
 package me.mrfunny.plugins.paper.config
 
 import me.mrfunny.plugins.paper.manager.GameManager
-import me.mrfunny.plugins.paper.worlds.TeamColor
+import me.mrfunny.plugins.paper.worlds.IslandColor
 import me.mrfunny.plugins.paper.worlds.GameWorld
 import me.mrfunny.plugins.paper.worlds.Island
 import me.mrfunny.plugins.paper.worlds.generators.Generator
@@ -15,7 +15,6 @@ import java.util.*
 import java.util.function.Consumer
 import java.util.stream.Collectors
 import kotlin.collections.ArrayList
-import kotlin.random.Random
 
 class ConfigurationManager(var gameManager: GameManager) {
     var configuration: ConfigurationSection
@@ -34,7 +33,7 @@ class ConfigurationManager(var gameManager: GameManager) {
         gameWorld.loadWorld(gameManager, false){
             val section: ConfigurationSection = getMapSection(mapName)
             section.getKeys(false).forEach{
-                if(EnumUtils.isValidEnum(TeamColor::class.java, it)){ // todo: fix
+                if(EnumUtils.isValidEnum(IslandColor::class.java, it)){ // todo: fix
                     val island: Island = loadIsland(gameWorld, section.getConfigurationSection(it)!!)
                     gameWorld.islands.add(island)
                 }
@@ -83,7 +82,7 @@ class ConfigurationManager(var gameManager: GameManager) {
 
     @Suppress("UNCHECKED_CAST")
     fun loadIsland(world: GameWorld, section: ConfigurationSection): Island{
-        val color: TeamColor = TeamColor.valueOf(section.name)
+        val color: IslandColor = IslandColor.valueOf(section.name)
 
         val locationsToWrite = hashMapOf<String, Location?>()
 

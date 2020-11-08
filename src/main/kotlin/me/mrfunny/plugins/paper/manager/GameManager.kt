@@ -8,13 +8,11 @@ import me.mrfunny.plugins.paper.config.ConfigurationManager
 import me.mrfunny.plugins.paper.gui.GUIManager
 import me.mrfunny.plugins.paper.setup.SetupWizardManager
 import me.mrfunny.plugins.paper.worlds.GameWorld
-import me.mrfunny.plugins.paper.worlds.Island
-import me.mrfunny.plugins.paper.worlds.generators.Generator
 import org.bukkit.Bukkit
-import org.bukkit.GameMode
 import org.bukkit.entity.Player
 
-class GameManager(val plugin: BedWars) {
+class GameManager(var plugin: BedWars) {
+
 
     var scoreboard: JPerPlayerScoreboard
     var setupWizardManager: SetupWizardManager = SetupWizardManager
@@ -25,14 +23,14 @@ class GameManager(val plugin: BedWars) {
     init {
         this.scoreboard = JPerPlayerScoreboard({ player: Player ->
             val lines = arrayListOf<String>()
-            if (player.gameMode == GameMode.SPECTATOR) {
-                lines.add("&7Мертвый")
-            }
-            lines.add("&a")
+//            if (player.gameMode == GameMode.SPECTATOR) {
+//                lines.add("&7Мертвый")
+//            }
+//            lines.add("&a")
             lines
         }, JScoreboardOptions("&a&lBedWars", JScoreboardTabHealthStyle.NUMBER, true))
 
-        this.configurationManager.loadWorld(this.configurationManager.randomMapName()) { state = GameState.LOBBY }
+//        this.configurationManager.loadWorld(this.configurationManager.randomMapName()) { state = GameState.LOBBY }
     }
 
     var state: GameState = GameState.PRELOBBY

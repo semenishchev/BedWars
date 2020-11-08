@@ -186,6 +186,12 @@ class ItemBuilder {
         return this
     }
 
+    fun setUnbreakable(u: Boolean): ItemBuilder{
+        val im = `is`.itemMeta
+        im.isUnbreakable = u
+        return this
+    }
+
     /**
      * Add a lore line.
      * @param line The lore line to add.

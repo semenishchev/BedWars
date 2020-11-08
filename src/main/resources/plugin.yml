@@ -5,12 +5,6 @@ main: me.mrfunny.plugins.paper.BedWars
 
 depend: [ExampleJScoreboardPlugin]
 
-permissions:
-  bedwars.admin:
-    default: false
-
 commands:
   setup:
-    permission: bedwars.admin
   start:
-    permission: bedwars.admin

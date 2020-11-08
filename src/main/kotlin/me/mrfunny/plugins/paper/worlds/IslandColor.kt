@@ -1,9 +1,10 @@
 package me.mrfunny.plugins.paper.worlds
 
 import org.bukkit.ChatColor
+import org.bukkit.Color
 import org.bukkit.Material
 
-enum class TeamColor {
+enum class IslandColor {
     GREEN,
     RED,
     BLUE,
@@ -27,6 +28,21 @@ enum class TeamColor {
             return ChatColor.GOLD
         }
         return ChatColor.valueOf(this.toString())
+    }
+
+    fun getColor(): Color{
+        return when(this){
+            GREEN -> Color.GREEN
+            RED -> Color.RED
+            BLUE -> Color.BLUE
+            YELLOW -> Color.YELLOW
+            AQUA -> Color.AQUA
+            WHITE -> Color.WHITE
+            GRAY -> Color.GRAY
+            BLACK -> Color.BLACK
+            ORANGE -> Color.ORANGE
+            PINK -> Color.FUCHSIA
+        }
     }
 
     fun woolMaterial(): Material{
