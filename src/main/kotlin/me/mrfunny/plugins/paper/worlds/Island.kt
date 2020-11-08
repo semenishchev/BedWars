@@ -45,6 +45,10 @@ class Island(var gameWorld: GameWorld, var color: TeamColor) {
     }
 
     fun alivePlayerCount(): Int{
+        if(isBedPlaced()){
+            return players.size
+        }
+
         return players.stream().filter{player -> player.gameMode != GameMode.SPECTATOR}.collect(Collectors.toList()).size
     }
 

@@ -3,6 +3,7 @@ package me.mrfunny.plugins.paper.events
 import me.mrfunny.plugins.paper.manager.GameManager
 import me.mrfunny.plugins.paper.manager.GameState
 import org.bukkit.Bukkit
+import org.bukkit.GameMode
 import org.bukkit.OfflinePlayer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -33,6 +34,19 @@ class PlayerLoginEventListener(private val gameManager: GameManager) : Listener 
     fun onJoin(event: PlayerJoinEvent) {
         event.joinMessage = null
         gameManager.scoreboard.addPlayer(event.player)
+
+        if (gameManager.state == GameState.ACTIVE) {
+            val world = gameManager.world
+            val playerIsland = world.getIslandForPlayer(event.player)
+
+            if(playerIsland != null){
+                if(playerIsland.isBedPlaced()){
+                    event.player.teleport(playerIsland.spawnLocation!!)
+                }
+            }
+        } else if (gameManager.state == GameState.LOBBY) {
+            event.player.teleport(gameManager.world.lobbyPosition)
+        }
     }
 
     @EventHandler

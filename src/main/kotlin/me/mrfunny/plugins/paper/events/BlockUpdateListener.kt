@@ -26,7 +26,7 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
         if(type.toString().contains("BED")){
             val location: Location = event.block.location
 
-            val island: Island = gameManager.world.getIslandForBedLocation(location)
+            val island: Island = gameManager.world.getIslandForBedLocation(location)!!
 
             if(!island.isMember(player)){
                 event.block.type = Material.AIR

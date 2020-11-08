@@ -15,6 +15,7 @@ import org.bukkit.GameMode
 import org.bukkit.entity.Player
 
 class GameManager(val plugin: BedWars) {
+
     var scoreboard: JPerPlayerScoreboard
     var setupWizardManager: SetupWizardManager = SetupWizardManager
     var configurationManager: ConfigurationManager = ConfigurationManager(this)
@@ -33,6 +34,7 @@ class GameManager(val plugin: BedWars) {
 
         this.configurationManager.loadWorld(this.configurationManager.randomMapName()) { state = GameState.LOBBY }
     }
+
     var state: GameState = GameState.PRELOBBY
     set(value) {
         field = value
@@ -57,7 +59,15 @@ class GameManager(val plugin: BedWars) {
 
 
             }
+            else -> TODO()
         }
+    }
+
+    fun endGameIfNeeded() {
+        if(world.getActiveIslands().size > 1){
+            return
+        }
+
     }
 
 }

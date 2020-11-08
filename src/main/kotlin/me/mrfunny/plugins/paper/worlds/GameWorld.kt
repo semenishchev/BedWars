@@ -7,6 +7,7 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.WorldCreator
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.entity.Player
 import java.io.*
 import java.util.*
 import java.util.stream.Collectors
@@ -94,7 +95,7 @@ class GameWorld(var name: String) {
         return toDelete.delete()
     }
 
-    fun getIslandForBedLocation(location: Location): Island {
+    fun getIslandForBedLocation(location: Location): Island? {
         val islandOptional: Optional<Island> = islands.stream().filter {
             if(it.bedLocation == location){
                 return@filter true
@@ -123,7 +124,7 @@ class GameWorld(var name: String) {
             return@filter false
         }.findFirst()
 
-        return islandOptional.get()
+        return islandOptional.orElse(null)
     }
 
     fun getSpawnForTeamColor(color: TeamColor): Location? {
@@ -136,6 +137,12 @@ class GameWorld(var name: String) {
         }
 
         return optional.get().spawnLocation
+    }
+
+    fun getIslandForPlayer(player: Player): Island? {
+        return islands.stream().filter{island ->
+            return@filter island.isMember(player)
+        }.findFirst().orElse(null)
     }
 
     fun getActiveIslands(): List<Island>{

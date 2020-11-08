@@ -11,4 +11,6 @@ permissions:
 
 commands:
   setup:
+    permission: bedwars.admin
   start:
+    permission: bedwars.admin
