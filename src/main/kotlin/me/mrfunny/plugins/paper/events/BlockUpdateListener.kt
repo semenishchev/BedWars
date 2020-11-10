@@ -17,8 +17,11 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
 
     @EventHandler
     fun onBreak(event: BlockBreakEvent){
-        if(gameManager.state != GameState.ACTIVE && gameManager.state != GameState.WON) return
         if(event.player.gameMode == GameMode.CREATIVE) return
+        if(gameManager.state != GameState.ACTIVE && gameManager.state != GameState.WON) {
+            event.isCancelled = true
+            return
+        }
 
         val player: Player = event.player
         val type: Material = event.block.type

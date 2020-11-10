@@ -7,9 +7,11 @@ import me.mrfunny.plugins.paper.BedWars
 import me.mrfunny.plugins.paper.config.ConfigurationManager
 import me.mrfunny.plugins.paper.gui.GUIManager
 import me.mrfunny.plugins.paper.setup.SetupWizardManager
+import me.mrfunny.plugins.paper.tasks.GameStartingTask
 import me.mrfunny.plugins.paper.worlds.GameWorld
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.bukkit.scheduler.BukkitTask
 
 class GameManager(var plugin: BedWars) {
 
@@ -19,6 +21,8 @@ class GameManager(var plugin: BedWars) {
     var configurationManager: ConfigurationManager = ConfigurationManager(this)
     var guiManager: GUIManager = GUIManager
     lateinit var world: GameWorld
+
+    lateinit var gameStartingTask: GameStartingTask
 
     init {
         this.scoreboard = JPerPlayerScoreboard({ player: Player ->
@@ -30,19 +34,26 @@ class GameManager(var plugin: BedWars) {
             lines
         }, JScoreboardOptions("&a&lBedWars", JScoreboardTabHealthStyle.NUMBER, true))
 
-//        this.configurationManager.loadWorld(this.configurationManager.randomMapName()) { state = GameState.LOBBY }
+        this.configurationManager.loadWorld(this.configurationManager.randomMapName()) { state = GameState.LOBBY }
     }
 
     var state: GameState = GameState.PRELOBBY
     set(value) {
         field = value
         when(value){
-            GameState.STARTING -> {
+            GameState.LOBBY -> {
                 Bukkit.getOnlinePlayers().forEach {
                     it.teleport(world.lobbyPosition)
                 }
+
             }
-            GameState.ACTIVE -> TODO()
+            GameState.STARTING -> {
+                gameStartingTask = GameStartingTask(this)
+                gameStartingTask.runTaskTimer(plugin, 0, 20)
+            }
+            GameState.ACTIVE -> {
+                gameStartingTask.cancel()
+            }
             GameState.WON -> TODO()
             GameState.RESET -> {
                 Bukkit.getOnlinePlayers().forEach {

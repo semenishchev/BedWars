@@ -12,7 +12,9 @@ import org.bukkit.plugin.java.JavaPlugin
 class BedWars : JavaPlugin() {
 
     lateinit var gameManager: GameManager
+    lateinit var instance: BedWars
     override fun onEnable() {
+        instance = this
         gameManager = GameManager(this)
 
         server.pluginManager.getPlugin("ExampleJScoreboardPlugin")?.let {
@@ -37,9 +39,12 @@ class BedWars : JavaPlugin() {
         server.pluginManager.registerEvents(InventoryClickListener(gameManager), this)
         server.pluginManager.registerEvents(BlockUpdateListener(gameManager), this)
         server.pluginManager.registerEvents(PlayerDeathListener(gameManager), this)
+        server.pluginManager.registerEvents(ItemListener, this)
+        server.pluginManager.registerEvents(HungerListener(gameManager), this)
     }
 
     override fun onDisable() {
+        gameManager = GameManager(instance)
         gameManager.scoreboard.destroy()
         gameManager.world.resetWorld()
     }

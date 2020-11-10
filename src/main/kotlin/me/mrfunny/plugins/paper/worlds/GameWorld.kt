@@ -18,18 +18,16 @@ class GameWorld(var name: String) {
 
     fun loadWorld(gameManager: GameManager, loadingIntoPlaying: Boolean, runnable: Runnable) {
         val sourceFolder = File("${gameManager.plugin.dataFolder.canonicalPath}${File.separator}..${File.separator}..${File.separator}$name")
-        val dest = File(if (loadingIntoPlaying) "${sourceFolder.path}_playing" else "")
+        val dest = File(name + if (loadingIntoPlaying) "_playing" else "")
         try{
             copyFolder(sourceFolder, dest)
         } catch (ex: IOException){
             ex.printStackTrace()
         }
 
-        val creator = WorldCreator(if (loadingIntoPlaying) "${sourceFolder.path}_playing" else "")
+        val creator = WorldCreator(name + if (loadingIntoPlaying) "_playing" else "")
         world = creator.createWorld()!!
         world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false)
-
-        val section: ConfigurationSection = gameManager.configurationManager.configuration
 
         runnable.run()
     }
@@ -41,7 +39,9 @@ class GameWorld(var name: String) {
                 println("[BedWars] directory copied from $src to $destination")
             }
 
-            for (file in src.list()) {
+            val list: Array<String> = src.list()
+
+            for (file in list) {
                 val srcFile = File(src, file)
                 val destFile = File(destination, file)
 

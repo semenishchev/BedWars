@@ -38,14 +38,16 @@ class PlayerDeathListener(private val gameManager: GameManager) : Listener {
             player.gameMode = GameMode.SPECTATOR
             player.teleport(gameManager.world.lobbyPosition)
             if(playerIsland.isBedPlaced()){
-                val task: BukkitTask = Bukkit.getScheduler().runTaskTimer(gameManager.plugin, PlayerRespawnTask(player), 0, 20)
+                val task: BukkitTask = Bukkit.getScheduler().runTaskTimer(gameManager.plugin, PlayerRespawnTask(player, gameManager.world.getIslandForPlayer(player)!!), 0, 20)
                 Bukkit.getScheduler().runTaskLater(gameManager.plugin, task::cancel, 20 * 6)
             } else {
-                player.sendTitle(Colorize.c("&cYOU DIED"), null, 30, 30, 30)
+                player.sendTitle(Colorize.c("&cYOU DIED"), null, 0, 20, 20)
             }
         }
     }
 
+
+    @EventHandler
     fun onDamageByOther(event: EntityDamageByEntityEvent){
         if(event.damager !is Player && event.entity !is Player) return
 

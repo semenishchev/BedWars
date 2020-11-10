@@ -15,6 +15,7 @@ import java.util.*
 import java.util.function.Consumer
 import java.util.stream.Collectors
 import kotlin.collections.ArrayList
+import kotlin.random.Random
 
 class ConfigurationManager(var gameManager: GameManager) {
     var configuration: ConfigurationSection
@@ -36,6 +37,8 @@ class ConfigurationManager(var gameManager: GameManager) {
                 if(EnumUtils.isValidEnum(IslandColor::class.java, it)){ // todo: fix
                     val island: Island = loadIsland(gameWorld, section.getConfigurationSection(it)!!)
                     gameWorld.islands.add(island)
+                } else {
+                    println("Not valid enum color key found $it")
                 }
             }
             gameWorld.lobbyPosition = from(gameWorld.world, section.getConfigurationSection("lobbySpawn")!!)
@@ -51,7 +54,7 @@ class ConfigurationManager(var gameManager: GameManager) {
             mapSection.createSection("lobbySpawn")
         }
 
-        writeLocation(gameWorld.lobbyPosition, mapSection)
+        writeLocation(gameWorld.lobbyPosition, lobbySection)
     }
 
     private fun loadGenerators(world: GameWorld?, section: ConfigurationSection): MutableList<Generator?>? {
@@ -77,7 +80,12 @@ class ConfigurationManager(var gameManager: GameManager) {
 
     fun randomMapName(): String {
         val mapNames = configuration.getKeys(false).toTypedArray()
-        return mapNames[0]
+
+        return if(mapNames.size == 0){
+            mapNames.first()
+        } else {
+            mapNames[Random.nextInt(mapNames.size)]
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -152,7 +160,7 @@ class ConfigurationManager(var gameManager: GameManager) {
 
         colorSection.set("generators", null)
 
-        val generatorSection: ConfigurationSection = mapSection.createSection("generators")
+        val generatorSection: ConfigurationSection = colorSection.createSection("generators")
 
         island.islandGenerators.forEach {
             val section: ConfigurationSection = generatorSection.createSection(UUID.randomUUID().toString())
