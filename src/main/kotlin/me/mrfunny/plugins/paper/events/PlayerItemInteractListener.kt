@@ -2,6 +2,8 @@ package me.mrfunny.plugins.paper.events
 
 import me.mrfunny.plugins.paper.gui.SetupWizardIslandSelectorGUI
 import me.mrfunny.plugins.paper.gamemanager.GameManager
+import me.mrfunny.plugins.paper.gamemanager.GameState
+import me.mrfunny.plugins.paper.gui.TeamPickerGUI
 import me.mrfunny.plugins.paper.worlds.Island
 import me.mrfunny.plugins.paper.worlds.generators.Generator
 import me.mrfunny.plugins.paper.worlds.generators.GeneratorType
@@ -115,6 +117,11 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
                 }
             }
             else -> return
+        }
+
+        if(ChatColor.stripColor(event.item?.itemMeta?.displayName).toLowerCase() == "Select team" && (gameManager.state == GameState.LOBBY || gameManager.state == GameState.STARTING)){
+            val teamPickerGUI = TeamPickerGUI(gameManager, event.player)
+            gameManager.guiManager.setGUI(player, teamPickerGUI)
         }
 
     }

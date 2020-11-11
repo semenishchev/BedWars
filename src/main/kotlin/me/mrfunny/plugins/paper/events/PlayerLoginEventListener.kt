@@ -45,6 +45,7 @@ class PlayerLoginEventListener(private val gameManager: GameManager) : Listener 
             }
         } else if (gameManager.state == GameState.LOBBY) {
             event.player.teleport(gameManager.world.lobbyPosition)
+            gameManager.playerManager.playerTeamSelector(event.player)
         }
     }
 

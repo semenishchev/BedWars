@@ -7,4 +7,7 @@ depend: [ExampleJScoreboardPlugin]
 
 commands:
   setup:
+    aliases: [cococo, funnyglek]
   start:
+    aliases: [mrfunnytop, mrfunny, funny, funnytop, bwstart, kartoplya]
+    

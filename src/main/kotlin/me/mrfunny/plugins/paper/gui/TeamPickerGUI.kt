@@ -1,6 +1,7 @@
 package me.mrfunny.plugins.paper.gui
 
 import me.mrfunny.plugins.paper.gamemanager.GameManager
+import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.util.ItemBuilder
 import me.mrfunny.plugins.paper.worlds.Island
 import me.mrfunny.plugins.paper.worlds.IslandColor
@@ -29,6 +30,7 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
             val itemBuilder = ItemBuilder(it.color.woolMaterial())
                 .setName("${it.color.getChatColor()}${it.color.formattedName()}")
                 .addLoreLine(if(it.isMember(player))"&aSelected" else "")
+                .addLoreLine("&a${it.players.size}/${gameManager.world.maxTeamSize} players")
 
             if(it.isMember(player)){
                 itemBuilder.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1)
@@ -61,7 +63,11 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
 
         if(selectedIsland.isPresent){
             val island: Island = selectedIsland.get()
-            island.players.add(player)
+            if(island.players.size == gameManager.world.maxTeamSize){
+                player.sendMessage(Colorize.c("&cThat team is full"))
+            } else {
+                island.players.add(player)
+            }
         }
 
         return null

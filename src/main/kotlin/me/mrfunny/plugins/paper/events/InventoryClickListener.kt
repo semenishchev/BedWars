@@ -2,7 +2,9 @@ package me.mrfunny.plugins.paper.events
 
 import me.mrfunny.plugins.paper.gui.GUI
 import me.mrfunny.plugins.paper.gamemanager.GameManager
+import me.mrfunny.plugins.paper.gamemanager.GameState
 import org.bukkit.ChatColor
+import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -13,6 +15,7 @@ class InventoryClickListener(private val gameManager: GameManager) : Listener {
 
     @EventHandler
     fun onClick(event: InventoryClickEvent){
+        if(gameManager.state == GameState.LOBBY && event.whoClicked.gameMode != GameMode.CREATIVE) return
         if(event.currentItem == null) return
         if(!event.currentItem!!.hasItemMeta()) return
         if(event.currentItem == null) return

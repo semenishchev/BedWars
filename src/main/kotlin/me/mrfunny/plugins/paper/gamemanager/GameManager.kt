@@ -16,13 +16,12 @@ import org.bukkit.entity.Player
 
 class GameManager(var plugin: BedWars) {
 
-
     var scoreboard: JPerPlayerScoreboard
     var setupWizardManager: SetupWizardManager = SetupWizardManager
     var configurationManager: ConfigurationManager = ConfigurationManager(this)
     var guiManager: GUIManager = GUIManager
 
-    private val playerManager: PlayerManager = PlayerManager(this)
+    val playerManager: PlayerManager = PlayerManager(this)
 
     lateinit var world: GameWorld
 
@@ -36,6 +35,8 @@ class GameManager(var plugin: BedWars) {
                 Bukkit.getOnlinePlayers().forEach {
                     it.teleport(world.lobbyPosition)
                 }
+
+                playerManager.giveAllTeamSelector()
             }
 
             GameState.STARTING -> {
@@ -48,7 +49,6 @@ class GameManager(var plugin: BedWars) {
 
                 Bukkit.getOnlinePlayers().forEach {
                     playerManager.setPlaying(it)
-
                 }
             }
 

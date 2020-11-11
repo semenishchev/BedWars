@@ -41,8 +41,13 @@ class PlayerManager(private val gameManager: GameManager) {
 
     fun giveAllTeamSelector(){
         Bukkit.getOnlinePlayers().forEach {
-            it.inventory.clear()
-            it.inventory.addItem(ItemBuilder(Material.WHITE_WOOL).setName("Select team").toItemStack())
+            playerTeamSelector(it)
         }
+    }
+
+    fun playerTeamSelector(player: Player){
+        player.inventory.clear()
+        player.inventory.clear()
+        player.inventory.addItem(ItemBuilder(Material.WHITE_WOOL).setName("Select team").toItemStack())
     }
 }

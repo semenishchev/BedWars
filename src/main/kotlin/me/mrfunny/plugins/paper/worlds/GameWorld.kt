@@ -18,9 +18,11 @@ class GameWorld(var name: String) {
     lateinit var lobbyPosition: Location
     lateinit var destinationWorldFolder: File
 
+    val maxTeamSize: Int = 1
+
     fun loadWorld(gameManager: GameManager, loadingIntoPlaying: Boolean, runnable: Runnable) {
         val sourceFolder = File("${gameManager.plugin.dataFolder.canonicalPath}${File.separator}..${File.separator}..${File.separator}$name")
-        destinationWorldFolder = File(name + if (loadingIntoPlaying) "_playing" else "")
+        destinationWorldFolder = File(sourceFolder.path + if (loadingIntoPlaying) "_playing" else "")
         try{
             copyFolder(sourceFolder, destinationWorldFolder)
         } catch (ex: IOException){
@@ -72,9 +74,8 @@ class GameWorld(var name: String) {
     }
 
     fun resetWorld(){
-        if(world == null) return
-
         val worldName: String = world.name
+        
         Bukkit.unloadWorld(world, false)
 
         if(delete(destinationWorldFolder)){
