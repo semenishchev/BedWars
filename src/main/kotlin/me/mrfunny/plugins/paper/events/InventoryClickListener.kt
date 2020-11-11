@@ -1,7 +1,7 @@
 package me.mrfunny.plugins.paper.events
 
 import me.mrfunny.plugins.paper.gui.GUI
-import me.mrfunny.plugins.paper.manager.GameManager
+import me.mrfunny.plugins.paper.gamemanager.GameManager
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler

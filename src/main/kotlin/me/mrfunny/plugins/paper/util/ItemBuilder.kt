@@ -14,9 +14,10 @@ import java.util.*
  * Easily create itemstacks, without messing your hands.
  * *Note that if you do use this in one of your projects, leave this notice.*
  * *Please do credit me if you do use this in one of your projects.*
- * @author NonameSL
+ * @author NonameSL, edit MrFunny
  */
 class ItemBuilder {
+
     private var `is`: ItemStack
 
     /**
@@ -196,11 +197,11 @@ class ItemBuilder {
      * Add a lore line.
      * @param line The lore line to add.
      */
-    fun addLoreLine(line: String?): ItemBuilder {
+    fun addLoreLine(line: String): ItemBuilder {
         val im = `is`.itemMeta
         var lore: MutableList<String?> = ArrayList()
         if (im.hasLore()) lore = ArrayList(im.lore)
-        lore.add(line)
+        lore.add(Colorize.c(line))
         im.lore = lore
         `is`.itemMeta = im
         return this

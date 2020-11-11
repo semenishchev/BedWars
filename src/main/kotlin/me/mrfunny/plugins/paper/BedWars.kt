@@ -3,7 +3,7 @@ package me.mrfunny.plugins.paper
 import me.mrfunny.plugins.paper.commands.SetupWizardCommand
 import me.mrfunny.plugins.paper.commands.StartCommand
 import me.mrfunny.plugins.paper.events.*
-import me.mrfunny.plugins.paper.manager.GameManager
+import me.mrfunny.plugins.paper.gamemanager.GameManager
 import org.bukkit.Bukkit
 
 import org.bukkit.plugin.java.JavaPlugin

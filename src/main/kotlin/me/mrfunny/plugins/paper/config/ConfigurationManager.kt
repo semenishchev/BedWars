@@ -1,6 +1,6 @@
 package me.mrfunny.plugins.paper.config
 
-import me.mrfunny.plugins.paper.manager.GameManager
+import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.worlds.IslandColor
 import me.mrfunny.plugins.paper.worlds.GameWorld
 import me.mrfunny.plugins.paper.worlds.Island

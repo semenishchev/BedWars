@@ -1,9 +1,8 @@
 package me.mrfunny.plugins.paper.worlds
 
-import me.mrfunny.plugins.paper.manager.GameManager
+import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.worlds.generators.Generator
 import org.bukkit.*
-import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import java.io.*
 import java.util.*
@@ -13,21 +12,29 @@ import kotlin.collections.ArrayList
 class GameWorld(var name: String) {
     lateinit var world: World
     var islands = arrayListOf<Island>()
+
     var generators: ArrayList<Generator> = arrayListOf()
+
     lateinit var lobbyPosition: Location
+    lateinit var destinationWorldFolder: File
 
     fun loadWorld(gameManager: GameManager, loadingIntoPlaying: Boolean, runnable: Runnable) {
         val sourceFolder = File("${gameManager.plugin.dataFolder.canonicalPath}${File.separator}..${File.separator}..${File.separator}$name")
-        val dest = File(name + if (loadingIntoPlaying) "_playing" else "")
+        destinationWorldFolder = File(name + if (loadingIntoPlaying) "_playing" else "")
         try{
-            copyFolder(sourceFolder, dest)
+            copyFolder(sourceFolder, destinationWorldFolder)
         } catch (ex: IOException){
             ex.printStackTrace()
         }
 
         val creator = WorldCreator(name + if (loadingIntoPlaying) "_playing" else "")
         world = creator.createWorld()!!
+
         world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false)
+        world.setGameRule(GameRule.DISABLE_RAIDS, true)
+        world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false)
+        world.setGameRule(GameRule.DO_MOB_SPAWNING, false)
+
 
         runnable.run()
     }
@@ -70,9 +77,7 @@ class GameWorld(var name: String) {
         val worldName: String = world.name
         Bukkit.unloadWorld(world, false)
 
-        val file = File("${Bukkit.getWorldContainer().absolutePath.replace(".", "")}${world.name}")
-
-        if(delete(file)){
+        if(delete(destinationWorldFolder)){
             println("[BedWars] Reset map $worldName")
         } else {
             println("[BedWard] Failed to delete $worldName")

@@ -1,6 +1,6 @@
 package me.mrfunny.plugins.paper.gui
 
-import me.mrfunny.plugins.paper.manager.GameManager
+import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.worlds.IslandColor
 import me.mrfunny.plugins.paper.util.ItemBuilder
 import org.bukkit.Bukkit
@@ -24,7 +24,7 @@ class SetupWizardIslandSelectorGUI(var gameManager: GameManager) : GUI {
     init {
         IslandColor.values().forEach {
             inventory.addItem(
-                ItemBuilder(it.woolMaterial()).setName("${it.getChatColor()} ${it.formattedName()}").toItemStack()
+                ItemBuilder(it.woolMaterial()).setName("${it.getChatColor()}${it.formattedName()}").toItemStack()
             )
         }
 

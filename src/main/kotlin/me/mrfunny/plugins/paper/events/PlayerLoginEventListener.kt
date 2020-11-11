@@ -1,9 +1,8 @@
 package me.mrfunny.plugins.paper.events
 
-import me.mrfunny.plugins.paper.manager.GameManager
-import me.mrfunny.plugins.paper.manager.GameState
+import me.mrfunny.plugins.paper.gamemanager.GameManager
+import me.mrfunny.plugins.paper.gamemanager.GameState
 import org.bukkit.Bukkit
-import org.bukkit.GameMode
 import org.bukkit.OfflinePlayer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener

@@ -1,11 +1,9 @@
 package me.mrfunny.plugins.paper.tasks
 
-import me.mrfunny.plugins.paper.manager.GameManager
-import me.mrfunny.plugins.paper.manager.GameState
+import me.mrfunny.plugins.paper.gamemanager.GameManager
+import me.mrfunny.plugins.paper.gamemanager.GameState
 import me.mrfunny.plugins.paper.util.Colorize
 import org.bukkit.Bukkit
-import org.bukkit.Instrument
-import org.bukkit.Note
 import org.bukkit.Sound
 import org.bukkit.boss.BarColor
 import org.bukkit.boss.BarStyle

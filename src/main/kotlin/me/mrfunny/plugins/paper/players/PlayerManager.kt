@@ -1,8 +1,9 @@
 package me.mrfunny.plugins.paper.players
 
-import me.mrfunny.plugins.paper.manager.GameManager
+import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.util.ItemBuilder
 import me.mrfunny.plugins.paper.worlds.Island
+import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -36,5 +37,12 @@ class PlayerManager(private val gameManager: GameManager) {
             .setLeatherArmorColor(island.color.getColor())
             .setUnbreakable(true)
             .toItemStack()
+    }
+
+    fun giveAllTeamSelector(){
+        Bukkit.getOnlinePlayers().forEach {
+            it.inventory.clear()
+            it.inventory.addItem(ItemBuilder(Material.WHITE_WOOL).setName("Select team").toItemStack())
+        }
     }
 }

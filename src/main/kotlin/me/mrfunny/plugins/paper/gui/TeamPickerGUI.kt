@@ -1,0 +1,73 @@
+package me.mrfunny.plugins.paper.gui
+
+import me.mrfunny.plugins.paper.gamemanager.GameManager
+import me.mrfunny.plugins.paper.util.ItemBuilder
+import me.mrfunny.plugins.paper.worlds.Island
+import me.mrfunny.plugins.paper.worlds.IslandColor
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
+import org.bukkit.Material
+import org.bukkit.enchantments.Enchantment
+import org.bukkit.entity.Player
+import org.bukkit.inventory.Inventory
+import org.bukkit.inventory.InventoryView
+import org.bukkit.inventory.ItemStack
+import java.util.*
+
+class TeamPickerGUI(private val gameManager: GameManager, private val player: Player) : GUI {
+
+    override val name: String = "Select island"
+
+    companion object Name {
+        const val name: String = "Select island"
+    }
+
+    override val inventory: Inventory = Bukkit.createInventory(null, 27, name)
+
+    init {
+        gameManager.world.islands.forEach {
+            val itemBuilder = ItemBuilder(it.color.woolMaterial())
+                .setName("${it.color.getChatColor()}${it.color.formattedName()}")
+                .addLoreLine(if(it.isMember(player))"&aSelected" else "")
+
+            if(it.isMember(player)){
+                itemBuilder.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1)
+            }
+            inventory.addItem(itemBuilder.toItemStack())
+        }
+
+        inventory.addItem(ItemBuilder(Material.BARRIER).setName("&cExit").toItemStack())
+    }
+
+    override fun handleClick(player: Player, itemStack: ItemStack, view: InventoryView): GUI? {
+        lateinit var clickedColor: IslandColor
+
+        val itemName: String = ChatColor.stripColor(itemStack.itemMeta.displayName)!!.substring(1)
+
+        for (color: IslandColor in IslandColor.values()) {
+            if (itemName.equals(color.formattedName(), true)) {
+                clickedColor = color
+                break
+            }
+        }
+
+        val playerIsland: Optional<Island> = gameManager.world.islands.stream().filter { island -> island.isMember(player) }.findFirst()
+
+        if(playerIsland.isPresent){
+            playerIsland.get().players.remove(player)
+        }
+
+        val selectedIsland: Optional<Island> = gameManager.world.islands.stream().filter { island -> island.color == clickedColor }.findFirst()
+
+        if(selectedIsland.isPresent){
+            val island: Island = selectedIsland.get()
+            island.players.add(player)
+        }
+
+        return null
+    }
+
+    override fun isInventory(view: InventoryView): Boolean {
+        return view.title == name
+    }
+}

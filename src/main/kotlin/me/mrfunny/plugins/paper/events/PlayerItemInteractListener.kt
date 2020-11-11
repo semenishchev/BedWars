@@ -1,7 +1,7 @@
 package me.mrfunny.plugins.paper.events
 
 import me.mrfunny.plugins.paper.gui.SetupWizardIslandSelectorGUI
-import me.mrfunny.plugins.paper.manager.GameManager
+import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.worlds.Island
 import me.mrfunny.plugins.paper.worlds.generators.Generator
 import me.mrfunny.plugins.paper.worlds.generators.GeneratorType
@@ -12,7 +12,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.scheduler.BukkitRunnable
 
 class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
 

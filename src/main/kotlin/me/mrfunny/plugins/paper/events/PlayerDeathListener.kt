@@ -1,20 +1,20 @@
 package me.mrfunny.plugins.paper.events
 
-import me.mrfunny.plugins.paper.manager.GameManager
-import me.mrfunny.plugins.paper.manager.GameState
+import me.mrfunny.plugins.paper.gamemanager.GameManager
+import me.mrfunny.plugins.paper.gamemanager.GameState
 import me.mrfunny.plugins.paper.tasks.PlayerRespawnTask
 import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.worlds.Island
 import org.bukkit.Bukkit
-import org.bukkit.Color
 import org.bukkit.GameMode
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
+import org.bukkit.entity.Skeleton
+import org.bukkit.entity.Villager
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.scheduler.BukkitTask
 
 class PlayerDeathListener(private val gameManager: GameManager) : Listener {
@@ -49,7 +49,12 @@ class PlayerDeathListener(private val gameManager: GameManager) : Listener {
 
     @EventHandler
     fun onDamageByOther(event: EntityDamageByEntityEvent){
-        if(event.damager !is Player && event.entity !is Player) return
+        if(event.entity !is Player) {
+            if(event.entity is Villager || event.entity is Skeleton){
+                event.isCancelled = true
+            }
+            return
+        }
 
         val damager: Player = event.damager as Player
         val player: Player = event.entity as Player

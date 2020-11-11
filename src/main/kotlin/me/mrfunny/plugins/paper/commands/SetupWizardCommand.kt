@@ -1,10 +1,7 @@
 package me.mrfunny.plugins.paper.commands
 
-import me.mrfunny.plugins.paper.manager.GameManager
+import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.worlds.GameWorld
-import org.bukkit.ChatColor
-import org.bukkit.World
-import org.bukkit.WorldCreator
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender

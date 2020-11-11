@@ -1,7 +1,7 @@
 package me.mrfunny.plugins.paper.events
 
-import me.mrfunny.plugins.paper.manager.GameManager
-import me.mrfunny.plugins.paper.manager.GameState
+import me.mrfunny.plugins.paper.gamemanager.GameManager
+import me.mrfunny.plugins.paper.gamemanager.GameState
 import me.mrfunny.plugins.paper.worlds.Island
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
