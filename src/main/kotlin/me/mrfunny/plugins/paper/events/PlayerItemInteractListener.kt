@@ -21,14 +21,21 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
     @EventHandler
     fun onInteract(event: PlayerInteractEvent){
         if(!event.hasItem()) return
-        if(!gameManager.setupWizardManager.isInWizard(event.player)) return
+
         if(event.item == null) return
         if(event.item!!.itemMeta == null) return
         if(!(event.item!!.hasItemMeta())) return
 
         val player: Player = event.player
 
-        val itemName: String? = ChatColor.stripColor(event.item?.itemMeta?.displayName)
+        val itemName: String? = ChatColor.stripColor(event.item?.itemMeta?.displayName).toLowerCase()
+
+        if(itemName == "select team" && gameManager.state == GameState.LOBBY || gameManager.state == GameState.STARTING){
+            val teamPickerGUI = TeamPickerGUI(gameManager, event.player)
+            gameManager.guiManager.setGUI(player, teamPickerGUI)
+            event.isCancelled = true
+            return
+        }
 
         val current: Location = player.location
         val clicked: Location = if(event.clickedBlock != null) event.clickedBlock!!.location else player.location
@@ -41,9 +48,10 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
 
         event.isCancelled = true
 
-        when(itemName.toLowerCase()){
+        if(!gameManager.setupWizardManager.isInWizard(event.player)) return
+
+        when(itemName){
             "set diamond generator" -> {
-                player.sendMessage("setting diamond generator")
                 val diamondGenerator = Generator(current, GeneratorType.DIAMOND)
                 gameManager.configurationManager.saveUnownedGenerator(player.world.name, diamondGenerator)
             }
@@ -104,6 +112,7 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
                 }
             }
             "set lobby spawn" -> {
+                player.sendMessage("Setting lobby spawn")
                 gameManager.setupWizardManager.getWorld(player)!!.lobbyPosition = current
                 gameManager.configurationManager.saveWorld(gameManager.setupWizardManager.getWorld(player)!!)
             }
@@ -117,11 +126,6 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
                 }
             }
             else -> return
-        }
-
-        if(ChatColor.stripColor(event.item?.itemMeta?.displayName).toLowerCase() == "Select team" && (gameManager.state == GameState.LOBBY || gameManager.state == GameState.STARTING)){
-            val teamPickerGUI = TeamPickerGUI(gameManager, event.player)
-            gameManager.guiManager.setGUI(player, teamPickerGUI)
         }
 
     }

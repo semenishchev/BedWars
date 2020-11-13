@@ -10,6 +10,7 @@ import me.mrfunny.plugins.paper.players.PlayerManager
 import me.mrfunny.plugins.paper.setup.SetupWizardManager
 import me.mrfunny.plugins.paper.tasks.GameStartingTask
 import me.mrfunny.plugins.paper.worlds.GameWorld
+import me.mrfunny.plugins.paper.worlds.Island
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -26,6 +27,20 @@ class GameManager(var plugin: BedWars) {
     lateinit var world: GameWorld
 
     lateinit var gameStartingTask: GameStartingTask
+
+    init {
+        configurationManager.loadWorld(configurationManager.randomMapName()) { world: GameWorld ->
+            this.world = world
+            state = GameState.LOBBY
+        }
+
+        this.scoreboard = JPerPlayerScoreboard({ player: Player ->
+            val lines = arrayListOf<String>()
+            lines.add("State: $state")
+            lines
+        }, JScoreboardOptions("&a&lBedWars", JScoreboardTabHealthStyle.NUMBER, true))
+
+    }
 
     var state: GameState = GameState.PRELOBBY
     set(value) {
@@ -49,9 +64,17 @@ class GameManager(var plugin: BedWars) {
 
                 Bukkit.getOnlinePlayers().forEach {
                     playerManager.setPlaying(it)
-                }
-            }
+                    val island: Island? = world.getIslandForPlayer(it)
 
+                    if(island == null){
+                        TODO("random assign")
+                    } else {
+                        it.teleport(island.spawnLocation!!)
+                    }
+
+                }
+
+            }
             GameState.WON -> {
                 Bukkit.broadcastMessage("${ChatColor.GREEN}MisterFunny01 won the game!")
             }
@@ -72,17 +95,6 @@ class GameManager(var plugin: BedWars) {
                 println("###################")
             }
         }
-    }
-
-    init {
-        this.configurationManager.loadWorld(this.configurationManager.randomMapName()) { state = GameState.LOBBY }
-
-        this.scoreboard = JPerPlayerScoreboard({ player: Player ->
-            val lines = arrayListOf<String>()
-            lines.add("State: $state")
-            lines
-        }, JScoreboardOptions("&a&lBedWars", JScoreboardTabHealthStyle.NUMBER, true))
-
     }
 
     fun endGameIfNeeded() {

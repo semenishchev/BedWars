@@ -75,7 +75,7 @@ class GameWorld(var name: String) {
 
     fun resetWorld(){
         val worldName: String = world.name
-        
+
         Bukkit.unloadWorld(world, false)
 
         if(delete(destinationWorldFolder)){

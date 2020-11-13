@@ -29,11 +29,11 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
         gameManager.world.islands.forEach {
             val itemBuilder = ItemBuilder(it.color.woolMaterial())
                 .setName("${it.color.getChatColor()}${it.color.formattedName()}")
-                .addLoreLine(if(it.isMember(player))"&aSelected" else "")
+                .addLoreLine(if(it.isMember(player))"&aSelected" else "&cNot selected")
                 .addLoreLine("&a${it.players.size}/${gameManager.world.maxTeamSize} players")
 
             if(it.isMember(player)){
-                itemBuilder.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1)
+                itemBuilder.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1).hideEnchantments()
             }
             inventory.addItem(itemBuilder.toItemStack())
         }
@@ -44,7 +44,7 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
     override fun handleClick(player: Player, itemStack: ItemStack, view: InventoryView): GUI? {
         lateinit var clickedColor: IslandColor
 
-        val itemName: String = ChatColor.stripColor(itemStack.itemMeta.displayName)!!.substring(1)
+        val itemName: String = ChatColor.stripColor(itemStack.itemMeta.displayName)!!
 
         for (color: IslandColor in IslandColor.values()) {
             if (itemName.equals(color.formattedName(), true)) {
@@ -69,6 +69,9 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
                 island.players.add(player)
             }
         }
+
+        view.close()
+        player.closeInventory()
 
         return null
     }

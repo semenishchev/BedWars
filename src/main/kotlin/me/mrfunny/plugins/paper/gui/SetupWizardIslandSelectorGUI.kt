@@ -35,10 +35,11 @@ class SetupWizardIslandSelectorGUI(var gameManager: GameManager) : GUI {
         lateinit var clickedColor: IslandColor
 
         if(!gameManager.setupWizardManager.isInWizard(player)) return null
-
-        val itemName: String = ChatColor.stripColor(itemStack.itemMeta.displayName)!!.substring(1)
+        println("pog")
+        val itemName: String = ChatColor.stripColor(itemStack.itemMeta.displayName)!!
 
         for(color: IslandColor in IslandColor.values()){
+            println(color)
             if(itemName.equals(color.formattedName(), true)){
                 clickedColor = color
                 break

@@ -31,7 +31,7 @@ class ConfigurationManager(var gameManager: GameManager) {
 
     fun loadWorld(mapName: String, consumer: Consumer<GameWorld>){
         val gameWorld = GameWorld(mapName)
-        gameWorld.loadWorld(gameManager, false){
+        gameWorld.loadWorld(gameManager, true){
             val section: ConfigurationSection = getMapSection(mapName)
             section.getKeys(false).forEach{
                 if(EnumUtils.isValidEnum(IslandColor::class.java, it)){ // todo: fix
@@ -41,7 +41,12 @@ class ConfigurationManager(var gameManager: GameManager) {
                     println("Not valid enum color key found $it")
                 }
             }
-            gameWorld.lobbyPosition = from(gameWorld.world, section.getConfigurationSection("lobbySpawn")!!)
+            if(section.getConfigurationSection("lobbySpawn") != null){
+                gameWorld.lobbyPosition = from(gameWorld.world, section.getConfigurationSection("lobbySpawn")!!)
+            } else {
+                gameWorld.lobbyPosition = gameWorld.world.spawnLocation
+            }
+
             consumer.accept(gameWorld)
         }
     }
@@ -55,6 +60,7 @@ class ConfigurationManager(var gameManager: GameManager) {
         }
 
         writeLocation(gameWorld.lobbyPosition, lobbySection)
+        gameManager.plugin.saveConfig()
     }
 
     private fun loadGenerators(world: GameWorld?, section: ConfigurationSection): MutableList<Generator?>? {
@@ -80,19 +86,12 @@ class ConfigurationManager(var gameManager: GameManager) {
 
     fun randomMapName(): String {
         val mapNames = configuration.getKeys(false).toTypedArray()
-
-        return if(mapNames.size == 0){
-            mapNames.first()
-        } else {
-            mapNames[Random.nextInt(mapNames.size)]
-        }
+        return mapNames[0]
     }
 
     @Suppress("UNCHECKED_CAST")
     fun loadIsland(world: GameWorld, section: ConfigurationSection): Island{
         val color: IslandColor = IslandColor.valueOf(section.name)
-
-        val locationsToWrite = hashMapOf<String, Location?>()
 
         val island = Island(world, color)
         try{

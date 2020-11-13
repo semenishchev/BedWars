@@ -7,6 +7,7 @@ import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.worlds.Island
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
+import org.bukkit.Sound
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 import org.bukkit.entity.Skeleton
@@ -15,6 +16,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.scheduler.BukkitTask
 
 class PlayerDeathListener(private val gameManager: GameManager) : Listener {
@@ -22,8 +24,14 @@ class PlayerDeathListener(private val gameManager: GameManager) : Listener {
     @EventHandler
     fun onDamage(event: EntityDamageEvent){
 
-        if(event.entity !is Player) return
-        if(gameManager.state != GameState.ACTIVE) return
+        if(gameManager.state != GameState.ACTIVE) { event.isCancelled = true; return;}
+
+        if(event.entity !is Player) {
+            if(event.entity is Villager || event.entity is Skeleton){
+                event.isCancelled = true
+            }
+            return
+        }
 
         val player: Player = event.entity as Player
         val playerIsland: Island? = gameManager.world.getIslandForPlayer(player)
@@ -32,7 +40,7 @@ class PlayerDeathListener(private val gameManager: GameManager) : Listener {
             return
         }
 
-        if(event.finalDamage >= player.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value){
+        if(event.finalDamage >= player.health){
             event.isCancelled = true
             player.health = player.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
             player.gameMode = GameMode.SPECTATOR
@@ -49,19 +57,30 @@ class PlayerDeathListener(private val gameManager: GameManager) : Listener {
 
     @EventHandler
     fun onDamageByOther(event: EntityDamageByEntityEvent){
-        if(event.entity !is Player) {
-            if(event.entity is Villager || event.entity is Skeleton){
-                event.isCancelled = true
-            }
-            return
-        }
 
         val damager: Player = event.damager as Player
         val player: Player = event.entity as Player
-        if(event.finalDamage >= player.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value){
+        if(event.finalDamage >= player.health){
             damager.sendMessage(Colorize.c("&aYou killed ${player.name}"))
+            damager.playSound(damager.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f)
         }
 
+    }
 
+    @EventHandler
+    fun onVoidTouch(event: PlayerMoveEvent){
+        val player: Player = event.player
+        if(event.to.x < -30){
+            player.health = player.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
+            player.gameMode = GameMode.SPECTATOR
+            player.teleport(gameManager.world.lobbyPosition)
+            val playerIsland: Island? = gameManager.world.getIslandForPlayer(player)
+            if(playerIsland != null || playerIsland?.isBedPlaced()!!){
+                val task: BukkitTask = Bukkit.getScheduler().runTaskTimer(gameManager.plugin, PlayerRespawnTask(player, gameManager.world.getIslandForPlayer(player)!!), 0, 20)
+                Bukkit.getScheduler().runTaskLater(gameManager.plugin, task::cancel, 20 * 6)
+            } else {
+                player.sendTitle(Colorize.c("&cYOU DIED"), null, 0, 20, 20)
+            }
+        }
     }
 }

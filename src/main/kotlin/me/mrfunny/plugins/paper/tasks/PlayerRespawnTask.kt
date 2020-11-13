@@ -15,14 +15,14 @@ class PlayerRespawnTask(private var player: Player, var playerIsland: Island) : 
 
     override fun run() {
         if(tick == 5){
-            player.sendTitle("&aRespawned", null, 20, 20, 20)
+            player.sendTitle(Colorize.c("&aRespawned"), null, 20, 20, 20)
             playerIsland.absolutelyAlive.remove(player.uniqueId)
             player.gameMode = GameMode.SURVIVAL
             player.teleport(playerIsland.spawnLocation!!)
             return
         }
 
-        player.sendTitle(Colorize.c("&cYou died"), Colorize.c("&aRespawning at ${5 - tick}..."), 30, 30, 30)
+        player.sendTitle(Colorize.c("&cYou died"), Colorize.c("&aRespawning at ${5 - tick}..."), 0, 30, 30)
 
         tick++
     }

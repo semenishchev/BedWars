@@ -4,6 +4,7 @@ import me.mrfunny.plugins.paper.commands.SetupWizardCommand
 import me.mrfunny.plugins.paper.commands.StartCommand
 import me.mrfunny.plugins.paper.events.*
 import me.mrfunny.plugins.paper.gamemanager.GameManager
+import me.mrfunny.plugins.paper.gamemanager.GameState
 import org.bukkit.Bukkit
 
 import org.bukkit.plugin.java.JavaPlugin
@@ -33,6 +34,8 @@ class BedWars : JavaPlugin() {
         server.onlinePlayers.forEach {
             gameManager.scoreboard.addPlayer(it)
         }
+
+        gameManager.state = GameState.LOBBY
 
         server.pluginManager.registerEvents(PlayerLoginEventListener(gameManager), this)
         server.pluginManager.registerEvents(PlayerItemInteractListener(gameManager), this)

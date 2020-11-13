@@ -3,10 +3,7 @@ package me.mrfunny.plugins.paper.worlds
 import com.sk89q.worldedit.math.BlockVector3
 import com.sk89q.worldedit.regions.CuboidRegion
 import me.mrfunny.plugins.paper.worlds.generators.Generator
-import org.bukkit.Bukkit
-import org.bukkit.GameMode
-import org.bukkit.Location
-import org.bukkit.OfflinePlayer
+import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import java.util.*
@@ -45,7 +42,32 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
 
     fun isBedPlaced(): Boolean{
         if(bedLocation == null) return false
-        return !bedLocation?.block?.type.toString().contains("BED")
+
+        if(bedLocation!!.block.type.name.contains("BED")){
+            return true
+        }
+
+        val oneExtraZ = bedLocation!!.add(.0, .0, 1.0)
+        if(oneExtraZ.block.type.name.contains("BED")){
+            return true
+        }
+
+        val oneExtraX = bedLocation!!.add(1.0, .0, .0)
+        if(oneExtraX.block.type.name.contains("BED")){
+            return true
+        }
+
+        val oneLessZ = bedLocation!!.add(.0, .0, -1.0)
+        if(oneLessZ.block.type.name.contains("BED")){
+            return true
+        }
+
+        val oneLessX = bedLocation!!.add(-1.0, .0, .0)
+        if(oneLessX.block.type.name.contains("BED")){
+            return true
+        }
+
+        return false
     }
 
     fun alivePlayerCount(): Int{

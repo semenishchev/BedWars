@@ -15,8 +15,17 @@ class InventoryClickListener(private val gameManager: GameManager) : Listener {
 
     @EventHandler
     fun onClick(event: InventoryClickEvent){
-        if(gameManager.state == GameState.LOBBY && event.whoClicked.gameMode != GameMode.CREATIVE) return
+        if(gameManager.state == GameState.LOBBY && event.whoClicked.gameMode != GameMode.CREATIVE) event.isCancelled = true
         if(event.currentItem == null) return
+
+        val materialName: String = event.currentItem!!.type.name
+        if(materialName.contains("HELMET")
+            || materialName.contains("CHESTPLATE")
+            || materialName.contains("LEGGINGS")
+            || materialName.contains("BOOTS")){
+            event.isCancelled = true
+        }
+
         if(!event.currentItem!!.hasItemMeta()) return
         if(event.currentItem == null) return
 
