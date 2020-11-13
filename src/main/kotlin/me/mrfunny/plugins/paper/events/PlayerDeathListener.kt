@@ -50,6 +50,12 @@ class PlayerDeathListener(private val gameManager: GameManager) : Listener {
                 Bukkit.getScheduler().runTaskLater(gameManager.plugin, task::cancel, 20 * 6)
             } else {
                 player.sendTitle(Colorize.c("&cYOU DIED"), null, 0, 20, 20)
+
+                if(!gameManager.world.getActiveIslands().contains(playerIsland)){
+                    Bukkit.broadcastMessage(Colorize.c("${playerIsland.color.formattedName()} &fis out"))
+                }
+
+                gameManager.endGameIfNeeded()
             }
         }
     }
@@ -57,7 +63,7 @@ class PlayerDeathListener(private val gameManager: GameManager) : Listener {
 
     @EventHandler
     fun onDamageByOther(event: EntityDamageByEntityEvent){
-
+        if(event.damager !is Player && event.entity !is Player) return
         val damager: Player = event.damager as Player
         val player: Player = event.entity as Player
         if(event.finalDamage >= player.health){
@@ -65,22 +71,5 @@ class PlayerDeathListener(private val gameManager: GameManager) : Listener {
             damager.playSound(damager.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f)
         }
 
-    }
-
-    @EventHandler
-    fun onVoidTouch(event: PlayerMoveEvent){
-        val player: Player = event.player
-        if(event.to.x < -30){
-            player.health = player.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
-            player.gameMode = GameMode.SPECTATOR
-            player.teleport(gameManager.world.lobbyPosition)
-            val playerIsland: Island? = gameManager.world.getIslandForPlayer(player)
-            if(playerIsland != null || playerIsland?.isBedPlaced()!!){
-                val task: BukkitTask = Bukkit.getScheduler().runTaskTimer(gameManager.plugin, PlayerRespawnTask(player, gameManager.world.getIslandForPlayer(player)!!), 0, 20)
-                Bukkit.getScheduler().runTaskLater(gameManager.plugin, task::cancel, 20 * 6)
-            } else {
-                player.sendTitle(Colorize.c("&cYOU DIED"), null, 0, 20, 20)
-            }
-        }
     }
 }

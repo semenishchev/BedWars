@@ -47,22 +47,22 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
             return true
         }
 
-        val oneExtraZ = bedLocation!!.add(.0, .0, 1.0)
+        val oneExtraZ = bedLocation!!.clone().add(0.0, 0.0, 1.0)
         if(oneExtraZ.block.type.name.contains("BED")){
             return true
         }
 
-        val oneExtraX = bedLocation!!.add(1.0, .0, .0)
+        val oneExtraX = bedLocation!!.clone().add(1.0, 0.0, 0.0)
         if(oneExtraX.block.type.name.contains("BED")){
             return true
         }
 
-        val oneLessZ = bedLocation!!.add(.0, .0, -1.0)
+        val oneLessZ = bedLocation!!.clone().add(0.0, .0, -1.0)
         if(oneLessZ.block.type.name.contains("BED")){
             return true
         }
 
-        val oneLessX = bedLocation!!.add(-1.0, .0, .0)
+        val oneLessX = bedLocation!!.clone().add(-1.0, 0.0, .0)
         if(oneLessX.block.type.name.contains("BED")){
             return true
         }

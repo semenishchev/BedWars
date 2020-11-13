@@ -100,42 +100,25 @@ class GameWorld(var name: String) {
                 return@filter true
             }
 
-            val oneExtraZ = location.add(.0, .0, 1.0)
-            if(it.bedLocation == oneExtraZ){
-                return@filter true
+            val oneExtraZ = location.clone().add(0.0, .0, 1.0)
+            val oneLessZ = location.clone().add(0.0, .0, -1.0)
+            val oneExtraX = location.clone().add(1.0, .0, 0.0)
+            val oneLessX = location.clone().add(-1.0, 0.0, 0.0)
+
+
+            val locations: Array<Location> = arrayOf(oneExtraZ, oneExtraX, oneLessZ, oneLessX)
+
+            for(toCheck: Location in locations){
+                if(toCheck == it.bedLocation && toCheck.block.type.name.contains("BED")){
+                    return@filter true
+                }
             }
 
-            val oneExtraX = location.add(1.0, .0, .0)
-            if(it.bedLocation == oneExtraX){
-                return@filter true
-            }
-
-            val oneLessZ = location.add(.0, .0, -1.0)
-            if(it.bedLocation == oneLessZ){
-                return@filter true
-            }
-
-            val oneLessX = location.add(-1.0, .0, .0)
-            if(it.bedLocation == oneLessX){
-                return@filter true
-            }
 
             return@filter false
         }.findFirst()
 
         return islandOptional.orElse(null)
-    }
-
-    fun getSpawnForTeamColor(color: IslandColor): Location? {
-        val optional: Optional<Island> = islands.stream().filter{
-            it.color == color
-        }.findFirst()
-
-        if(!optional.isPresent){
-            return null
-        }
-
-        return optional.get().spawnLocation
     }
 
     fun getIslandForPlayer(player: Player): Island? {

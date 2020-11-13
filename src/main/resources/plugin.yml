@@ -10,4 +10,5 @@ commands:
     aliases: [cococo, funnyglek]
   start:
     aliases: [mrfunnytop, mrfunny, funny, funnytop, bwstart, kartoplya]
+  forcestart:
     

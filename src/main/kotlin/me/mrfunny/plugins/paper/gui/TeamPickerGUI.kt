@@ -45,9 +45,10 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
         lateinit var clickedColor: IslandColor
 
         val itemName: String = ChatColor.stripColor(itemStack.itemMeta.displayName)!!
-
+        println(itemName)
         for (color: IslandColor in IslandColor.values()) {
             if (itemName.equals(color.formattedName(), true)) {
+                println(color)
                 clickedColor = color
                 break
             }
@@ -67,6 +68,7 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
                 player.sendMessage(Colorize.c("&cThat team is full"))
             } else {
                 island.players.add(player)
+                gameManager.playerManager.giveTeamArmor(player, island)
             }
         }
 

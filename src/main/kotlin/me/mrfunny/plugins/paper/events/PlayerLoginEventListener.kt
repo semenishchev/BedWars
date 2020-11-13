@@ -3,6 +3,7 @@ package me.mrfunny.plugins.paper.events
 import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.gamemanager.GameState
 import org.bukkit.Bukkit
+import org.bukkit.GameMode
 import org.bukkit.OfflinePlayer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -44,7 +45,10 @@ class PlayerLoginEventListener(private val gameManager: GameManager) : Listener 
                 }
             }
         } else if (gameManager.state == GameState.LOBBY) {
+            event.player.gameMode = GameMode.SURVIVAL
             event.player.teleport(gameManager.world.lobbyPosition)
+            event.player.enderChest.clear()
+            event.player.inventory.clear()
             gameManager.playerManager.playerTeamSelector(event.player)
         }
     }

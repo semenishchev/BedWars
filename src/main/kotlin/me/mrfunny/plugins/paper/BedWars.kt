@@ -1,5 +1,6 @@
 package me.mrfunny.plugins.paper
 
+import me.mrfunny.plugins.paper.commands.ForcestartCommand
 import me.mrfunny.plugins.paper.commands.SetupWizardCommand
 import me.mrfunny.plugins.paper.commands.StartCommand
 import me.mrfunny.plugins.paper.events.*
@@ -28,8 +29,9 @@ class BedWars : JavaPlugin() {
             println(it)
         }
 
-        getCommand("setup")!!.setExecutor(SetupWizardCommand(gameManager))
-        getCommand("start")!!.setExecutor(StartCommand(gameManager))
+        getCommand("setup")?.setExecutor(SetupWizardCommand(gameManager))
+        getCommand("start")?.setExecutor(StartCommand(gameManager))
+        getCommand("forcestart")?.setExecutor(ForcestartCommand(gameManager))
 
         server.onlinePlayers.forEach {
             gameManager.scoreboard.addPlayer(it)
@@ -44,6 +46,7 @@ class BedWars : JavaPlugin() {
         server.pluginManager.registerEvents(PlayerDeathListener(gameManager), this)
         server.pluginManager.registerEvents(ItemListener, this)
         server.pluginManager.registerEvents(HungerListener(gameManager), this)
+        server.pluginManager.registerEvents(ChatListeners(gameManager), this)
     }
 
     override fun onDisable() {

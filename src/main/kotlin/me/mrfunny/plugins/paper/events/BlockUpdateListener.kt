@@ -2,11 +2,9 @@ package me.mrfunny.plugins.paper.events
 
 import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.gamemanager.GameState
+import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.worlds.Island
-import org.bukkit.ChatColor
-import org.bukkit.GameMode
-import org.bukkit.Location
-import org.bukkit.Material
+import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -19,7 +17,7 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
     fun onBreak(event: BlockBreakEvent){
         if(event.player.gameMode == GameMode.CREATIVE) return
         if(gameManager.state != GameState.ACTIVE && gameManager.state != GameState.WON) {
-            event.isCancelled = true
+            event.isCancelled = true 
             return
         }
 
@@ -31,11 +29,22 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
 
             val island: Island = gameManager.world.getIslandForBedLocation(location)!!
 
-            if(!island.isMember(player)){
-                event.block.type = Material.AIR
-            }
+            println("Bed broken")
 
-            event.isCancelled = true
+            if(!island.isMember(player)){
+                event.isDropItems = false
+                island.players.forEach {
+                    it.sendTitle(Colorize.c("&cBED BROKEN"), Colorize.c("&aYOU ARE NO LONGER RESPAWN"), 0, 40, 0)
+                }
+
+                Bukkit.getOnlinePlayers().forEach {
+                    it.playSound(it.location, Sound.ENTITY_WITHER_DEATH, 1f, 1f)
+                }
+
+                Bukkit.broadcastMessage(Colorize.c("&fBED DESTROYED> ${island.color.getChatColor()}${island.color.formattedName()}&f bed has been destroyed by ${gameManager.world.getIslandForPlayer(player)!!.color}${player.name}"))
+            } else {
+                event.isCancelled = true
+            }
             return
         }
     }

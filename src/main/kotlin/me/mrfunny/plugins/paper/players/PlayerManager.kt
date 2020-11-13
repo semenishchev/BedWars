@@ -28,6 +28,13 @@ class PlayerManager(private val gameManager: GameManager) {
         player.gameMode = GameMode.SURVIVAL
         player.teleport(island.spawnLocation!!)
 
+        player.enderChest.clear()
+        player.inventory.clear()
+
+        giveTeamArmor(player, island)
+    }
+
+    fun giveTeamArmor(player: Player, island: Island){
         player.inventory.helmet = ItemBuilder(Material.LEATHER_HELMET)
             .setLeatherArmorColor(island.color.getColor())
             .setUnbreakable(true)

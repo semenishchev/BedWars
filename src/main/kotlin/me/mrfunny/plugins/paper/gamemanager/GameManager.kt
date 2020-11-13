@@ -9,11 +9,13 @@ import me.mrfunny.plugins.paper.gui.GUIManager
 import me.mrfunny.plugins.paper.players.PlayerManager
 import me.mrfunny.plugins.paper.setup.SetupWizardManager
 import me.mrfunny.plugins.paper.tasks.GameStartingTask
+import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.worlds.GameWorld
 import me.mrfunny.plugins.paper.worlds.Island
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
+import java.util.*
 
 class GameManager(var plugin: BedWars) {
 
@@ -62,21 +64,50 @@ class GameManager(var plugin: BedWars) {
             GameState.ACTIVE -> {
                 gameStartingTask.cancel()
 
-                Bukkit.getOnlinePlayers().forEach {
-                    playerManager.setPlaying(it)
-                    val island: Island? = world.getIslandForPlayer(it)
+                for(player: Player in Bukkit.getOnlinePlayers()) {
+                    playerManager.setPlaying(player)
+                    val island: Island? = world.getIslandForPlayer(player)
 
                     if(island == null){
-                        TODO("random assign")
+                        val optionalIsland: Optional<Island> = world.islands.stream().filter {
+                            return@filter it.players.size < world.maxTeamSize
+                        }.findAny()
+
+                        if(!optionalIsland.isPresent){
+                            player.kickPlayer("Not enough islands")
+                            continue
+                        }
+                        island?.players?.add(player)
                     } else {
-                        it.teleport(island.spawnLocation!!)
+                        player.teleport(world.lobbyPosition)
                     }
+
+                    playerManager.setPlaying(player)
 
                 }
 
             }
             GameState.WON -> {
-                Bukkit.broadcastMessage("${ChatColor.GREEN}MisterFunny01 won the game!")
+                val finalIsland: Optional<Island> = world.getActiveIslands().stream().findFirst()
+                if(!finalIsland.isPresent){
+                    Bukkit.broadcastMessage(Colorize.c("&fНИЧЬЯ"))
+                } else {
+                    val island: Island = finalIsland.get()
+                    Bukkit.broadcastMessage(Colorize.c("Команда ${island.color.formattedName()} победили!"))
+                    var winners: String = ""
+                    island.players.forEach {
+                        winners += it.name + ", "
+                        it.sendTitle(Colorize.c("&l&6ПОБЕДА"), null, 0, 30, 20)
+                    }
+                    Bukkit.broadcastMessage(Colorize.c("&8Победители: &a$winners"))
+
+                    Bukkit.getScheduler().runTaskLater(plugin, {task ->
+
+                        println("Reseting task ${task.taskId}")
+                        state = GameState.RESET
+                    }
+                    , 20 * 4)
+                }
             }
             GameState.RESET -> {
                 Bukkit.getOnlinePlayers().forEach {
@@ -86,7 +117,7 @@ class GameManager(var plugin: BedWars) {
                 Bukkit.getScheduler().runTaskLater(plugin, {task ->
                     world.resetWorld()
                     println("[BedWars] Game ${task.taskId} reset")
-                    Bukkit.shutdown()
+                    Bukkit.spigot().restart()
                 }, 20)
             }
             else -> {
