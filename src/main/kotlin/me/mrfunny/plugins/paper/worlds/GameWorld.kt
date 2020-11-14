@@ -128,7 +128,7 @@ class GameWorld(var name: String) {
     }
 
     fun getActiveIslands(): List<Island>{
-        return islands.stream().filter{ island -> island.isBedPlaced() && island.alivePlayerCount() != 0}.collect(
+        return islands.stream().filter{ island -> (island.isBedPlaced() && island.alivePlayerCount() != null) || island.alivePlayerCount() != 0}.collect(
             Collectors.toList())
     }
 }

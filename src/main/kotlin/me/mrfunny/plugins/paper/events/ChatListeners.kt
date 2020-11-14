@@ -32,6 +32,6 @@ class ChatListeners(private val gameManager: GameManager): Listener {
             prefix.append("&3")
         }
 
-        event.format = Colorize.c(prefix.toString())
+        event.format = Colorize.c("$prefix%s &7>") + "%s"
     }
 }

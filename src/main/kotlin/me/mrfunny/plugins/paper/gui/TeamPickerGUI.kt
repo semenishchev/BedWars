@@ -1,5 +1,7 @@
 package me.mrfunny.plugins.paper.gui
 
+import dev.jcsoftware.jscoreboards.JScoreboardTeam
+import dev.jcsoftware.jscoreboards.exception.JScoreboardException
 import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.util.ItemBuilder
@@ -45,7 +47,6 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
         lateinit var clickedColor: IslandColor
 
         val itemName: String = ChatColor.stripColor(itemStack.itemMeta.displayName)!!
-        println(itemName)
         for (color: IslandColor in IslandColor.values()) {
             if (itemName.equals(color.formattedName(), true)) {
                 println(color)
@@ -56,8 +57,11 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
 
         val playerIsland: Optional<Island> = gameManager.world.islands.stream().filter { island -> island.isMember(player) }.findFirst()
 
-        if(playerIsland.isPresent){
-            playerIsland.get().players.remove(player)
+        playerIsland.ifPresent{ island ->
+            island.players.remove(player)
+            try{
+                gameManager.scoreboard.findTeam(island.color.formattedName()).get().addPlayer(player)
+            } catch (ignore: JScoreboardException) {}
         }
 
         val selectedIsland: Optional<Island> = gameManager.world.islands.stream().filter { island -> island.color == clickedColor }.findFirst()
@@ -67,6 +71,9 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
             if(island.players.size == gameManager.world.maxTeamSize){
                 player.sendMessage(Colorize.c("&cThat team is full"))
             } else {
+                try{
+                    gameManager.scoreboard.findTeam(island.color.formattedName()).get().addPlayer(player)
+                } catch (ignore: JScoreboardException) {}
                 island.players.add(player)
                 gameManager.playerManager.giveTeamArmor(player, island)
             }

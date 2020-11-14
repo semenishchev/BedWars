@@ -3,6 +3,8 @@ package me.mrfunny.plugins.paper.gamemanager
 import dev.jcsoftware.jscoreboards.JPerPlayerScoreboard
 import dev.jcsoftware.jscoreboards.JScoreboardOptions
 import dev.jcsoftware.jscoreboards.JScoreboardTabHealthStyle
+import dev.jcsoftware.jscoreboards.JScoreboardTeam
+import dev.jcsoftware.jscoreboards.exception.JScoreboardException
 import me.mrfunny.plugins.paper.BedWars
 import me.mrfunny.plugins.paper.config.ConfigurationManager
 import me.mrfunny.plugins.paper.gui.GUIManager
@@ -19,7 +21,7 @@ import java.util.*
 
 class GameManager(var plugin: BedWars) {
 
-    var scoreboard: JPerPlayerScoreboard
+    lateinit var scoreboard: JPerPlayerScoreboard
     var setupWizardManager: SetupWizardManager = SetupWizardManager
     var configurationManager: ConfigurationManager = ConfigurationManager(this)
     var guiManager: GUIManager = GUIManager
@@ -33,14 +35,43 @@ class GameManager(var plugin: BedWars) {
     init {
         configurationManager.loadWorld(configurationManager.randomMapName()) { world: GameWorld ->
             this.world = world
+            this.scoreboard = JPerPlayerScoreboard({ player: Player ->
+                val lines = arrayListOf<String>()
+                if(state != GameState.ACTIVE){
+                    lines.add("&aWaiting...")
+                } else {
+                    for (island: Island in world.islands){
+                        val builder: StringBuilder = StringBuilder()
+
+                        builder.append(island.color.getChatColor()).append(island.color.formattedName()[0]).append(" &f")
+                        builder.append(island.color.formattedName()).append(": ")
+
+                        if(island.isBedPlaced()){
+                            builder.append("&a✓")
+                        } else {
+                            if(island.alivePlayerCount() == 0){
+                                builder.append("&c✘")
+                            } else {
+                                builder.append("&a" + island.alivePlayerCount())
+                            }
+                        }
+
+                        lines.add(builder.toString())
+                    }
+                }
+                lines
+            }, JScoreboardOptions("&a&lBedWars", JScoreboardTabHealthStyle.NUMBER, true))
             state = GameState.LOBBY
+
+            for(island: Island in world.islands){
+                try{
+                    this.scoreboard.createTeam(island.color.formattedName(), island.color.toString())
+                } catch (ex: JScoreboardException){
+                    ex.printStackTrace()
+                }
+            }
         }
 
-        this.scoreboard = JPerPlayerScoreboard({ player: Player ->
-            val lines = arrayListOf<String>()
-            lines.add("State: $state")
-            lines
-        }, JScoreboardOptions("&a&lBedWars", JScoreboardTabHealthStyle.NUMBER, true))
 
     }
 
@@ -77,13 +108,11 @@ class GameManager(var plugin: BedWars) {
                             player.kickPlayer("Not enough islands")
                             continue
                         }
-                        island?.players?.add(player)
-                    } else {
-                        player.teleport(world.lobbyPosition)
+                        optionalIsland.get().players.add(player)
+                        scoreboard.findTeam(optionalIsland.get().color.formattedName()).get().addPlayer(player)
                     }
 
                     playerManager.setPlaying(player)
-
                 }
 
             }
@@ -106,7 +135,7 @@ class GameManager(var plugin: BedWars) {
                         println("Reseting task ${task.taskId}")
                         state = GameState.RESET
                     }
-                    , 20 * 4)
+                    , 20 * 10)
                 }
             }
             GameState.RESET -> {
