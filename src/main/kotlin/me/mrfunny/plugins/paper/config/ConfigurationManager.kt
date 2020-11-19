@@ -33,16 +33,17 @@ class ConfigurationManager(var gameManager: GameManager) {
         val gameWorld = GameWorld(mapName)
         gameWorld.loadWorld(gameManager, true){
             val section: ConfigurationSection = getMapSection(mapName)
-            section.getKeys(false).forEach{
-                if(EnumUtils.isValidEnum(IslandColor::class.java, it)){ // todo: fix
-                    val island: Island = loadIsland(gameWorld, section.getConfigurationSection(it)!!)
+            for(sectionColor: String in section.getKeys(false)){
+                if(EnumUtils.isValidEnum(IslandColor::class.java, sectionColor)){
+                    val island: Island = loadIsland(gameWorld, section.getConfigurationSection(sectionColor)!!)
                     gameWorld.islands.add(island)
                 } else {
-                    println("Not valid enum color key found $it")
+                    continue
                 }
             }
+
             if(section.getConfigurationSection("lobbySpawn") != null){
-                gameWorld.lobbyPosition = from(gameWorld.world, section.getConfigurationSection("lobbySpawn")!!)
+                gameWorld.lobbyPosition = Companion.from(gameWorld.world, section.getConfigurationSection("lobbySpawn")!!)
             } else {
                 gameWorld.lobbyPosition = gameWorld.world.spawnLocation
             }
@@ -65,7 +66,7 @@ class ConfigurationManager(var gameManager: GameManager) {
 
     private fun loadGenerators(world: GameWorld?, section: ConfigurationSection): MutableList<Generator?>? {
         return section.getKeys(false).stream().map { key: String? ->
-            val location = from(world!!.world, section.getConfigurationSection(key!!)!!)
+            val location = Companion.from(world!!.world, section.getConfigurationSection(key!!)!!)
             val typeString = section.getString("type")
             if (!EnumUtils.isValidEnum(GeneratorType::class.java, key)) {
                 return@map null
@@ -95,12 +96,12 @@ class ConfigurationManager(var gameManager: GameManager) {
 
         val island = Island(world, color)
         try{
-            island.bedLocation = from(world.world, section.getConfigurationSection("bed")!!)
-            island.spawnLocation = from(world.world, section.getConfigurationSection("spawn")!!)
-            island.upgradeEntityLocation = from(world.world, section.getConfigurationSection("upgradeLocation")!!)
-            island.shopEntityLocation = from(world.world, section.getConfigurationSection("shop")!!)
-            island.protectedCorner1 = from(world.world, section.getConfigurationSection("cornerOne")!!)
-            island.protectedCorner2 = from(world.world, section.getConfigurationSection("cornerTwo")!!)
+            island.bedLocation = Companion.from(world.world, section.getConfigurationSection("bed")!!)
+            island.spawnLocation = Companion.from(world.world, section.getConfigurationSection("spawn")!!)
+            island.upgradeEntityLocation = Companion.from(world.world, section.getConfigurationSection("upgradeLocation")!!)
+            island.shopEntityLocation = Companion.from(world.world, section.getConfigurationSection("shop")!!)
+            island.protectedCorner1 = Companion.from(world.world, section.getConfigurationSection("cornerOne")!!)
+            island.protectedCorner2 = Companion.from(world.world, section.getConfigurationSection("cornerTwo")!!)
             island.islandGenerators = loadGenerators(world, section.getConfigurationSection("generators")!!) as ArrayList<Generator>
         } catch (exception: Exception) {
             Bukkit.getLogger().severe("Invalid ${color.formattedName()} island in ${world.name}")
@@ -153,8 +154,6 @@ class ConfigurationManager(var gameManager: GameManager) {
             if(it.value != null){
                 writeLocation(it.value, section)
             }
-
-
         }
 
         colorSection.set("generators", null)
@@ -170,16 +169,18 @@ class ConfigurationManager(var gameManager: GameManager) {
         gameManager.plugin.saveConfig()
     }
 
-    private fun writeLocation(location: Location?, section: ConfigurationSection){
-        section.set("x", location?.x)
-        section.set("y", location?.y)
-        section.set("z", location?.z)
-        section.set("yaw", location?.yaw)
-        section.set("pitch", location?.pitch)
-    }
+    companion object {
+        fun from(world: World, section: ConfigurationSection): Location{
+            return Location(world, section.getDouble("x"), section.getDouble("y"), section.getDouble("z"), section.getDouble("yaw").toFloat(), section.getDouble("pitch").toFloat())
+        }
 
-    fun from(world: World, section: ConfigurationSection): Location{
-        return Location(world, section.getDouble("x"), section.getDouble("y"), section.getDouble("z"), section.getDouble("yaw").toFloat(), section.getDouble("pitch").toFloat())
+        fun writeLocation(location: Location?, section: ConfigurationSection){
+            section.set("x", location?.x)
+            section.set("y", location?.y)
+            section.set("z", location?.z)
+            section.set("yaw", location?.yaw)
+            section.set("pitch", location?.pitch)
+        }
     }
 
 }

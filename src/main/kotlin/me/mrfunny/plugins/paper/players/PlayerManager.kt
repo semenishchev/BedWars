@@ -10,7 +10,7 @@ import org.bukkit.entity.Player
 
 class PlayerManager(private val gameManager: GameManager) {
 
-    fun setSpectatorMode(player: Player){
+    private fun setSpectatorMode(player: Player){
         player.teleport(gameManager.world.lobbyPosition)
         player.gameMode = GameMode.SPECTATOR
 

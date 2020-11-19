@@ -1,9 +1,8 @@
 package me.mrfunny.plugins.paper.gamemanager
 
-import dev.jcsoftware.jscoreboards.JPerPlayerScoreboard
+import dev.jcsoftware.jscoreboards.JScoreboard
 import dev.jcsoftware.jscoreboards.JScoreboardOptions
 import dev.jcsoftware.jscoreboards.JScoreboardTabHealthStyle
-import dev.jcsoftware.jscoreboards.JScoreboardTeam
 import dev.jcsoftware.jscoreboards.exception.JScoreboardException
 import me.mrfunny.plugins.paper.BedWars
 import me.mrfunny.plugins.paper.config.ConfigurationManager
@@ -11,17 +10,17 @@ import me.mrfunny.plugins.paper.gui.GUIManager
 import me.mrfunny.plugins.paper.players.PlayerManager
 import me.mrfunny.plugins.paper.setup.SetupWizardManager
 import me.mrfunny.plugins.paper.tasks.GameStartingTask
+import me.mrfunny.plugins.paper.tasks.GameTickTask
 import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.worlds.GameWorld
 import me.mrfunny.plugins.paper.worlds.Island
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import java.util.*
 
 class GameManager(var plugin: BedWars) {
 
-    lateinit var scoreboard: JPerPlayerScoreboard
+    var scoreboard: JScoreboard = JScoreboard(JScoreboardOptions("&a&lBedWars", JScoreboardTabHealthStyle.NUMBER, true))
     var setupWizardManager: SetupWizardManager = SetupWizardManager
     var configurationManager: ConfigurationManager = ConfigurationManager(this)
     var guiManager: GUIManager = GUIManager
@@ -31,48 +30,27 @@ class GameManager(var plugin: BedWars) {
     lateinit var world: GameWorld
 
     lateinit var gameStartingTask: GameStartingTask
+    lateinit var gameTickTask: GameTickTask
+
+    /*
+
+     */
 
     init {
+
         configurationManager.loadWorld(configurationManager.randomMapName()) { world: GameWorld ->
             this.world = world
-            this.scoreboard = JPerPlayerScoreboard({ player: Player ->
-                val lines = arrayListOf<String>()
-                if(state != GameState.ACTIVE){
-                    lines.add("&aWaiting...")
-                } else {
-                    for (island: Island in world.islands){
-                        val builder: StringBuilder = StringBuilder()
-
-                        builder.append(island.color.getChatColor()).append(island.color.formattedName()[0]).append(" &f")
-                        builder.append(island.color.formattedName()).append(": ")
-
-                        if(island.isBedPlaced()){
-                            builder.append("&a✓")
-                        } else {
-                            if(island.alivePlayerCount() == 0){
-                                builder.append("&c✘")
-                            } else {
-                                builder.append("&a" + island.alivePlayerCount())
-                            }
-                        }
-
-                        lines.add(builder.toString())
-                    }
-                }
-                lines
-            }, JScoreboardOptions("&a&lBedWars", JScoreboardTabHealthStyle.NUMBER, true))
             state = GameState.LOBBY
 
             for(island: Island in world.islands){
                 try{
-                    this.scoreboard.createTeam(island.color.formattedName(), island.color.toString())
+                    val islandColorChar: Char = island.color.getChatColor().char
+                    this.scoreboard.createTeam(island.color.formattedName(), "&" + islandColorChar + "&l" + island.color.formattedName()[0] + "&r" + islandColorChar)
                 } catch (ex: JScoreboardException){
                     ex.printStackTrace()
                 }
             }
         }
-
-
     }
 
     var state: GameState = GameState.PRELOBBY
@@ -94,6 +72,8 @@ class GameManager(var plugin: BedWars) {
 
             GameState.ACTIVE -> {
                 gameStartingTask.cancel()
+                this.gameTickTask = GameTickTask(this)
+                this.gameTickTask.runTaskTimer(plugin, 0, 20)
 
                 for(player: Player in Bukkit.getOnlinePlayers()) {
                     playerManager.setPlaying(player)
@@ -117,6 +97,7 @@ class GameManager(var plugin: BedWars) {
 
             }
             GameState.WON -> {
+                this.gameTickTask.cancel()
                 val finalIsland: Optional<Island> = world.getActiveIslands().stream().findFirst()
                 if(!finalIsland.isPresent){
                     Bukkit.broadcastMessage(Colorize.c("&fНИЧЬЯ"))
@@ -146,7 +127,6 @@ class GameManager(var plugin: BedWars) {
                 Bukkit.getScheduler().runTaskLater(plugin, {task ->
                     world.resetWorld()
                     println("[BedWars] Game ${task.taskId} reset")
-                    Bukkit.spigot().restart()
                 }, 20)
             }
             else -> {
@@ -163,6 +143,35 @@ class GameManager(var plugin: BedWars) {
         }
 
         state = GameState.WON
+    }
+
+    fun updateScoreboard(){
+            val lines = arrayListOf<String>()
+            if(state != GameState.ACTIVE){
+                lines.add("&fWaiting...")
+                lines.add("&a ${Bukkit.getOnlinePlayers().size}/${world.maxTeamSize * world.islands.size}")
+            } else {
+                for (island: Island in world.islands){
+                    if(island.players.size == 0) continue
+                    val builder: StringBuilder = StringBuilder()
+
+                    builder.append("&").append(island.color.getChatColor().char).append(island.color.formattedName()[0]).append(" &f")
+                    builder.append(island.color.formattedName()).append(": ")
+
+                    if(island.isBedPlaced()){
+                        builder.append("&a✓")
+                    } else {
+                        if(island.alivePlayerCount() == 0){
+                            builder.append("&c✘")
+                        } else {
+                            builder.append("&a" + island.alivePlayerCount())
+                        }
+                    }
+
+                    lines.add(builder.toString())
+                }
+            }
+            scoreboard.setLines(lines)
     }
 
 }

@@ -57,5 +57,6 @@ class PlayerLoginEventListener(private val gameManager: GameManager) : Listener 
     fun onQuit(event: PlayerQuitEvent) {
         event.quitMessage = null
         gameManager.scoreboard.removePlayer(event.player)
+        gameManager.updateScoreboard()
     }
 }

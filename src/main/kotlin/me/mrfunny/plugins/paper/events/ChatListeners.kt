@@ -18,20 +18,22 @@ class ChatListeners(private val gameManager: GameManager): Listener {
         val prefix: StringBuilder = StringBuilder()
 
         if(player.hasPermission("bedwars.admin")){
-            prefix.append("&c&lADMIN ")
+            prefix.append("&c&lADMIN &r")
         }
 
         if(player.gameMode == GameMode.SPECTATOR){
-            prefix.append("&6&lSPECTATOR ")
+            prefix.append("&6&lSPECTATOR &r")
         }
 
         val island: Island? = gameManager.world.getIslandForPlayer(player)
+        var islandColorCode = "&3"
         if(island != null){
-            prefix.append(island.color.getChatColor()).append("&l").append(island.color.formattedName()).append(" ")
+            islandColorCode = island.color.getChatColor().char.toString()
+            prefix.append(islandColorCode).append("&l").append(island.color.formattedName()).append(" ")
         } else {
-            prefix.append("&3")
+            prefix.append(islandColorCode)
         }
 
-        event.format = Colorize.c("$prefix%s &7>") + "%s"
+        event.format = Colorize.c("$prefix&r$islandColorCode%s &7>") + "%s"
     }
 }

@@ -59,9 +59,8 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
 
         playerIsland.ifPresent{ island ->
             island.players.remove(player)
-            try{
-                gameManager.scoreboard.findTeam(island.color.formattedName()).get().addPlayer(player)
-            } catch (ignore: JScoreboardException) {}
+            gameManager.scoreboard.findTeam(island.color.formattedName()).get().addPlayer(player)
+            gameManager.updateScoreboard()
         }
 
         val selectedIsland: Optional<Island> = gameManager.world.islands.stream().filter { island -> island.color == clickedColor }.findFirst()
