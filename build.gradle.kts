@@ -21,7 +21,7 @@ tasks {
     compileTestKotlin { kotlinOptions.jvmTarget = "1.8" }
     compileJava { options.encoding = "UTF-8" }
     jar {
-        val out = "D:\\AAPaperServer\\plugins\\"
+        val out = "D:\\AAPaperServer2\\plugins\\"
         destinationDirectory.set(File(out))
         doFirst {
                 from({

@@ -131,4 +131,16 @@ class GameWorld(var name: String) {
         return islands.stream().filter{ island -> island.alivePlayerCount() != 0}.collect(
             Collectors.toList())
     }
+
+    fun tick(currentSecond: Int) {
+        for(island: Island in islands){
+            island.islandGenerators.forEach {
+                it.spawn()
+            }
+        }
+
+        generators.forEach {
+            it.spawn()
+        }
+    }
 }

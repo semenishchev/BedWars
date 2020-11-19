@@ -32,10 +32,6 @@ class GameManager(var plugin: BedWars) {
     lateinit var gameStartingTask: GameStartingTask
     lateinit var gameTickTask: GameTickTask
 
-    /*
-
-     */
-
     init {
 
         configurationManager.loadWorld(configurationManager.randomMapName()) { world: GameWorld ->
@@ -45,7 +41,7 @@ class GameManager(var plugin: BedWars) {
             for(island: Island in world.islands){
                 try{
                     val islandColorChar: Char = island.color.getChatColor().char
-                    this.scoreboard.createTeam(island.color.formattedName(), "&" + islandColorChar + "&l" + island.color.formattedName()[0] + "&r" + islandColorChar)
+                    this.scoreboard.createTeam(island.color.formattedName(), "&" + islandColorChar + "&l" + island.color.formattedName()[0] + "&r&" + islandColorChar)
                 } catch (ex: JScoreboardException){
                     ex.printStackTrace()
                 }
@@ -58,6 +54,7 @@ class GameManager(var plugin: BedWars) {
         field = value
         when(value){
             GameState.LOBBY -> {
+                updateScoreboard()
                 Bukkit.getOnlinePlayers().forEach {
                     it.teleport(world.lobbyPosition)
                 }
@@ -66,6 +63,7 @@ class GameManager(var plugin: BedWars) {
             }
 
             GameState.STARTING -> {
+                updateScoreboard()
                 gameStartingTask = GameStartingTask(this)
                 gameStartingTask.runTaskTimer(plugin, 0, 20)
             }
@@ -78,11 +76,14 @@ class GameManager(var plugin: BedWars) {
                 for(player: Player in Bukkit.getOnlinePlayers()) {
                     playerManager.setPlaying(player)
                     val island: Island? = world.getIslandForPlayer(player)
+                    player.saturation = 20f
+                    player.health = 20.0
+                    player.foodLevel = 20
 
                     if(island == null){
                         val optionalIsland: Optional<Island> = world.islands.stream().filter {
                             return@filter it.players.size < world.maxTeamSize
-                        }.findAny()
+                        }.findFirst()
 
                         if(!optionalIsland.isPresent){
                             player.kickPlayer("Not enough islands")
@@ -110,6 +111,8 @@ class GameManager(var plugin: BedWars) {
                         it.sendTitle(Colorize.c("&l&6ПОБЕДА"), null, 0, 30, 20)
                     }
                     Bukkit.broadcastMessage(Colorize.c("&8Победители: &a$winners"))
+
+                    updateScoreboard()
 
                     Bukkit.getScheduler().runTaskLater(plugin, {task ->
 
@@ -147,9 +150,9 @@ class GameManager(var plugin: BedWars) {
 
     fun updateScoreboard(){
             val lines = arrayListOf<String>()
-            if(state != GameState.ACTIVE){
+            if(state == GameState.LOBBY || state == GameState.STARTING){
                 lines.add("&fWaiting...")
-                lines.add("&a ${Bukkit.getOnlinePlayers().size}/${world.maxTeamSize * world.islands.size}")
+                lines.add("&a${Bukkit.getOnlinePlayers().size}/${world.maxTeamSize * world.islands.size}")
             } else {
                 for (island: Island in world.islands){
                     if(island.players.size == 0) continue
@@ -170,8 +173,21 @@ class GameManager(var plugin: BedWars) {
 
                     lines.add(builder.toString())
                 }
+
+                if(lines.isEmpty()){
+                    lines.add("")
+                }
             }
+
             scoreboard.setLines(lines)
+
+        for(player: Player in Bukkit.getOnlinePlayers()){
+            val island: Island? = world.getIslandForPlayer(player)
+
+            if(island != null){
+                player.setPlayerListName(Colorize.c("&${island.color.getChatColor().char}${player.displayName}"))
+            }
+        }
     }
 
 }

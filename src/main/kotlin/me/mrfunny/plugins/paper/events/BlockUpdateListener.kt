@@ -29,7 +29,7 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
 
             val island: Island = gameManager.world.getIslandForBedLocation(location)!!
 
-            println("Bed broken")
+            println("Broken bed for: ${island.color.formattedName()}")
 
             if(!island.isMember(player)){
                 event.isDropItems = false
@@ -37,11 +37,13 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
                     it.sendTitle(Colorize.c("&cBED BROKEN"), Colorize.c("&aYOU ARE NO LONGER RESPAWN"), 0, 40, 0)
                 }
 
+                location.world.spigot().strikeLightningEffect(location, false)
+
                 Bukkit.getOnlinePlayers().forEach {
                     it.playSound(it.location, Sound.ENTITY_WITHER_DEATH, 1f, 1f)
                 }
 
-                Bukkit.broadcastMessage(Colorize.c("&fBED DESTROYED> ${island.color.getChatColor()}${island.color.formattedName()}&f bed has been destroyed by ${gameManager.world.getIslandForPlayer(player)!!.color}${player.name}"))
+                Bukkit.broadcastMessage(Colorize.c("&fBED DESTROYED> ${island.color.getChatColor()}${island.color.formattedName()}&f bed has been destroyed by ${gameManager.world.getIslandForPlayer(player)!!.color.getChatColor()}${player.name}"))
             } else {
                 event.isCancelled = true
             }
