@@ -34,7 +34,7 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
             if(!island.isMember(player)){
                 event.isDropItems = false
                 island.players.forEach {
-                    it.sendTitle(Colorize.c("&cBED BROKEN"), Colorize.c("&aYOU ARE NO LONGER RESPAWN"), 0, 40, 0)
+                    it.sendTitle(Colorize.c("&cВАША КРОВАТЬ СЛОМАНА"), Colorize.c("&aВЫ БОЛЬШЕ НЕ ВОЗРОДИТЕСЬ"), 0, 40, 0)
                 }
 
                 location.world.spigot().strikeLightningEffect(location, false)
@@ -43,7 +43,7 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
                     it.playSound(it.location, Sound.ENTITY_WITHER_DEATH, 1f, 1f)
                 }
 
-                Bukkit.broadcastMessage(Colorize.c("&fBED DESTROYED> ${island.color.getChatColor()}${island.color.formattedName()}&f bed has been destroyed by ${gameManager.world.getIslandForPlayer(player)!!.color.getChatColor()}${player.name}"))
+                Bukkit.broadcastMessage(Colorize.c("&fКровать сломана> ${island.color.getChatColor()}${island.color.formattedName()}&f bed has been destroyed by ${gameManager.world.getIslandForPlayer(player)!!.color.getChatColor()}${player.name}"))
             } else {
                 event.isCancelled = true
             }
@@ -59,6 +59,12 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
         if(event.block.x > 110){
             event.isCancelled = true
             event.player.sendMessage("${ChatColor.RED}You cannot place blocks on Y: 110 and more")
+            return
+        }
+
+        if(event.block.type.name.contains("BED")){
+            event.isCancelled = true
+            event.player.sendMessage("Ууу ясно читор")
             return
         }
 

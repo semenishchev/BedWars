@@ -74,7 +74,6 @@ class GameManager(var plugin: BedWars) {
                 this.gameTickTask.runTaskTimer(plugin, 0, 20)
 
                 for(player: Player in Bukkit.getOnlinePlayers()) {
-                    playerManager.setPlaying(player)
                     val island: Island? = world.getIslandForPlayer(player)
                     player.saturation = 20f
                     player.health = 20.0
@@ -83,7 +82,7 @@ class GameManager(var plugin: BedWars) {
                     if(island == null){
                         val optionalIsland: Optional<Island> = world.islands.stream().filter {
                             return@filter it.players.size < world.maxTeamSize
-                        }.findFirst()
+                        }.findAny()
 
                         if(!optionalIsland.isPresent){
                             player.kickPlayer("Not enough islands")
@@ -105,7 +104,7 @@ class GameManager(var plugin: BedWars) {
                 } else {
                     val island: Island = finalIsland.get()
                     Bukkit.broadcastMessage(Colorize.c("Команда ${island.color.formattedName()} победили!"))
-                    var winners: String = ""
+                    var winners = ""
                     island.players.forEach {
                         winners += it.name + ", "
                         it.sendTitle(Colorize.c("&l&6ПОБЕДА"), null, 0, 30, 20)
@@ -141,6 +140,8 @@ class GameManager(var plugin: BedWars) {
     }
 
     fun endGameIfNeeded() {
+        if(state != GameState.ACTIVE) return
+
         if(world.getActiveIslands().size > 1){
             return
         }

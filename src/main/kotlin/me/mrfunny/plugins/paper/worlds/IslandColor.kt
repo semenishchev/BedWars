@@ -59,4 +59,20 @@ enum class IslandColor {
             PINK -> Material.PINK_WOOL
         }
     }
+
+    // todo: сделать, чтобы все отображалось на русском
+    fun russianName(): String{ // метод вовзращает только основу слова, поскольку в разных ситуациях оно разное
+        return when(this){     // краснАЯ, краснЫХ, зеленЫХ, зеленАЯ
+            GREEN -> "Зелен"
+            RED -> "Красн"
+            BLUE -> "Син"
+            YELLOW -> "Желт"
+            AQUA -> "Голуб"
+            WHITE -> "Бел"
+            GRAY -> "Сер"
+            BLACK -> "Черн"
+            ORANGE -> "Оранж"
+            PINK -> "Розов"
+        }
+    }
 }

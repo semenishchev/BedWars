@@ -65,7 +65,14 @@ class PlayerManager(private val gameManager: GameManager) {
     }
 
     fun playerTeamSelector(player: Player){
+        val island: Island? = gameManager.world.getIslandForPlayer(player)
+
+        var woolMaterial: Material = Material.WHITE_WOOL
+        if(island != null){
+            woolMaterial = island.color.woolMaterial()
+        }
+
         player.inventory.clear()
-        player.inventory.addItem(ItemBuilder(Material.WHITE_WOOL).setName("Select team").toItemStack())
+        player.inventory.addItem(ItemBuilder(woolMaterial).setName("Select team").toItemStack())
     }
 }

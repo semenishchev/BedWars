@@ -44,7 +44,6 @@ class PlayerDeathListener(private val gameManager: GameManager) : Listener {
             event.isCancelled = true
             player.health = player.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
             player.gameMode = GameMode.SPECTATOR
-            player.teleport(gameManager.world.lobbyPosition)
             if(playerIsland.isBedPlaced()){
                 val task: BukkitTask = Bukkit.getScheduler().runTaskTimer(gameManager.plugin, PlayerRespawnTask(player, gameManager.world.getIslandForPlayer(player)!!), 0, 20)
                 Bukkit.getScheduler().runTaskLater(gameManager.plugin, task::cancel, 20 * 6)
@@ -52,11 +51,14 @@ class PlayerDeathListener(private val gameManager: GameManager) : Listener {
                 player.sendTitle(Colorize.c("&cYOU DIED"), null, 0, 20, 20)
 
                 if(!gameManager.world.getActiveIslands().contains(playerIsland)){
-                    Bukkit.broadcastMessage(Colorize.c("${playerIsland.color.formattedName()} &fis out"))
+                    Bukkit.broadcastMessage(Colorize.c("${playerIsland.color.formattedName()}&f is out"))
                 }
+
+                player.world.spigot().strikeLightningEffect(player.location, false)
 
                 gameManager.endGameIfNeeded()
             }
+            player.teleport(gameManager.world.lobbyPosition)
         }
     }
 

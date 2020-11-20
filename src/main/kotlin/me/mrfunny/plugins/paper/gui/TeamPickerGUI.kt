@@ -74,9 +74,10 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
                     gameManager.scoreboard.findTeam(island.color.formattedName()).get().addPlayer(player)
                 } catch (ignore: JScoreboardException) {}
                 island.players.add(player)
-                gameManager.playerManager.giveTeamArmor(player, island)
             }
         }
+
+        gameManager.playerManager.playerTeamSelector(player)
 
         view.close()
         player.closeInventory()

@@ -29,6 +29,7 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
             return
         }
 
+        armorStand?.setGravity(false)
         armorStand?.isVisible = false
         armorStand?.isInvulnerable = true
         armorStand?.isCustomNameVisible = true
@@ -48,12 +49,12 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
             return
         }
 
+        secondsSinceActivation++
+
         if(!isIslandGenerator) {
             armorStand?.isCustomNameVisible = true
             armorStand?.customName = Colorize.c(getArmorstandName())
         }
-
-        secondsSinceActivation++
 
         if(secondsSinceActivation != getActivationTime()) return
 
