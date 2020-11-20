@@ -44,6 +44,7 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
     }
 
     override fun handleClick(player: Player, itemStack: ItemStack, view: InventoryView): GUI? {
+        if(!isInventory(view)) return null
         lateinit var clickedColor: IslandColor
 
         val itemName: String = ChatColor.stripColor(itemStack.itemMeta.displayName)!!

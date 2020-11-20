@@ -3,6 +3,7 @@ package me.mrfunny.plugins.paper.events
 import me.mrfunny.plugins.paper.gui.SetupWizardIslandSelectorGUI
 import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.gamemanager.GameState
+import me.mrfunny.plugins.paper.gui.ItemShopGUI
 import me.mrfunny.plugins.paper.gui.TeamPickerGUI
 import me.mrfunny.plugins.paper.worlds.Island
 import me.mrfunny.plugins.paper.worlds.generators.Generator
@@ -13,9 +14,24 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 
 class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
+
+    @EventHandler
+    fun onInteractWithShop(event: PlayerInteractEntityEvent){
+        val name: String = ChatColor.stripColor(event.rightClicked.name.toLowerCase())
+
+        if(name == "магазин предметов") {
+            event.isCancelled = true
+            val gui: ItemShopGUI = ItemShopGUI(gameManager, event.player)
+            gameManager.guiManager.setGUI(event.player, gui)
+        } else if(name == "улучшения команды"){
+
+        }
+
+    }
 
     @ExperimentalStdlibApi
     @EventHandler

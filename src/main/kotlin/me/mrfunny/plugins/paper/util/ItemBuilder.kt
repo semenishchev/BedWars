@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.bukkit.inventory.meta.SkullMeta
 import java.util.*
+import java.util.stream.Collectors
 
 /**
  * Easily create itemstacks, without messing your hands.
@@ -148,7 +149,7 @@ class ItemBuilder {
      */
     fun setLore(vararg lore: String?): ItemBuilder {
         val im = `is`.itemMeta
-        im.lore = listOf(*lore)
+        im.lore = Arrays.stream(lore).map { string -> return@map Colorize.c(string!!) }.collect(Collectors.toList())
         `is`.itemMeta = im
         return this
     }
@@ -265,6 +266,11 @@ class ItemBuilder {
         val im = `is`.itemMeta
         im.addItemFlags(ItemFlag.HIDE_ENCHANTS)
         `is`.itemMeta = im
+        return this
+    }
+
+    fun setAmount(amount: Int): ItemBuilder{
+        `is`.amount = amount
         return this
     }
 

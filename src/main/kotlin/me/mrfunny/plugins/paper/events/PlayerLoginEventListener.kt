@@ -2,6 +2,7 @@ package me.mrfunny.plugins.paper.events
 
 import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.gamemanager.GameState
+import me.mrfunny.plugins.paper.tasks.PlayerRespawnTask
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.OfflinePlayer
@@ -11,6 +12,7 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerPreLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.scheduler.BukkitTask
 import java.util.*
 
 class PlayerLoginEventListener(private val gameManager: GameManager) : Listener {
@@ -42,9 +44,14 @@ class PlayerLoginEventListener(private val gameManager: GameManager) : Listener 
 
             if(playerIsland != null){
                 if(playerIsland.isBedPlaced()){
-                    event.player.teleport(playerIsland.spawnLocation!!)
+                    gameManager.playerManager.setSpectatorMode(event.player)
+                    val task: BukkitTask = Bukkit.getScheduler().runTaskTimer(gameManager.plugin, PlayerRespawnTask(event.player, gameManager.world.getIslandForPlayer(event.player)!!, gameManager), 0, 20)
+                    Bukkit.getScheduler().runTaskLater(gameManager.plugin, task::cancel, 20 * 6)
+                    return
                 }
             }
+
+            gameManager.playerManager.setSpectatorMode(event.player)
         } else if (gameManager.state == GameState.LOBBY) {
             event.player.gameMode = GameMode.SURVIVAL
             event.player.teleport(gameManager.world.lobbyPosition)
@@ -59,5 +66,6 @@ class PlayerLoginEventListener(private val gameManager: GameManager) : Listener 
         event.quitMessage = null
         gameManager.scoreboard.removePlayer(event.player)
         gameManager.updateScoreboard()
+        gameManager.endGameIfNeeded()
     }
 }

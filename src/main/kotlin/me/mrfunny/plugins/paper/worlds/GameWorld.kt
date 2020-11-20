@@ -41,8 +41,7 @@ class GameWorld(var name: String) {
         world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false)
         world.setGameRule(GameRule.DISABLE_RAIDS, true)
         world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false)
-        world.setGameRule(GameRule.DO_MOB_SPAWNING, false)
-
+        world.difficulty = Difficulty.NORMAL
 
         runnable.run()
     }

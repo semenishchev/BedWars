@@ -22,7 +22,7 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
 
         if(isIslandGenerator) return
 
-        armorStand = location.world.spawn(location, ArmorStand::class.java)
+        armorStand = location.world.spawn(location.add(0.0, 1.0, 0.0), ArmorStand::class.java)
 
         if(!value && armorStand != null){
             armorStand?.remove()
@@ -56,7 +56,7 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
             armorStand?.customName = Colorize.c(getArmorstandName())
         }
 
-        if(secondsSinceActivation != getActivationTime()) return
+        if(secondsSinceActivation < getActivationTime()) return
 
         secondsSinceActivation = 0
 
@@ -79,8 +79,11 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
     }
 
     private fun getArmorstandName(): String{
-        val timeLeft: Int = getActivationTime() - secondsSinceActivation
-        val typeName: String = type.name.capitalize()
+        var timeLeft: Int = getActivationTime() - secondsSinceActivation
+        if(timeLeft == 0){
+            timeLeft = getActivationTime()
+        }
+        val typeName: String = type.name.toLowerCase().capitalize()
         val pluralize: String = if(timeLeft == 1) "" else "s"
         return "&a$typeName: $timeLeft second$pluralize..." //todo: другой колор код в зависимости от типа генератора
     }
@@ -90,10 +93,10 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
             GeneratorType.IRON -> {
                 return when (currentTier) {
                     GeneratorTier.ONE -> {
-                        2
+                        4
                     }
                     GeneratorTier.TWO -> {
-                        1
+                        2
                     }
                     else -> {
                         1
@@ -103,20 +106,20 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
             GeneratorType.GOLD -> {
                 return when (currentTier) {
                     GeneratorTier.ONE -> {
-                        7
+                        10
                     }
                     GeneratorTier.TWO -> {
                         5
                     }
                     else -> {
-                        3
+                        2
                     }
                 }
             }
             GeneratorType.DIAMOND -> {
                 return when (currentTier) {
                     GeneratorTier.ONE -> {
-                        20
+                        40
                     }
                     GeneratorTier.TWO -> {
                         15
@@ -129,7 +132,7 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
             GeneratorType.EMERALD -> {
                 if(isIslandGenerator){
                     if (currentTier == GeneratorTier.ONE) {
-                        return 30
+                        return 40
                     }
                     else if (currentTier == GeneratorTier.TWO) {
                         return 20

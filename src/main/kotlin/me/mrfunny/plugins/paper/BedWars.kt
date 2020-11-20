@@ -44,9 +44,10 @@ class BedWars : JavaPlugin() {
         server.pluginManager.registerEvents(InventoryClickListener(gameManager), this)
         server.pluginManager.registerEvents(BlockUpdateListener(gameManager), this)
         server.pluginManager.registerEvents(PlayerDeathListener(gameManager), this)
-        server.pluginManager.registerEvents(ItemListener, this)
         server.pluginManager.registerEvents(HungerListener(gameManager), this)
         server.pluginManager.registerEvents(ChatListeners(gameManager), this)
+        server.pluginManager.registerEvents(ItemListener, this)
+        server.pluginManager.registerEvents(MobSpawnListener, this)
     }
 
     override fun onDisable() {

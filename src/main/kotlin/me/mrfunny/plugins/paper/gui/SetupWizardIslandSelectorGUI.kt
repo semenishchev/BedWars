@@ -32,10 +32,10 @@ class SetupWizardIslandSelectorGUI(var gameManager: GameManager) : GUI {
     }
 
     override fun handleClick(player: Player, itemStack: ItemStack, view: InventoryView): GUI? {
+        if(!isInventory(view)) return null
         lateinit var clickedColor: IslandColor
 
         if(!gameManager.setupWizardManager.isInWizard(player)) return null
-        println("pog")
         val itemName: String = ChatColor.stripColor(itemStack.itemMeta.displayName)!!
 
         for(color: IslandColor in IslandColor.values()){

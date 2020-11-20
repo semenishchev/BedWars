@@ -1,11 +1,12 @@
 package me.mrfunny.plugins.paper.tasks
 
+import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.worlds.Island
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 
-class PlayerRespawnTask(private var player: Player, var playerIsland: Island) : Runnable {
+class PlayerRespawnTask(private var player: Player, var playerIsland: Island, private var gamaManager: GameManager) : Runnable {
 
     init {
         playerIsland.absolutelyAlive.add(player.uniqueId)
@@ -19,6 +20,7 @@ class PlayerRespawnTask(private var player: Player, var playerIsland: Island) : 
             playerIsland.absolutelyAlive.remove(player.uniqueId)
             player.gameMode = GameMode.SURVIVAL
             player.teleport(playerIsland.spawnLocation!!)
+            gamaManager.playerManager.giveTeamArmor(player, playerIsland)
             return
         }
 

@@ -41,7 +41,7 @@ class GameManager(var plugin: BedWars) {
             for(island: Island in world.islands){
                 try{
                     val islandColorChar: Char = island.color.getChatColor().char
-                    this.scoreboard.createTeam(island.color.formattedName(), "&" + islandColorChar + "&l" + island.color.formattedName()[0] + "&r&" + islandColorChar)
+                    this.scoreboard.createTeam(island.color.formattedName(), "&$islandColorChar")
                 } catch (ex: JScoreboardException){
                     ex.printStackTrace()
                 }
@@ -95,6 +95,10 @@ class GameManager(var plugin: BedWars) {
                     playerManager.setPlaying(player)
                 }
 
+                world.islands.forEach {
+                    it.spawnShops()
+                }
+
             }
             GameState.WON -> {
                 this.gameTickTask.cancel()
@@ -129,6 +133,7 @@ class GameManager(var plugin: BedWars) {
                 Bukkit.getScheduler().runTaskLater(plugin, {task ->
                     world.resetWorld()
                     println("[BedWars] Game ${task.taskId} reset")
+                    Bukkit.spigot().restart()
                 }, 20)
             }
             else -> {

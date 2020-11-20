@@ -1,14 +1,20 @@
 package me.mrfunny.plugins.paper.worlds
 
-import com.sk89q.worldedit.math.BlockVector3
-import com.sk89q.worldedit.regions.CuboidRegion
+import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.worlds.generators.Generator
 import me.mrfunny.plugins.paper.worlds.generators.GeneratorType
-import org.bukkit.*
+import org.bukkit.Bukkit
+import org.bukkit.GameMode
+import org.bukkit.Location
+import org.bukkit.OfflinePlayer
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
+import org.bukkit.entity.Skeleton
+import org.bukkit.entity.Villager
 import java.util.*
 import java.util.stream.Collectors
+import kotlin.math.max
+import kotlin.math.min
 
 class Island(var gameWorld: GameWorld, var color: IslandColor) {
 
@@ -39,6 +45,19 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
         return players.contains(player)
     }
 
+    fun spawnShops(){
+        val itemShopEntity: Villager = shopEntityLocation!!.world.spawn(shopEntityLocation!!, Villager::class.java)
+        itemShopEntity.profession = Villager.Profession.BUTCHER
+        itemShopEntity.customName = Colorize.c("&eМагазин предметов")
+        itemShopEntity.isCustomNameVisible = true
+        itemShopEntity.setAI(false)
+
+        val teamUpgradeShop: Skeleton = upgradeEntityLocation!!.world.spawn(upgradeEntityLocation!!, Skeleton::class.java)
+        teamUpgradeShop.customName = Colorize.c("&eУлучшения команды")
+        teamUpgradeShop.isCustomNameVisible = true
+        teamUpgradeShop.setAI(false)
+    }
+
     fun activateEmeraldGenerators(){
         islandGenerators.forEach {
             if(it.type == GeneratorType.EMERALD){
@@ -48,15 +67,32 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
     }
 
     fun isBlockWithinProtectedZone(block: Block): Boolean{
-        val blockLocation: Location = block.location
+        val containts: Boolean = blocksFromTwoPoints(protectedCorner1!!, protectedCorner2!!).contains(block.location)
+        return containts
 
-        val one: BlockVector3 = BlockVector3.at(protectedCorner1!!.x, protectedCorner1!!.y, protectedCorner1!!.z)
-        val two: BlockVector3 = BlockVector3.at(protectedCorner2!!.x, protectedCorner2!!.y, protectedCorner2!!.z)
+    }
 
-        val region: CuboidRegion = CuboidRegion(one, two)
+    fun blocksFromTwoPoints(loc1: Location, loc2: Location): ArrayList<Location>{
+        val blocks = arrayListOf<Location>()
 
-        return region.contains(BlockVector3.at(blockLocation.x, blockLocation.y, blockLocation.z))
+        val topBlockX = (max(loc1.blockX, loc2.blockX))
+        val bottomBlockX = (min(loc1.blockX, loc2.blockX))
 
+        val topBlockY = (max(loc1.blockY, loc2.blockY))
+        val bottomBlockY = (min(loc1.blockY, loc2.blockY))
+
+        val topBlockZ = (max(loc1.blockZ, loc2.blockZ))
+        val bottomBlockZ = (min(loc1.blockZ, loc2.blockZ))
+
+        for (x in bottomBlockX..topBlockX){
+            for(y in bottomBlockY..topBlockY) {
+                for (z in bottomBlockZ..topBlockZ) {
+                    blocks.add(loc1.world.getBlockAt(x, y, z).location)
+                }
+            }
+        }
+
+        return blocks
     }
 
     fun isBedPlaced(): Boolean{

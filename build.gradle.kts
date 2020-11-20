@@ -13,7 +13,6 @@ repositories {
 dependencies {
     compileOnly("com.destroystokyo.paper", "paper-api", "1.16.3-R0.1-SNAPSHOT")
     compileOnly("com.destroystokyo.paper", "paper", "1.16.3-R0.1-SNAPSHOT")
-    compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.0.0-SNAPSHOT")
     testImplementation(kotlin("test-junit"))
 }
 tasks {

@@ -49,6 +49,12 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
             }
             return
         }
+
+        for (island: Island in gameManager.world.islands) {
+            if(island.isBlockWithinProtectedZone(event.block)){
+                event.isCancelled = true
+            }
+        }
     }
 
     @EventHandler
@@ -70,6 +76,7 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
 
         for (island: Island in gameManager.world.islands) {
             if(island.isBlockWithinProtectedZone(event.block)){
+                event.player.sendMessage("Blocks not allowed here")
                 event.isCancelled = true
             }
         }
