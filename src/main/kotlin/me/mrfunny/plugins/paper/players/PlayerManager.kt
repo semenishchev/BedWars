@@ -44,7 +44,7 @@ class PlayerManager(private val gameManager: GameManager) {
             .setLeatherArmorColor(island.color.getColor())
             .setUnbreakable(true)
             .toItemStack()
-        
+
         // todo: проверить на наличие улучшений брони
 
         player.inventory.leggings = ItemBuilder(Material.LEATHER_LEGGINGS)

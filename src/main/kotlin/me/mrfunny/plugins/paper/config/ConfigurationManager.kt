@@ -42,8 +42,13 @@ class ConfigurationManager(var gameManager: GameManager) {
                 }
             }
 
+            if(section.isConfigurationSection("generators")){
+                val generatorSection: ConfigurationSection = section.getConfigurationSection("generators")!!
+                gameWorld.generators = loadGenerators(gameWorld, generatorSection, false) as ArrayList<Generator>
+            }
+
             if(section.getConfigurationSection("lobbySpawn") != null){
-                gameWorld.lobbyPosition = Companion.from(gameWorld.world, section.getConfigurationSection("lobbySpawn")!!)
+                gameWorld.lobbyPosition = from(gameWorld.world, section.getConfigurationSection("lobbySpawn")!!)
             } else {
                 gameWorld.lobbyPosition = gameWorld.world.spawnLocation
             }
@@ -64,15 +69,17 @@ class ConfigurationManager(var gameManager: GameManager) {
         gameManager.plugin.saveConfig()
     }
 
-    private fun loadGenerators(world: GameWorld?, section: ConfigurationSection): MutableList<Generator?>? {
+    private fun loadGenerators(world: GameWorld?, section: ConfigurationSection, forIsland: Boolean): MutableList<Generator?>? {
         return section.getKeys(false).stream().map { key: String? ->
-            val location = Companion.from(world!!.world, section.getConfigurationSection(key!!)!!)
-            val typeString = section.getString("type")
-            if (!EnumUtils.isValidEnum(GeneratorType::class.java, key)) {
+            val generatorSection = section.getConfigurationSection(key!!)!!
+            val location = from(world!!.world, generatorSection.getConfigurationSection("location")!!)
+            val typeString = generatorSection.getString("type")
+
+            if (!EnumUtils.isValidEnum(GeneratorType::class.java, typeString)) {
                 return@map null
             }
             val type = GeneratorType.valueOf(typeString!!)
-            val generator = Generator(location, type)
+            val generator = Generator(location, type, forIsland)
             generator
         }.collect(Collectors.toList())
     }
@@ -96,13 +103,13 @@ class ConfigurationManager(var gameManager: GameManager) {
 
         val island = Island(world, color)
         try{
-            island.bedLocation = Companion.from(world.world, section.getConfigurationSection("bed")!!)
-            island.spawnLocation = Companion.from(world.world, section.getConfigurationSection("spawn")!!)
-            island.upgradeEntityLocation = Companion.from(world.world, section.getConfigurationSection("upgradeLocation")!!)
-            island.shopEntityLocation = Companion.from(world.world, section.getConfigurationSection("shop")!!)
-            island.protectedCorner1 = Companion.from(world.world, section.getConfigurationSection("cornerOne")!!)
-            island.protectedCorner2 = Companion.from(world.world, section.getConfigurationSection("cornerTwo")!!)
-            island.islandGenerators = loadGenerators(world, section.getConfigurationSection("generators")!!) as ArrayList<Generator>
+            island.bedLocation = from(world.world, section.getConfigurationSection("bed")!!)
+            island.spawnLocation = from(world.world, section.getConfigurationSection("spawn")!!)
+            island.upgradeEntityLocation = from(world.world, section.getConfigurationSection("upgradeLocation")!!)
+            island.shopEntityLocation = from(world.world, section.getConfigurationSection("shop")!!)
+            island.protectedCorner1 = from(world.world, section.getConfigurationSection("cornerOne")!!)
+            island.protectedCorner2 = from(world.world, section.getConfigurationSection("cornerTwo")!!)
+            island.islandGenerators = loadGenerators(world, section.getConfigurationSection("generators")!!, true) as ArrayList<Generator>
         } catch (exception: Exception) {
             Bukkit.getLogger().severe("Invalid ${color.formattedName()} island in ${world.name}")
         }

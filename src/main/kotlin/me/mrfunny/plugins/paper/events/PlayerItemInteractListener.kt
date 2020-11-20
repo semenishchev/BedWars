@@ -52,11 +52,11 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
 
         when(itemName){
             "set diamond generator" -> {
-                val diamondGenerator = Generator(current, GeneratorType.DIAMOND)
+                val diamondGenerator = Generator(current, GeneratorType.DIAMOND, false)
                 gameManager.configurationManager.saveUnownedGenerator(player.world.name, diamondGenerator)
             }
             "set emerald generator" -> {
-                val emeraldGenerator = Generator(current, GeneratorType.EMERALD)
+                val emeraldGenerator = Generator(current, GeneratorType.EMERALD, false)
                 gameManager.configurationManager.saveUnownedGenerator(player.world.name, emeraldGenerator)
             }
             "change island" -> {
@@ -85,12 +85,12 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
                 if(island != null) {
                     player.sendMessage("setting generator location")
 
-                    var islandGenerator = Generator(current, GeneratorType.IRON)
+                    var islandGenerator = Generator(current, GeneratorType.IRON, true)
                     island.islandGenerators.add(islandGenerator)
 
-                    islandGenerator = Generator(current, GeneratorType.GOLD)
+                    islandGenerator = Generator(current, GeneratorType.GOLD, true)
                     island.islandGenerators.add(islandGenerator)
-                    islandGenerator = Generator(current, GeneratorType.EMERALD)
+                    islandGenerator = Generator(current, GeneratorType.EMERALD, true)
                     island.islandGenerators.add(islandGenerator)
                 }
             }

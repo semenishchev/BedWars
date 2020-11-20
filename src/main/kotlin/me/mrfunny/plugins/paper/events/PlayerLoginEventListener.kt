@@ -34,6 +34,7 @@ class PlayerLoginEventListener(private val gameManager: GameManager) : Listener 
     fun onJoin(event: PlayerJoinEvent) {
         event.joinMessage = null
         gameManager.scoreboard.addPlayer(event.player)
+        gameManager.updateScoreboard()
 
         if (gameManager.state == GameState.ACTIVE) {
             val world = gameManager.world

@@ -3,6 +3,7 @@ package me.mrfunny.plugins.paper.worlds
 import com.sk89q.worldedit.math.BlockVector3
 import com.sk89q.worldedit.regions.CuboidRegion
 import me.mrfunny.plugins.paper.worlds.generators.Generator
+import me.mrfunny.plugins.paper.worlds.generators.GeneratorType
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
@@ -19,6 +20,16 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
     var spawnLocation: Location? = null
 
     var islandGenerators = arrayListOf<Generator>()
+    set(value) {
+        field = value
+
+        islandGenerators.forEach {
+            println(it.type)
+            if(it.type != GeneratorType.EMERALD){
+                it.activated = true
+            }
+        }
+    }
 
     var players = arrayListOf<Player>()
     var absolutelyAlive = arrayListOf<UUID>()
@@ -26,6 +37,14 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
 
     fun isMember(player: Player): Boolean{
         return players.contains(player)
+    }
+
+    fun activateEmeraldGenerators(){
+        islandGenerators.forEach {
+            if(it.type == GeneratorType.EMERALD){
+                it.activated = true
+            }
+        }
     }
 
     fun isBlockWithinProtectedZone(block: Block): Boolean{

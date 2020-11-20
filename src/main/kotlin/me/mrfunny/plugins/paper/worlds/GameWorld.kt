@@ -1,7 +1,10 @@
 package me.mrfunny.plugins.paper.worlds
 
 import me.mrfunny.plugins.paper.gamemanager.GameManager
+import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.worlds.generators.Generator
+import me.mrfunny.plugins.paper.worlds.generators.GeneratorTier
+import me.mrfunny.plugins.paper.worlds.generators.GeneratorType
 import org.bukkit.*
 import org.bukkit.entity.Player
 import java.io.*
@@ -19,6 +22,9 @@ class GameWorld(var name: String) {
     lateinit var destinationWorldFolder: File
 
     val maxTeamSize: Int = 1
+
+    var diamondTier: GeneratorTier = GeneratorTier.ONE
+    var emeraldTier: GeneratorTier = GeneratorTier.ONE
 
     fun loadWorld(gameManager: GameManager, loadingIntoPlaying: Boolean, runnable: Runnable) {
         val sourceFolder = File("${gameManager.plugin.dataFolder.canonicalPath}${File.separator}..${File.separator}..${File.separator}$name")
@@ -133,6 +139,28 @@ class GameWorld(var name: String) {
     }
 
     fun tick(currentSecond: Int) {
+        val minuteOfGame: Double = secondsToMinutes(currentSecond)
+
+        if(minuteOfGame == 3.0){
+            Bukkit.broadcastMessage(Colorize.c("&bАлмазные&f генераторы были улучшены до уровня II"))
+            diamondTier = GeneratorTier.TWO
+        }
+
+        if(minuteOfGame == 5.0){
+            Bukkit.broadcastMessage(Colorize.c("&aИзумрудные&f генераторы были улучшены до уровня II"))
+            emeraldTier = GeneratorTier.TWO
+        }
+
+        if(minuteOfGame == 10.0){
+            Bukkit.broadcastMessage(Colorize.c("&bАлмазные&f генераторы были улучшены до уровня III"))
+            diamondTier = GeneratorTier.THREE
+        }
+
+        if(minuteOfGame == 15.0){
+            Bukkit.broadcastMessage(Colorize.c("&aИзумрудные&f генераторы были улучшены до уровня III"))
+            diamondTier = GeneratorTier.THREE
+        }
+
         for(island: Island in islands){
             island.islandGenerators.forEach {
                 it.spawn()
@@ -140,7 +168,19 @@ class GameWorld(var name: String) {
         }
 
         generators.forEach {
+            it.activated = true
+            if(it.type == GeneratorType.DIAMOND){
+                it.currentTier = diamondTier
+            }
+
+            if(it.type == GeneratorType.EMERALD){
+                it.currentTier = emeraldTier
+            }
             it.spawn()
         }
+    }
+
+    private fun secondsToMinutes(seconds: Int): Double{
+        return seconds / 60.0
     }
 }
