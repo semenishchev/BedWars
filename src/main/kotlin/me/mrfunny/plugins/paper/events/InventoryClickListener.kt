@@ -34,13 +34,6 @@ class InventoryClickListener(private val gameManager: GameManager) : Listener {
         val player: Player = event.whoClicked as Player
 
         val gui: GUI? = gameManager.guiManager.getOpenGui(player)
-        if(gui is ItemShopGUI){
-            println("Opened shop by player ${player.name}")
-            event.isCancelled = true
-            gui.handleClick(player, event.currentItem!!, event.view)
-            gameManager.guiManager.setGUI(player, ItemShopGUI(gameManager, player))
-            return
-        }
         if(gui == null){
             event.view.close()
             event.whoClicked.closeInventory()
@@ -54,7 +47,11 @@ class InventoryClickListener(private val gameManager: GameManager) : Listener {
             player.closeInventory()
             return
         }
-        val newGUI: GUI = gui.handleClick(player, event.currentItem!!, event.view) ?: return
+        if(gui.handleClick(player, event.currentItem!!, event.view) == null){
+            event.isCancelled = true
+            return
+        }
+        val newGUI: GUI = gui.handleClick(player, event.currentItem!!, event.view)!!
 
         gameManager.guiManager.setGUI(player, newGUI)
 

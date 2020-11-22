@@ -11,9 +11,12 @@ import me.mrfunny.plugins.paper.worlds.generators.GeneratorType
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.Material
+import org.bukkit.entity.Fireball
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 
@@ -25,7 +28,7 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
 
         if(name == "магазин предметов") {
             event.isCancelled = true
-            val gui: ItemShopGUI = ItemShopGUI(gameManager, event.player)
+            val gui = ItemShopGUI(gameManager, event.player)
             gameManager.guiManager.setGUI(event.player, gui)
         } else if(name == "улучшения команды"){
 
@@ -37,6 +40,20 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
     @EventHandler
     fun onInteract(event: PlayerInteractEvent){
         if(!event.hasItem()) return
+        if (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK) {
+            if(gameManager.state != GameState.ACTIVE) return
+            if (event.item!!.type == Material.LEGACY_FIREBALL || event.item!!.type == Material.FIRE_CHARGE) {
+                event.isCancelled = true
+                val newItem = event.item!!
+                newItem.amount = newItem.amount - 1
+                event.player.inventory.remove(event.item!!)
+                event.player.inventory.addItem(newItem)
+                event.player.updateInventory()
+                val fireball = event.player.launchProjectile(Fireball::class.java)
+                fireball.direction = event.player.location.direction
+                fireball.location.y = fireball.location.y - 0.5
+            }
+        }
 
         if(event.item == null) return
         if(event.item!!.itemMeta == null) return
@@ -58,7 +75,6 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
         val island: Island? = gameManager.setupWizardManager.getIsland(player)
 
         if(itemName == null){
-            println("null")
             return
         }
 

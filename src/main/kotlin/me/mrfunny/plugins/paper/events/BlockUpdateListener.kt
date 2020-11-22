@@ -5,11 +5,14 @@ import me.mrfunny.plugins.paper.gamemanager.GameState
 import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.worlds.Island
 import org.bukkit.*
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
+import org.bukkit.entity.TNTPrimed
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.metadata.MetadataValue
 
@@ -66,6 +69,15 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
     }
 
     @EventHandler
+    fun onExplode(event: EntityExplodeEvent){
+        event.blockList().forEach {
+            if(!it.hasMetadata("placed")){
+                event.blockList().remove(it)
+            }
+        }
+    }
+
+    @EventHandler
     fun onPlace(event: BlockPlaceEvent){
         if(gameManager.state != GameState.ACTIVE && gameManager.state != GameState.WON) return
         if(event.player.gameMode == GameMode.CREATIVE) return
@@ -88,6 +100,21 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
                 event.isCancelled = true
                 return
             }
+        }
+
+        if(event.blockPlaced.type == Material.TNT) {
+            event.isCancelled = true
+            val location = event.blockPlaced.location
+            location.x += 0.5
+            location.y += 0.5
+            location.z += 0.5
+            (location.world!!.spawnEntity(location, EntityType.PRIMED_TNT) as TNTPrimed).fuseTicks = 40
+            val newItem = event.itemInHand
+            newItem.amount = newItem.amount - 1
+            event.player.inventory.remove(event.itemInHand)
+            event.player.inventory.addItem(newItem)
+            event.player.updateInventory()
+            return
         }
 
         event.block.setMetadata("placed", FixedMetadataValue(gameManager.plugin, event.player.name))

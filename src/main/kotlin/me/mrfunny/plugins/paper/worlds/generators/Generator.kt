@@ -85,7 +85,8 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
         }
         val typeName: String = type.name.toLowerCase().capitalize()
         val pluralize: String = if(timeLeft == 1) "" else "s"
-        return "&a$typeName: $timeLeft second$pluralize..." //todo: same color code as material color
+        val colorCode: String = if(type == GeneratorType.EMERALD) "&2" else if (type == GeneratorType.DIAMOND) "&b" else ""
+        return "$colorCode$typeName: $timeLeft second$pluralize..." //todo: same color code as material color
     }
 
     private fun getActivationTime(): Int {

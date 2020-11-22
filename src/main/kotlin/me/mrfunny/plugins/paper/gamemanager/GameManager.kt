@@ -48,7 +48,6 @@ class GameManager(var plugin: BedWars) {
             }
         }
     }
-
     var state: GameState = GameState.PRELOBBY
     set(value) {
         field = value
