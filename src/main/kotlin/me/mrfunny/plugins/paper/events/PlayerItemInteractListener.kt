@@ -40,26 +40,28 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
     @EventHandler
     fun onInteract(event: PlayerInteractEvent){
         if(!event.hasItem()) return
-        if (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK) {
-            if(gameManager.state != GameState.ACTIVE) return
-            if (event.item!!.type == Material.LEGACY_FIREBALL || event.item!!.type == Material.FIRE_CHARGE) {
-                event.isCancelled = true
-                val newItem = event.item!!
-                newItem.amount = newItem.amount - 1
-                event.player.inventory.remove(event.item!!)
-                event.player.inventory.addItem(newItem)
-                event.player.updateInventory()
-                val fireball = event.player.launchProjectile(Fireball::class.java)
-                fireball.direction = event.player.location.direction
-                fireball.location.y = fireball.location.y - 0.5
-            }
-        }
 
         if(event.item == null) return
         if(event.item!!.itemMeta == null) return
         if(!(event.item!!.hasItemMeta())) return
 
         val player: Player = event.player
+
+        if (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK) {
+            if (event.item!!.type == Material.LEGACY_FIREBALL || event.item!!.type == Material.FIRE_CHARGE) {
+                event.isCancelled = true
+                if(gameManager.state == GameState.ACTIVE){
+                    val newItem = event.item!!
+                    newItem.amount = newItem.amount - 1
+                    event.player.inventory.remove(event.item!!)
+                    event.player.inventory.addItem(newItem)
+                    event.player.updateInventory()
+                    val fireball = event.player.launchProjectile(Fireball::class.java)
+                    fireball.direction = event.player.location.direction
+                    fireball.location.y = fireball.location.y - 0.5
+                }
+            }
+        }
 
         val itemName: String? = ChatColor.stripColor(event.item?.itemMeta?.displayName).toLowerCase()
 
@@ -70,10 +72,6 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
             return
         }
 
-        val current: Location = player.location
-        val clicked: Location = if(event.clickedBlock != null) event.clickedBlock!!.location else player.location
-        val island: Island? = gameManager.setupWizardManager.getIsland(player)
-
         if(itemName == null){
             return
         }
@@ -81,6 +79,9 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
         event.isCancelled = true
 
         if(!gameManager.setupWizardManager.isInWizard(event.player)) return
+        val current: Location = player.location
+        val clicked: Location = if(event.clickedBlock != null) event.clickedBlock!!.location else player.location
+        val island: Island? = gameManager.setupWizardManager.getIsland(player)
 
         when(itemName){
             "set diamond generator" -> {

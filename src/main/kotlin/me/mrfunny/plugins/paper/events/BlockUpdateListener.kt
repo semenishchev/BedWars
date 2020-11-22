@@ -5,6 +5,7 @@ import me.mrfunny.plugins.paper.gamemanager.GameState
 import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.worlds.Island
 import org.bukkit.*
+import org.bukkit.block.Block
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.entity.TNTPrimed
@@ -14,7 +15,6 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.metadata.FixedMetadataValue
-import org.bukkit.metadata.MetadataValue
 
 class BlockUpdateListener(private val gameManager: GameManager) : Listener {
 
@@ -25,6 +25,7 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
             event.isCancelled = true 
             return
         }
+
 
         val player: Player = event.player
         val type: Material = event.block.type
@@ -70,17 +71,24 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
 
     @EventHandler
     fun onExplode(event: EntityExplodeEvent){
-        event.blockList().forEach {
-            if(!it.hasMetadata("placed")){
-                event.blockList().remove(it)
+        val blockIterator: MutableIterator<Block> = event.blockList().iterator()
+
+        while(blockIterator.hasNext()){
+            if(!blockIterator.next().hasMetadata("placed")){
+                blockIterator.remove()
+            } else if(blockIterator.next().type.name.contains("GLASS")){
+                blockIterator.remove()
             }
         }
     }
 
     @EventHandler
     fun onPlace(event: BlockPlaceEvent){
-        if(gameManager.state != GameState.ACTIVE && gameManager.state != GameState.WON) return
         if(event.player.gameMode == GameMode.CREATIVE) return
+        if(gameManager.state != GameState.ACTIVE && gameManager.state != GameState.WON) {
+            event.isCancelled = true
+            return
+        }
 
         if(event.block.x > 110){
             event.isCancelled = true
@@ -117,7 +125,7 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
             return
         }
 
-        event.block.setMetadata("placed", FixedMetadataValue(gameManager.plugin, event.player.name))
+        event.block.setMetadata("placed", FixedMetadataValue(gameManager.plugin, "block"))
 
     }
 }

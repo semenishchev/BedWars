@@ -52,7 +52,7 @@ class PlayerLoginEventListener(private val gameManager: GameManager) : Listener 
             }
 
             gameManager.playerManager.setSpectatorMode(event.player)
-        } else if (gameManager.state == GameState.LOBBY) {
+        } else if (gameManager.state == GameState.LOBBY || gameManager.state == GameState.STARTING) {
             event.player.gameMode = GameMode.SURVIVAL
             event.player.teleport(gameManager.world.lobbyPosition)
             event.player.enderChest.clear()
@@ -63,9 +63,9 @@ class PlayerLoginEventListener(private val gameManager: GameManager) : Listener 
 
     @EventHandler
     fun onQuit(event: PlayerQuitEvent) {
-        gameManager.endGameIfNeeded()
         event.quitMessage = null
         gameManager.scoreboard.removePlayer(event.player)
         gameManager.updateScoreboard()
+        gameManager.endGameIfNeeded()
     }
 }

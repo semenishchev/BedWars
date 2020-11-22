@@ -159,6 +159,7 @@ class GameManager(var plugin: BedWars) {
                 lines.add("&fКарта: ${world.world.name.replace("_playing", "")}")
                 lines.add("&fИгроков: &a${Bukkit.getOnlinePlayers().size}/${world.maxTeamSize * world.islands.size}")
             } else {
+
                 for (island: Island in world.islands){
                     if(island.players.size == 0) continue
                     val builder: StringBuilder = StringBuilder()

@@ -8,7 +8,12 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.LeatherArmorMeta
+import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.inventory.meta.SkullMeta
+import org.bukkit.potion.PotionData
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
+import org.bukkit.potion.PotionType
 import java.util.*
 import java.util.stream.Collectors
 
@@ -69,7 +74,13 @@ class ItemBuilder {
         `is`.durability = dur
         return this
     }
-
+    fun setPotion(type: PotionEffectType, duration: Int, amplifier: Int): ItemBuilder{
+        `is`.type = Material.POTION
+        val pm: PotionMeta = `is`.itemMeta as PotionMeta
+        pm.addCustomEffect(PotionEffect(PotionEffectType.INVISIBILITY, duration, amplifier, false, true), true)
+        `is`.itemMeta = pm
+        return this
+    }
     /**
      * Set the displayname of the item.
      * @param name The name to change it to.

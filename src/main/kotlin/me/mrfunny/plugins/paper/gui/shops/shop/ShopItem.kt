@@ -21,7 +21,7 @@ class ShopItem(val price: Int, val currencyMaterial: Material, val category: Sho
 
         output.add("")
 
-        output.add(if(canBuy(player)) Colorize.c("&aНажмите, чтобы купить") else "&cУ вас недостаточно $currencyMaterial для покупки")
+        output.add(Colorize.c(if(canBuy(player)) "&aНажмите, чтобы купить" else "&cУ вас недостаточно $currencyMaterial для покупки"))
 
         output.add("")
 
@@ -29,8 +29,7 @@ class ShopItem(val price: Int, val currencyMaterial: Material, val category: Sho
     }
 
     fun getShopItemstack(player: Player): ItemStack {
-        val builder: ItemBuilder = ItemBuilder(item).setLore(getLore(player))
-        return builder.toItemStack()
+        return ItemBuilder(item.type, item.amount).setLore(getLore(player)).toItemStack()
     }
 
     fun canBuy(player: Player): Boolean{
