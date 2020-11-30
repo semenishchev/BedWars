@@ -39,7 +39,6 @@ class SetupWizardIslandSelectorGUI(var gameManager: GameManager) : GUI {
         val itemName: String = ChatColor.stripColor(itemStack.itemMeta.displayName)!!
 
         for(color: IslandColor in IslandColor.values()){
-            println(color)
             if(itemName.equals(color.formattedName(), true)){
                 clickedColor = color
                 break

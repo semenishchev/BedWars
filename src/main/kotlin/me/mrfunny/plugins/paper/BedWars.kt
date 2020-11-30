@@ -6,8 +6,9 @@ import me.mrfunny.plugins.paper.commands.StartCommand
 import me.mrfunny.plugins.paper.events.*
 import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.gamemanager.GameState
+import me.mrfunny.plugins.paper.util.Colorize
+import me.mrfunny.plugins.paper.players.PlayerData
 import org.bukkit.Bukkit
-
 import org.bukkit.plugin.java.JavaPlugin
 
 
@@ -15,6 +16,7 @@ class BedWars : JavaPlugin() {
 
     lateinit var gameManager: GameManager
     lateinit var instance: BedWars
+
     override fun onEnable() {
         instance = this
         gameManager = GameManager(this)
@@ -34,6 +36,7 @@ class BedWars : JavaPlugin() {
         getCommand("forcestart")?.setExecutor(ForcestartCommand(gameManager))
 
         server.onlinePlayers.forEach {
+            PlayerData.PLAYERS[it.uniqueId] = PlayerData(it.uniqueId)
             gameManager.scoreboard.addPlayer(it)
         }
 
@@ -48,12 +51,19 @@ class BedWars : JavaPlugin() {
         server.pluginManager.registerEvents(ChatListeners(gameManager), this)
         server.pluginManager.registerEvents(ItemListener, this)
         server.pluginManager.registerEvents(MobSpawnListener, this)
+        server.pluginManager.registerEvents(PotionListener(gameManager), this)
     }
+
+
 
     override fun onDisable() {
         gameManager = GameManager(instance)
         gameManager.scoreboard.destroy()
         gameManager.world.resetWorld()
+    }
+
+    companion object {
+        fun String.colorize() = Colorize.c(this)
     }
 
 }

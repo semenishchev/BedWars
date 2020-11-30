@@ -5,6 +5,7 @@ import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.gamemanager.GameState
 import me.mrfunny.plugins.paper.gui.ItemShopGUI
 import me.mrfunny.plugins.paper.gui.TeamPickerGUI
+import me.mrfunny.plugins.paper.gui.TeamUpgradeGUI
 import me.mrfunny.plugins.paper.worlds.Island
 import me.mrfunny.plugins.paper.worlds.generators.Generator
 import me.mrfunny.plugins.paper.worlds.generators.GeneratorType
@@ -26,12 +27,14 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
     fun onInteractWithShop(event: PlayerInteractEntityEvent){
         val name: String = ChatColor.stripColor(event.rightClicked.name.toLowerCase())
 
-        if(name == "магазин предметов") {
+        if(name == "item shop") {
             event.isCancelled = true
             val gui = ItemShopGUI(gameManager, event.player)
             gameManager.guiManager.setGUI(event.player, gui)
-        } else if(name == "улучшения команды"){
-
+        } else if(name == "team upgrades"){
+            event.isCancelled = true
+            val gui = TeamUpgradeGUI(gameManager)
+            gameManager.guiManager.setGUI(event.player, gui)
         }
 
     }
@@ -43,7 +46,6 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
 
         if(event.item == null) return
         if(event.item!!.itemMeta == null) return
-        if(!(event.item!!.hasItemMeta())) return
 
         val player: Player = event.player
 
@@ -59,7 +61,14 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
                     val fireball = event.player.launchProjectile(Fireball::class.java)
                     fireball.direction = event.player.location.direction
                     fireball.location.y = fireball.location.y - 0.5
+                    return
                 }
+            }
+        }
+
+        if(event.action == Action.RIGHT_CLICK_BLOCK){
+            if(event.clickedBlock!!.type.name.contains("BED") && !player.isSneaking){
+                event.isCancelled = true
             }
         }
 
@@ -76,8 +85,7 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
             return
         }
 
-        event.isCancelled = true
-
+        if(!(event.item!!.hasItemMeta())) return
         if(!gameManager.setupWizardManager.isInWizard(event.player)) return
         val current: Location = player.location
         val clicked: Location = if(event.clickedBlock != null) event.clickedBlock!!.location else player.location
@@ -160,6 +168,7 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
             }
             else -> return
         }
+        event.isCancelled = true
 
     }
 }

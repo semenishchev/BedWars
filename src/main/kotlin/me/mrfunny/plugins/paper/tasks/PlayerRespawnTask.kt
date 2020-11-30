@@ -2,6 +2,7 @@ package me.mrfunny.plugins.paper.tasks
 
 import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.util.Colorize
+import me.mrfunny.plugins.paper.players.PlayerData
 import me.mrfunny.plugins.paper.worlds.Island
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
@@ -20,11 +21,11 @@ class PlayerRespawnTask(private var player: Player, var playerIsland: Island, pr
             playerIsland.absolutelyAlive.remove(player.uniqueId)
             player.gameMode = GameMode.SURVIVAL
             player.teleport(playerIsland.spawnLocation!!)
-            gamaManager.playerManager.giveTeamArmor(player, playerIsland)
+            PlayerData.PLAYERS[player.uniqueId]?.health = 20.0
             return
         }
 
-        player.sendTitle(Colorize.c("&cYou died"), Colorize.c("&aRespawning at ${5 - tick}..."), 0, 30, 30)
+        player.sendTitle(Colorize.c("&cYOU DIED"), Colorize.c("&aRespawn at ${5 - tick}..."), 0, 30, 30)
 
         tick++
     }

@@ -1,5 +1,6 @@
 package me.mrfunny.plugins.paper.worlds
 
+import me.mrfunny.plugins.paper.gui.shops.teamupgrades.UpgradeItem
 import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.worlds.generators.Generator
 import me.mrfunny.plugins.paper.worlds.generators.GeneratorType
@@ -25,6 +26,8 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
     var bedLocation: Location? = null
     var spawnLocation: Location? = null
 
+    var totalSouls: Int = 0
+
     var islandGenerators = arrayListOf<Generator>()
     set(value) {
         field = value
@@ -39,7 +42,8 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
 
     var players = arrayListOf<Player>()
     var absolutelyAlive = arrayListOf<UUID>()
-    var isAlive: Boolean = true
+
+    val upgrades = arrayListOf<UpgradeItem>()
 
     fun isMember(player: Player): Boolean{
         return players.contains(player)
@@ -48,12 +52,12 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
     fun spawnShops(){
         val itemShopEntity: Villager = shopEntityLocation!!.world.spawn(shopEntityLocation!!, Villager::class.java)
         itemShopEntity.profession = Villager.Profession.BUTCHER
-        itemShopEntity.customName = Colorize.c("&eМагазин предметов")
+        itemShopEntity.customName = Colorize.c("&eItem shop")
         itemShopEntity.isCustomNameVisible = true
         itemShopEntity.setAI(false)
 
         val teamUpgradeShop: Skeleton = upgradeEntityLocation!!.world.spawn(upgradeEntityLocation!!, Skeleton::class.java)
-        teamUpgradeShop.customName = Colorize.c("&eУлучшения команды")
+        teamUpgradeShop.customName = Colorize.c("&eTeam upgrades")
         teamUpgradeShop.isCustomNameVisible = true
         teamUpgradeShop.setAI(false)
     }

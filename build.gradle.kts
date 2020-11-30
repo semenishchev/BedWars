@@ -8,11 +8,14 @@ repositories {
     maven("https://gitlab.com/XjCyan1de/maven-repo/-/raw/master/")
     maven("https://jitpack.io/")
     maven("https://maven.enginehub.org/repo/")
+    maven ("https://repo.dmulloy2.net/nexus/repository/public/" )
 }
 
 dependencies {
     compileOnly("com.destroystokyo.paper", "paper-api", "1.16.3-R0.1-SNAPSHOT")
     compileOnly("com.destroystokyo.paper", "paper", "1.16.3-R0.1-SNAPSHOT")
+    compileOnly("com.comphenix.protocol", "ProtocolLib", "4.5.1")
+    compileOnly("org.projectlombok", "lombok", "1.18.16")
     testImplementation(kotlin("test-junit"))
 }
 tasks {

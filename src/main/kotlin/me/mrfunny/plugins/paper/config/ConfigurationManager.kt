@@ -30,13 +30,17 @@ class ConfigurationManager(var gameManager: GameManager) {
     }
 
     fun loadWorld(mapName: String, consumer: Consumer<GameWorld>){
-        val gameWorld = GameWorld(mapName)
+        val gameWorld = GameWorld(mapName, gameManager)
         gameWorld.loadWorld(gameManager, true){
             val section: ConfigurationSection = getMapSection(mapName)
+            var totalTeams = 0
             for(sectionColor: String in section.getKeys(false)){
-                if(EnumUtils.isValidEnum(IslandColor::class.java, sectionColor)){
-                    val island: Island = loadIsland(gameWorld, section.getConfigurationSection(sectionColor)!!)
-                    gameWorld.islands.add(island)
+                if(EnumUtils.isValidEnum(IslandColor::class.java, sectionColor)) {
+                    if (totalTeams < gameWorld.maxComands) {
+                        val island: Island = loadIsland(gameWorld, section.getConfigurationSection(sectionColor)!!)
+                        totalTeams++
+                        gameWorld.islands.add(island)
+                    }
                 } else {
                     continue
                 }
@@ -94,7 +98,7 @@ class ConfigurationManager(var gameManager: GameManager) {
 
     fun randomMapName(): String {
         val mapNames = configuration.getKeys(false).toTypedArray()
-        return mapNames[0]
+        return "Lighthouse"
     }
 
     @Suppress("UNCHECKED_CAST")

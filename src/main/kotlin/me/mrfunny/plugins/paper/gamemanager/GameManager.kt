@@ -12,9 +12,13 @@ import me.mrfunny.plugins.paper.setup.SetupWizardManager
 import me.mrfunny.plugins.paper.tasks.GameStartingTask
 import me.mrfunny.plugins.paper.tasks.GameTickTask
 import me.mrfunny.plugins.paper.util.Colorize
+import me.mrfunny.plugins.paper.util.TeleportUtil
 import me.mrfunny.plugins.paper.worlds.GameWorld
 import me.mrfunny.plugins.paper.worlds.Island
 import org.bukkit.Bukkit
+import org.bukkit.boss.BarColor
+import org.bukkit.boss.BarStyle
+import org.bukkit.boss.BossBar
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -31,6 +35,7 @@ class GameManager(var plugin: BedWars) {
 
     lateinit var gameStartingTask: GameStartingTask
     lateinit var gameTickTask: GameTickTask
+    val bossBar: BossBar = Bukkit.createBossBar("Game starting in 20...", BarColor.GREEN, BarStyle.SEGMENTED_20)
 
     init {
 
@@ -71,6 +76,7 @@ class GameManager(var plugin: BedWars) {
                 gameStartingTask.cancel()
                 this.gameTickTask = GameTickTask(this)
                 this.gameTickTask.runTaskTimer(plugin, 0, 20)
+                TeleportUtil.nofallPlayers.clear()
 
                 for(player: Player in Bukkit.getOnlinePlayers()) {
                     val island: Island? = world.getIslandForPlayer(player)
@@ -103,16 +109,16 @@ class GameManager(var plugin: BedWars) {
                 this.gameTickTask.cancel()
                 val finalIsland: Optional<Island> = world.getActiveIslands().stream().findFirst()
                 if(!finalIsland.isPresent){
-                    Bukkit.broadcastMessage(Colorize.c("&fНИЧЬЯ"))
+                    Bukkit.broadcastMessage(Colorize.c("&fDRAW"))
                 } else {
                     val island: Island = finalIsland.get()
-                    Bukkit.broadcastMessage(Colorize.c("Команда ${island.color.formattedName()} победили!"))
+                    Bukkit.broadcastMessage(Colorize.c("${island.color.formattedName()} has won!"))
                     var winners = ""
                     island.players.forEach {
                         winners += it.name + ", "
-                        it.sendTitle(Colorize.c("&l&6ПОБЕДА"), null, 0, 30, 20)
+                        it.sendTitle(Colorize.c("&l&6Victory"), null, 0, 30, 20)
                     }
-                    Bukkit.broadcastMessage(Colorize.c("&8Победители: &a$winners"))
+                    Bukkit.broadcastMessage(Colorize.c("&8Winners: &a$winners"))
 
                     updateScoreboard()
 
@@ -121,7 +127,7 @@ class GameManager(var plugin: BedWars) {
                         println("Reseting task ${task.taskId}")
                         state = GameState.RESET
                     }
-                    , 20 * 10)
+                    , 20 * 15)
                 }
             }
             GameState.RESET -> {
@@ -184,8 +190,7 @@ class GameManager(var plugin: BedWars) {
                     lines.add("")
                 }
             }
-
-            scoreboard.setLines(lines)
+        scoreboard.setLines(lines)
 
         for(player: Player in Bukkit.getOnlinePlayers()){
             val island: Island? = world.getIslandForPlayer(player)

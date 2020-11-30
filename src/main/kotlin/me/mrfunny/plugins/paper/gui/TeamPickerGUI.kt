@@ -25,7 +25,7 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
         const val name: String = "Select island"
     }
 
-    override val inventory: Inventory = Bukkit.createInventory(null, 27, name)
+    override val inventory: Inventory = Bukkit.createInventory(null, 9, name)
 
     init {
         gameManager.world.islands.forEach {
@@ -36,6 +36,10 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
 
             if(it.isMember(player)){
                 itemBuilder.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1).hideEnchantments()
+            }
+            itemBuilder.addLoreLine("")
+            for (player in it.players) {
+                itemBuilder.addLoreLine("${it.color.getChatColor()}${player.name}")
             }
             inventory.addItem(itemBuilder.toItemStack())
         }
@@ -50,7 +54,7 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
         val itemName: String = ChatColor.stripColor(itemStack.itemMeta.displayName)!!
         for (color: IslandColor in IslandColor.values()) {
             if (itemName.equals(color.formattedName(), true)) {
-                println(color)
+                println("${player.name} was assigned to ${color.formattedName()}")
                 clickedColor = color
                 break
             }

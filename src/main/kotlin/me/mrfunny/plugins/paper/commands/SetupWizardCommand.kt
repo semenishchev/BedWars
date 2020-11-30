@@ -20,8 +20,6 @@ class SetupWizardCommand(var gameManager: GameManager) : CommandExecutor {
                 return true
             }
 
-            if(!player.hasPermission("bedwars.admin")) { return true }
-
             val mapName: String = args[0]
             if(mapName.equals("exit", true)){
                 gameManager.setupWizardManager.removeFromWizard(player)
@@ -29,7 +27,7 @@ class SetupWizardCommand(var gameManager: GameManager) : CommandExecutor {
                 return true
             }
             player.sendMessage("Loading world, one moment...")
-            val gameWorld = GameWorld(mapName)
+            val gameWorld = GameWorld(mapName, gameManager)
             gameWorld.loadWorld(gameManager, false) { gameManager.setupWizardManager.activateSetupWizard(player, gameWorld) }
         } else {
             sender.sendMessage("Only players can execute this command!")

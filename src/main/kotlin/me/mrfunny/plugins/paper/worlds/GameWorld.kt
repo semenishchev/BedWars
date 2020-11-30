@@ -1,10 +1,13 @@
 package me.mrfunny.plugins.paper.worlds
 
+import me.mrfunny.plugins.paper.BedWars.Companion.colorize
 import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.worlds.generators.Generator
 import me.mrfunny.plugins.paper.worlds.generators.GeneratorTier
 import me.mrfunny.plugins.paper.worlds.generators.GeneratorType
+import net.md_5.bungee.api.ChatMessageType
+import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.*
 import org.bukkit.entity.Player
 import java.io.*
@@ -12,7 +15,7 @@ import java.util.*
 import java.util.stream.Collectors
 import kotlin.collections.ArrayList
 
-class GameWorld(var name: String) {
+class GameWorld(var name: String, val gameManager: GameManager) {
     lateinit var world: World
     var islands = arrayListOf<Island>()
 
@@ -22,6 +25,7 @@ class GameWorld(var name: String) {
     lateinit var destinationWorldFolder: File
 
     val maxTeamSize: Int = 1
+    val maxComands: Int = 8
 
     var diamondTier: GeneratorTier = GeneratorTier.ONE
     var emeraldTier: GeneratorTier = GeneratorTier.ONE
@@ -41,9 +45,14 @@ class GameWorld(var name: String) {
         world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false)
         world.setGameRule(GameRule.DISABLE_RAIDS, true)
         world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false)
+        world.setGameRule(GameRule.DO_WEATHER_CYCLE, false)
         world.difficulty = Difficulty.NORMAL
 
         runnable.run()
+    }
+
+    fun isMapInit(): Boolean{
+        return this::lobbyPosition.isInitialized
     }
 
     private fun copyFolder(src: File, destination: File){
@@ -76,6 +85,10 @@ class GameWorld(var name: String) {
             input.close()
             out.close()
         }
+    }
+
+    fun isSolo(): Boolean{
+        return maxTeamSize == 1
     }
 
     fun resetWorld(){
@@ -119,7 +132,6 @@ class GameWorld(var name: String) {
                 }
             }
 
-
             return@filter false
         }.findFirst()
 
@@ -140,24 +152,59 @@ class GameWorld(var name: String) {
     fun tick(currentSecond: Int) {
         val minuteOfGame: Double = secondsToMinutes(currentSecond)
 
-        if(minuteOfGame == 3.0){
-            Bukkit.broadcastMessage(Colorize.c("&bАлмазные&f генераторы были улучшены до уровня II"))
-            diamondTier = GeneratorTier.TWO
-        }
-
         if(minuteOfGame == 5.0){
-            Bukkit.broadcastMessage(Colorize.c("&aИзумрудные&f генераторы были улучшены до уровня II"))
+            Bukkit.broadcastMessage(Colorize.c("&4Ruby&f generators has been upgraded to level II"))
             emeraldTier = GeneratorTier.TWO
         }
 
         if(minuteOfGame == 10.0){
-            Bukkit.broadcastMessage(Colorize.c("&bАлмазные&f генераторы были улучшены до уровня III"))
+            Bukkit.broadcastMessage(Colorize.c("&4Ruby&f generators has been upgraded to level III"))
             diamondTier = GeneratorTier.THREE
         }
 
-        if(minuteOfGame == 15.0){
-            Bukkit.broadcastMessage(Colorize.c("&aИзумрудные&f генераторы были улучшены до уровня III"))
-            diamondTier = GeneratorTier.THREE
+        if(minuteOfGame == 20.0){
+            Bukkit.broadcastMessage("&cALL BEDS DESTRUCTION IN 10 MINUTES")
+        }
+
+        if(minuteOfGame == 25.0){
+            Bukkit.broadcastMessage("&cALL BEDS DESTRUCTION IN 5 MINUTES")
+        }
+
+        if(currentSecond == 1795){
+            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 5")
+        }
+
+        if(currentSecond == 1796){
+            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 4")
+        }
+
+        if(currentSecond == 1797){
+            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 3")
+        }
+
+        if(currentSecond == 1798){
+            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 2")
+        }
+
+        if(currentSecond == 1799){
+            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 1")
+        }
+
+        if(currentSecond == 1800){
+            islands.forEach {
+                it.bedLocation?.block?.breakNaturally()
+                world.spigot().strikeLightningEffect(it.bedLocation!!, false)
+                world.spawnParticle(Particle.EXPLOSION_HUGE, it.bedLocation!!, 1)
+                world.playSound(it.bedLocation!!, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f)
+                for(player in it.players){
+                    player.playSound(player.location, Sound.ENTITY_ENDER_DRAGON_DEATH, 1f, 1f)
+                }
+            }
+        }
+
+        Bukkit.getOnlinePlayers().forEach {
+
+            it.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent("&7${gameManager.playerManager.getIronCount(it)} iron &f• &6${gameManager.playerManager.getGoldCount(it)} gold &f• &4${gameManager.playerManager.getRubyCount(it)} ruby &f• &b${getIslandForPlayer(it)?.totalSouls} souls".colorize()))
         }
 
         for(island: Island in islands){

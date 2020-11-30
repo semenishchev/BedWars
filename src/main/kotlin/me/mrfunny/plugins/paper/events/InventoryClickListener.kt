@@ -6,17 +6,21 @@ import me.mrfunny.plugins.paper.gamemanager.GameState
 import me.mrfunny.plugins.paper.gui.ItemShopGUI
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
+import org.bukkit.block.Chest
+import org.bukkit.block.EnderChest
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
+import org.bukkit.event.inventory.InventoryType
 
 class InventoryClickListener(private val gameManager: GameManager) : Listener {
 
     @EventHandler
     fun onClick(event: InventoryClickEvent){
         if(gameManager.state == GameState.LOBBY && event.whoClicked.gameMode != GameMode.CREATIVE) event.isCancelled = true
+        if(event.inventory.holder is Chest || event.inventory.holder is EnderChest) return
         if(event.currentItem == null) return
 
         val materialName: String = event.currentItem!!.type.name

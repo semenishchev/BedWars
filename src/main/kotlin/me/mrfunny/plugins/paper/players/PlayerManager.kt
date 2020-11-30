@@ -1,18 +1,21 @@
 package me.mrfunny.plugins.paper.players
 
 import me.mrfunny.plugins.paper.gamemanager.GameManager
+import me.mrfunny.plugins.paper.util.InventoryApi
 import me.mrfunny.plugins.paper.util.ItemBuilder
 import me.mrfunny.plugins.paper.worlds.Island
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 
 class PlayerManager(private val gameManager: GameManager) {
 
     fun setSpectatorMode(player: Player){
         player.teleport(gameManager.world.lobbyPosition)
-        player.inventory.clear()
+        InventoryApi.clearInventoryExceptArmor(player)
+        player.inventory.addItem()
         player.gameMode = GameMode.SPECTATOR
 
         gameManager.endGameIfNeeded()
@@ -31,7 +34,7 @@ class PlayerManager(private val gameManager: GameManager) {
 
         player.enderChest.clear()
         player.inventory.clear()
-
+//        player.inventory.addItem(ItemStack(Material.WOODEN_SWORD))
         giveTeamArmor(player, island)
     }
 
@@ -46,8 +49,6 @@ class PlayerManager(private val gameManager: GameManager) {
             .setUnbreakable(true)
             .toItemStack()
 
-        // todo: проверить на наличие улучшений брони
-
         player.inventory.leggings = ItemBuilder(Material.LEATHER_LEGGINGS)
             .setLeatherArmorColor(island.color.getColor())
             .setUnbreakable(true)
@@ -57,6 +58,7 @@ class PlayerManager(private val gameManager: GameManager) {
             .setLeatherArmorColor(island.color.getColor())
             .setUnbreakable(true)
             .toItemStack()
+
     }
 
     fun giveAllTeamSelector(){
@@ -75,5 +77,38 @@ class PlayerManager(private val gameManager: GameManager) {
 
         player.inventory.clear()
         player.inventory.addItem(ItemBuilder(woolMaterial).setName("Select team").toItemStack())
+    }
+
+    fun getIronCount(player: Player): Int{
+        var count = 0
+        for(item in player.inventory){
+            if(item == null) continue
+            if(item.type == Material.GHAST_TEAR){
+                count += item.amount
+            }
+        }
+        return count
+    }
+
+    fun getGoldCount(player: Player): Int{
+        var count = 0
+        for(item in player.inventory){
+            if(item == null) continue
+            if(item.type == Material.GOLD_NUGGET){
+                count += item.amount
+            }
+        }
+        return count
+    }
+
+    fun getRubyCount(player: Player): Int{
+        var count = 0
+        for(item in player.inventory){
+            if(item == null) continue
+            if(item.type == Material.FERMENTED_SPIDER_EYE){
+                count += item.amount
+            }
+        }
+        return count
     }
 }

@@ -1,6 +1,7 @@
 package me.mrfunny.plugins.paper.worlds.generators
 
 import me.mrfunny.plugins.paper.util.Colorize
+import me.mrfunny.plugins.paper.util.ItemBuilder
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.ArmorStand
@@ -15,7 +16,7 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
 
     var activated: Boolean = false
     set(value) {
-
+        if(type == GeneratorType.DIAMOND) return
         if(value == field) return
 
         field = value
@@ -36,10 +37,27 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
         armorStand?.customName = Colorize.c(getArmorstandName())
     }
 
-    var secondsSinceActivation: Int = 0
+    private var secondsSinceActivation: Int = 0
+
+    fun getItemStack(): Material {
+        return when (type) {
+            GeneratorType.IRON -> {
+                Material.GHAST_TEAR
+            }
+            GeneratorType.GOLD -> {
+                Material.GOLD_NUGGET
+            }
+            GeneratorType.DIAMOND -> {
+                Material.DIAMOND
+            }
+            GeneratorType.EMERALD -> {
+                Material.FERMENTED_SPIDER_EYE
+            }
+        }
+    }
 
     fun spawn(){
-        if(type == GeneratorType.DIAMOND && isIslandGenerator) return // забанить нафиг возможность спавнить алмазы на базе (защита от дурака)
+        if(type == GeneratorType.DIAMOND) return // забанить нафиг возможность спавнить алмазы на базе (защита от дурака)
 
         if(!activated){
             if(armorStand != null){
@@ -59,23 +77,28 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
         if(secondsSinceActivation < getActivationTime()) return
 
         secondsSinceActivation = 0
+        var name = ""
 
         val resourceType: Material = when(type){
             GeneratorType.IRON -> {
-                Material.IRON_INGOT
+                name = "&fIron"
+                Material.GHAST_TEAR
             }
             GeneratorType.GOLD -> {
-                Material.GOLD_INGOT
+                name = "&6Gold"
+                Material.GOLD_NUGGET
             }
             GeneratorType.DIAMOND -> {
+                name = "&4Lol"
                 Material.DIAMOND
             }
             GeneratorType.EMERALD -> {
-                Material.EMERALD
+                name = "&4Ruby"
+                Material.FERMENTED_SPIDER_EYE
             }
         }
 
-        location.world.dropItem(location, ItemStack(resourceType))
+        location.world.dropItem(location, ItemBuilder(resourceType).setName(name).toItemStack())
     }
 
     private fun getArmorstandName(): String{
@@ -83,10 +106,10 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
         if(timeLeft == 0){
             timeLeft = getActivationTime()
         }
-        val typeName: String = type.name.toLowerCase().capitalize()
+//        val typeName: String = type.name.toLowerCase().capitalize()
         val pluralize: String = if(timeLeft == 1) "" else "s"
-        val colorCode: String = if(type == GeneratorType.EMERALD) "&2" else if (type == GeneratorType.DIAMOND) "&b" else ""
-        return "$colorCode$typeName: $timeLeft second$pluralize..." //todo: same color code as material color
+        val colorCode: String = if(type == GeneratorType.EMERALD) "&4" else if (type == GeneratorType.DIAMOND) "&b" else ""
+        return "${colorCode}Ruby at $timeLeft second$pluralize..." //todo: same color code as material color
     }
 
     private fun getActivationTime(): Int {
@@ -94,7 +117,7 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
             GeneratorType.IRON -> {
                 return when (currentTier) {
                     GeneratorTier.ONE -> {
-                        4
+                        3
                     }
                     GeneratorTier.TWO -> {
                         2
@@ -107,10 +130,10 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
             GeneratorType.GOLD -> {
                 return when (currentTier) {
                     GeneratorTier.ONE -> {
-                        10
+                        8
                     }
                     GeneratorTier.TWO -> {
-                        5
+                        4
                     }
                     else -> {
                         2
@@ -133,7 +156,7 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
             GeneratorType.EMERALD -> {
                 if(isIslandGenerator){
                     if (currentTier == GeneratorTier.ONE) {
-                        return 40
+                        return 60
                     }
                     else if (currentTier == GeneratorTier.TWO) {
                         return 20
@@ -141,10 +164,10 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
                 } else {
                     return when (currentTier) {
                         GeneratorTier.ONE -> {
-                            25
+                            40
                         }
                         GeneratorTier.TWO -> {
-                            20
+                            30
                         }
                         else -> {
                             15
@@ -154,5 +177,24 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
             }
         }
         return 20
+    }
+
+    companion object{
+        fun getItemStack(type: GeneratorType): Material {
+            return when (type) {
+                GeneratorType.IRON -> {
+                    Material.GHAST_TEAR
+                }
+                GeneratorType.GOLD -> {
+                    Material.GOLD_NUGGET
+                }
+                GeneratorType.DIAMOND -> {
+                    Material.DIAMOND
+                }
+                GeneratorType.EMERALD -> {
+                    Material.FERMENTED_SPIDER_EYE
+                }
+            }
+        }
     }
 }

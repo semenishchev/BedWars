@@ -15,8 +15,10 @@ import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
 import me.mrfunny.plugins.paper.gui.shops.shop.ShopItem
 import org.bukkit.enchantments.Enchantment
+import org.bukkit.enchantments.Enchantment.ARROW_KNOCKBACK
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionData
+import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.potion.PotionType
 
@@ -25,51 +27,53 @@ class ItemShopGUI(private val gameManager: GameManager, private val player: Play
     override val name: String = "Shop"
     private val items: Array<ShopItem>
 
+    val invisibilityPotion: ItemStack = ItemStack(Material.POTION)
+    val speedPotion: ItemStack = ItemStack(Material.POTION)
+    val jumpPotion: ItemStack = ItemStack(Material.POTION)
+
     init {
+        // invisibility
+        val invisibilityPotionMeta: PotionMeta = invisibilityPotion.itemMeta as PotionMeta
+        invisibilityPotionMeta.addCustomEffect(PotionEffect(PotionEffectType.INVISIBILITY, 600, 2), true)
+        invisibilityPotion.itemMeta = invisibilityPotionMeta
         val island: Island = gameManager.world.getIslandForPlayer(player)!!
+
+        // todo:
         items = arrayOf(
-            ShopItem(4, Material.IRON_INGOT, ShopCategory.BLOCKS, ItemBuilder(island.color.woolMaterial(), 16).toItemStack(), 19, "&aНеплохие блоки, чтобы строится"),
-            ShopItem(6, Material.GOLD_INGOT, ShopCategory.BLOCKS, ItemBuilder(Material.OAK_PLANKS, 12).toItemStack(), 28, "Неплох для застройки кровати"),
-            ShopItem(24, Material.IRON_INGOT, ShopCategory.BLOCKS, ItemBuilder(Material.END_STONE, 16).toItemStack(), 37, "Защитит кровать от почти всех взрывов"),
+            ShopItem(20, Material.GHAST_TEAR, ShopCategory.UTILITY, ItemBuilder(Material.SNOWBALL).setName("&aSwapping snowball").toItemStack(), 1),
+            ShopItem(4, Material.GHAST_TEAR, ShopCategory.BLOCKS, ItemBuilder(island.color.woolMaterial(), 16).toItemStack(), 19, "&aНеплохие блоки, чтобы строится"),
+            ShopItem(6, Material.GOLD_NUGGET, ShopCategory.BLOCKS, ItemBuilder(Material.OAK_PLANKS, 12).toItemStack(), 28, "Неплох для застройки кровати"),
+            ShopItem(24, Material.GHAST_TEAR, ShopCategory.BLOCKS, ItemBuilder(Material.END_STONE, 16).toItemStack(), 37, "Защитит кровать от почти всех взрывов"),
 
-            ShopItem(10, Material.IRON_INGOT, ShopCategory.MELEE, ItemBuilder(Material.IRON_SWORD).toItemStack(), 20),
-            ShopItem(7, Material.GOLD_INGOT, ShopCategory.MELEE, ItemBuilder(Material.DIAMOND_SWORD).toItemStack(), 29),
-            ShopItem(3, Material.EMERALD, ShopCategory.MELEE, ItemBuilder(Material.NETHERITE_SWORD).toItemStack(), 38),
-            ShopItem(15, Material.IRON_INGOT, ShopCategory.MELEE, ItemBuilder(Material.SHIELD).toItemStack(), 47),
+            ShopItem(10, Material.GHAST_TEAR, ShopCategory.MELEE, ItemBuilder(Material.IRON_SWORD).toItemStack(), 20),
+            ShopItem(7, Material.GOLD_NUGGET, ShopCategory.MELEE, ItemBuilder(Material.DIAMOND_SWORD).toItemStack(), 29),
+            ShopItem(3, Material.FERMENTED_SPIDER_EYE, ShopCategory.MELEE, ItemBuilder(Material.NETHERITE_SWORD).toItemStack(), 38),
+            ShopItem(15, Material.GHAST_TEAR, ShopCategory.MELEE, ItemBuilder(Material.SHIELD).toItemStack(), 47),
 
-            ShopItem(10, Material.IRON_INGOT, ShopCategory.ARMOR, ItemBuilder(Material.IRON_BOOTS).toItemStack(), 21),
-            ShopItem(12, Material.GOLD_INGOT, ShopCategory.ARMOR, ItemBuilder(Material.DIAMOND_BOOTS).toItemStack(), 30),
-            ShopItem(6, Material.EMERALD, ShopCategory.ARMOR, ItemBuilder(Material.NETHERITE_BOOTS).toItemStack(), 39),
-            ShopItem(20, Material.GOLD_INGOT, ShopCategory.ARMOR, ItemBuilder(Material.TOTEM_OF_UNDYING).toItemStack(), 48),
+            ShopItem(10, Material.GHAST_TEAR, ShopCategory.ARMOR, ItemBuilder(Material.IRON_BOOTS).toItemStack(), 21),
+            ShopItem(12, Material.GOLD_NUGGET, ShopCategory.ARMOR, ItemBuilder(Material.DIAMOND_BOOTS).toItemStack(), 30),
+            ShopItem(6, Material.FERMENTED_SPIDER_EYE, ShopCategory.ARMOR, ItemBuilder(Material.NETHERITE_BOOTS).toItemStack(), 39),
+            ShopItem(20, Material.GOLD_NUGGET, ShopCategory.ARMOR, ItemBuilder(Material.TOTEM_OF_UNDYING).toItemStack(), 48),
 
-            ShopItem(20, Material.IRON_INGOT, ShopCategory.TOOLS, ItemBuilder(Material.SHEARS).toItemStack(), 22),
-            ShopItem(10, Material.IRON_INGOT, ShopCategory.TOOLS, ItemBuilder(Material.WOODEN_PICKAXE).setUnbreakable(true).addEnchant(Enchantment.DIG_SPEED, 2).toItemStack(), 31),
-            ShopItem(10, Material.EMERALD, ShopCategory.TOOLS, ItemBuilder(Material.WOODEN_AXE).setUnbreakable(true).addEnchant(Enchantment.DIG_SPEED, 2).toItemStack(), 40),
+            ShopItem(20, Material.GHAST_TEAR, ShopCategory.TOOLS, ItemBuilder(Material.SHEARS).toItemStack(), 22),
+            ShopItem(10, Material.GHAST_TEAR, ShopCategory.TOOLS, ItemBuilder(Material.WOODEN_PICKAXE).setUnbreakable(true).addEnchant(Enchantment.DIG_SPEED, 2).toItemStack(), 31),
+            ShopItem(10, Material.GHAST_TEAR, ShopCategory.TOOLS, ItemBuilder(Material.WOODEN_AXE).addEnchant(Enchantment.DIG_SPEED, 2).toItemStack(), 40),
+            ShopItem(10, Material.GOLD_NUGGET, ShopCategory.TOOLS, ItemBuilder(Material.FISHING_ROD).setUnbreakable(false).setName("&aGrappling Hook").toItemStack(), 49),
 
-            ShopItem(10, Material.GOLD_INGOT, ShopCategory.RANGED, ItemBuilder(Material.BOW).setUnbreakable(true).toItemStack(), 23),
-            ShopItem(10, Material.GOLD_INGOT, ShopCategory.RANGED, ItemBuilder(Material.BOW).setUnbreakable(true).addEnchant(Enchantment.ARROW_KNOCKBACK, 1).addEnchant(Enchantment.ARROW_DAMAGE, 2).toItemStack(), 32),
-            ShopItem(8, Material.IRON_INGOT, ShopCategory.RANGED, ItemBuilder(Material.ARROW, 8).toItemStack(), 41),
+            ShopItem(10, Material.GOLD_NUGGET, ShopCategory.RANGED, ItemBuilder(Material.BOW).setUnbreakable(true).toItemStack(), 23),
+            ShopItem(10, Material.GOLD_NUGGET, ShopCategory.RANGED, ItemBuilder(Material.BOW).setUnbreakable(true).addEnchant(
+                ARROW_KNOCKBACK, 1).addEnchant(Enchantment.ARROW_DAMAGE, 2).toItemStack(), 32),
+            ShopItem(8, Material.GHAST_TEAR, ShopCategory.RANGED, ItemBuilder(Material.ARROW, 8).toItemStack(), 41),
 
-            ShopItem(2, Material.EMERALD, ShopCategory.POTIONS, ItemBuilder(Material.POTION).setPotion(PotionEffectType.INVISIBILITY, 600, 2).toItemStack(), 24),
-            ShopItem(1, Material.EMERALD, ShopCategory.POTIONS, ItemBuilder(Material.POTION).setPotion(PotionEffectType.SPEED, 900, 3).toItemStack(), 33),
-            ShopItem(2, Material.EMERALD, ShopCategory.POTIONS, ItemBuilder(Material.POTION).setPotion(PotionEffectType.JUMP, 900, 5).toItemStack(), 42),
+            ShopItem(2, Material.FERMENTED_SPIDER_EYE, ShopCategory.POTIONS, invisibilityPotion, 24),
+//            ShopItem(1, Material.FERMENTED_SPIDER_EYE, ShopCategory.POTIONS, ItemBuilder(Material.POTION).setPotion(PotionEffectType.SPEED, 900, 3).toItemStack(), 33),
+//            ShopItem(2, Material.FERMENTED_SPIDER_EYE, ShopCategory.POTIONS, ItemBuilder(Material.POTION).setPotion(PotionEffectType.JUMP, 900, 5).toItemStack(), 42),
 
-            ShopItem(40, Material.IRON_INGOT, ShopCategory.UTILITY, ItemBuilder(Material.FIRE_CHARGE).toItemStack(), 25),
-            ShopItem(8, Material.GOLD_INGOT, ShopCategory.UTILITY, ItemBuilder(Material.TNT).toItemStack(), 34),
-            ShopItem(3, Material.GOLDEN_APPLE, ShopCategory.UTILITY, ItemBuilder(Material.GOLDEN_APPLE).toItemStack(), 43),
-            ShopItem(3, Material.EMERALD, ShopCategory.UTILITY, ItemBuilder(Material.ENDER_PEARL).toItemStack(), 51),
+            ShopItem(40, Material.GHAST_TEAR, ShopCategory.UTILITY, ItemBuilder(Material.FIRE_CHARGE).toItemStack(), 25),
+            ShopItem(8, Material.GOLD_NUGGET, ShopCategory.UTILITY, ItemBuilder(Material.TNT).toItemStack(), 34),
+            ShopItem(3, Material.GOLD_NUGGET, ShopCategory.UTILITY, ItemBuilder(Material.GOLDEN_APPLE).toItemStack(), 43),
+            ShopItem(3, Material.FERMENTED_SPIDER_EYE, ShopCategory.UTILITY, ItemBuilder(Material.ENDER_PEARL).toItemStack(), 51),
         )
-        ShopCategory.values().forEach {
-            when(it){
-                ShopCategory.BLOCKS -> inventory.setItem(2, ItemStack(Material.TERRACOTTA))
-                ShopCategory.MELEE -> inventory.setItem(3, ItemStack(Material.GOLDEN_SWORD))
-                ShopCategory.ARMOR -> inventory.setItem(4, ItemStack(Material.IRON_BOOTS))
-                ShopCategory.TOOLS -> inventory.setItem(5, ItemStack(Material.STONE_HOE))
-                ShopCategory.RANGED -> inventory.setItem(3, ItemStack(Material.BOW))
-                ShopCategory.POTIONS -> inventory.setItem(3, ItemStack(Material.BREWING_STAND))
-                ShopCategory.UTILITY -> inventory.setItem(3, ItemStack(Material.TNT))
-            }
-        }
 
         items.forEach {
             inventory.setItem(it.position, it.getShopItemstack(player))
@@ -89,11 +93,36 @@ class ItemShopGUI(private val gameManager: GameManager, private val player: Play
         val currencyMaterial: Material = shopItem.currencyMaterial
 
         if(player.inventory.contains(currencyMaterial, price)){
-            player.inventory.addItem(shopItem.item)
-            player.inventory.removeItem(ItemStack(currencyMaterial, price))
-            player.sendMessage(Colorize.c("&aВы приобрели &6${shopItem.item.itemMeta.localizedName}"))
+            if(shopItem.item.type.name.contains("BOOTS")){
+                when {
+                    shopItem.item.type.name.contains("IRON") -> {
+                        player.inventory.boots = ItemStack(Material.IRON_BOOTS)
+                        player.inventory.leggings = ItemStack(Material.IRON_LEGGINGS)
+                    }
+                    shopItem.item.type.name.contains("DIAMOND") -> {
+                        player.inventory.boots = ItemStack(Material.DIAMOND_BOOTS)
+                        player.inventory.leggings = ItemStack(Material.DIAMOND_LEGGINGS)
+                    }
+                    shopItem.item.type.name.contains("NETHERITE") -> {
+                        player.inventory.boots = ItemStack(Material.NETHERITE_BOOTS)
+                        player.inventory.leggings = ItemStack(Material.NETHERITE_LEGGINGS)
+                    }
+                }
+            } else {
+                player.inventory.addItem(shopItem.item)
+            }
+
+            val itemStackToRemove: ItemStack = when(currencyMaterial){
+                Material.GHAST_TEAR -> ItemBuilder(currencyMaterial, price).setName("&fIron").toItemStack()
+                Material.GOLD_NUGGET -> ItemBuilder(currencyMaterial, price).setName("&6Gold").toItemStack()
+                Material.FERMENTED_SPIDER_EYE -> ItemBuilder(currencyMaterial, price).setName("&4Ruby").toItemStack()
+                else -> ItemBuilder(currencyMaterial, price).setName("&4Ruby").toItemStack()
+            }
+
+            player.inventory.removeItem(itemStackToRemove)
+            player.sendMessage(Colorize.c("&aYou purchased &6${shopItem.item.i18NDisplayName}"))
         } else {
-            player.sendMessage(Colorize.c("&cУ вас недостаточно денег для покупки этого"))
+            player.sendMessage(Colorize.c("&cYou didn't have enough ${shopItem.currencyMaterial}"))
         }
         return null
     }

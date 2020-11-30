@@ -12,6 +12,7 @@ import org.bukkit.entity.TNTPrimed
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockExplodeEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.metadata.FixedMetadataValue
@@ -38,7 +39,7 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
             if(!island.isMember(player)){
                 event.isDropItems = false
                 island.players.forEach {
-                    it.sendTitle(Colorize.c("&cВАША КРОВАТЬ СЛОМАНА"), Colorize.c("&aВЫ БОЛЬШЕ НЕ ВОЗРОДИТЕСЬ"), 0, 40, 0)
+                    it.sendTitle(Colorize.c("&cYOU BED HAS BEEN BROKEN"), Colorize.c("&aYOU WILL NO LONGER RESPAWN"), 0, 40, 0)
                 }
 
                 location.world.spigot().strikeLightningEffect(location, false)
@@ -47,7 +48,7 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
                     it.playSound(it.location, Sound.ENTITY_WITHER_DEATH, 1f, 1f)
                 }
 
-                Bukkit.broadcastMessage(Colorize.c("&fКровать сломана> ${island.color.getChatColor()}${island.color.russianName()}ая&f кровать была разрушена ${gameManager.world.getIslandForPlayer(player)!!.color.getChatColor()}${player.name}"))
+                Bukkit.broadcastMessage(Colorize.c("&fBED DESTRUCTION> ${island.color.getChatColor()}${island.color.formattedName()}&f bed has been destroyed by ${gameManager.world.getIslandForPlayer(player)!!.color.getChatColor()}${player.name}"))
             } else {
                 player.sendMessage("${ChatColor.RED}Вы не можете сломать свою кровать...")
                 event.isCancelled = true
@@ -64,7 +65,7 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
 
         if(!event.block.hasMetadata("placed")){
             event.isCancelled = true
-            player.sendMessage("${ChatColor.RED}Вы можете ломать только не блоки, которые поставили другие игроки")
+            player.sendMessage("${ChatColor.RED}You can break placed by players blocks")
             return
         }
     }
@@ -74,9 +75,26 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
         val blockIterator: MutableIterator<Block> = event.blockList().iterator()
 
         while(blockIterator.hasNext()){
-            if(!blockIterator.next().hasMetadata("placed")){
+            try{
+                if(!blockIterator.next().hasMetadata("placed") || blockIterator.next().type.name.contains("GLASS") || blockIterator.next().type.name.contains("BED")){
+                    blockIterator.remove()
+                }
+            } catch (ex: Exception){
                 blockIterator.remove()
-            } else if(blockIterator.next().type.name.contains("GLASS")){
+            }
+        }
+    }
+
+    @EventHandler
+    fun onBlockExplode(event: BlockExplodeEvent){
+        val blockIterator: MutableIterator<Block> = event.blockList().iterator()
+
+        while(blockIterator.hasNext()){
+            try{
+                if(!blockIterator.next().hasMetadata("placed") || blockIterator.next().type.name.contains("GLASS") || blockIterator.next().type.name.contains("BED")){
+                    blockIterator.remove()
+                }
+            } catch (ex: Exception){
                 blockIterator.remove()
             }
         }
@@ -90,25 +108,21 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
             return
         }
 
-        if(event.block.x > 110){
+        if(event.block.y > 110){
             event.isCancelled = true
             event.player.sendMessage("${ChatColor.RED}You cannot place blocks on Y: 110 and more")
             return
         }
 
-        if(event.block.type.name.contains("BED")){
-            event.isCancelled = true
-            event.player.sendMessage("Ууу ясно читор")
-            return
-        }
-
         for (island: Island in gameManager.world.islands) {
             if(island.isBlockWithinProtectedZone(event.block)){
-                event.player.sendMessage("Вы не можете ставить сдесь блоки")
+                event.player.sendMessage("You cannot place blocks here")
                 event.isCancelled = true
                 return
             }
         }
+
+        event.block.setMetadata("placed", FixedMetadataValue(gameManager.plugin, "block"))
 
         if(event.blockPlaced.type == Material.TNT) {
             event.isCancelled = true
@@ -124,8 +138,6 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
             event.player.updateInventory()
             return
         }
-
-        event.block.setMetadata("placed", FixedMetadataValue(gameManager.plugin, "block"))
 
     }
 }
