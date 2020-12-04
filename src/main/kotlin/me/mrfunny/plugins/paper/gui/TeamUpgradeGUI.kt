@@ -18,7 +18,7 @@ class TeamUpgradeGUI(private val gameManager: GameManager): GUI {
     override val name: String = "Team upgrades"
 
     private val upgrades: Array<UpgradeItem> = arrayOf(
-       UpgradeItem("Мечи", "asdsd", ItemBuilder(Material.DIAMOND_SWORD).setLore("", "Lol").toItemStack(), MaxLevel.THREE, 1, 2, 4)
+       UpgradeItem("Мечи", "asdsd", ItemBuilder(Material.DIAMOND_SWORD).setLore("", "&aDamage upgrade").toItemStack(), MaxLevel.THREE, 1, 2, 4)
    )
 
     init {
@@ -34,9 +34,12 @@ class TeamUpgradeGUI(private val gameManager: GameManager): GUI {
         if(!itemStack.itemMeta.hasLore()) return null
         if(!isUpgrade(itemStack)) return null
         if(getUpgradeByItemStack(itemStack) == null) return null
-        val upgrade: UpgradeItem = getUpgradeByItemStack(itemStack)!!
+        var upgrade: UpgradeItem = getUpgradeByItemStack(itemStack)!!
 
         val island: Island = gameManager.world.getIslandForPlayer(player)!!
+        if(island.upgrades.contains(upgrade)){
+            upgrade = island.upgrades[island.upgrades.indexOf(upgrade)]
+        }
 
         upgrade.upgrade(player, gameManager){
             if(upgrade.upgradeName == "Мечи"){

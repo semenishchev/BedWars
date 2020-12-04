@@ -9,6 +9,8 @@ import me.mrfunny.plugins.paper.worlds.generators.GeneratorType
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.*
+import org.bukkit.block.Block
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import java.io.*
 import java.util.*
@@ -31,6 +33,7 @@ class GameWorld(var name: String, val gameManager: GameManager) {
     var emeraldTier: GeneratorTier = GeneratorTier.ONE
 
     fun loadWorld(gameManager: GameManager, loadingIntoPlaying: Boolean, runnable: Runnable) {
+        println("Set file separator as ${File.separator}. Path is ${gameManager.plugin.dataFolder.canonicalPath}")
         val sourceFolder = File("${gameManager.plugin.dataFolder.canonicalPath}${File.separator}..${File.separator}..${File.separator}$name")
         destinationWorldFolder = File(sourceFolder.path + if (loadingIntoPlaying) "_playing" else "")
         try{
@@ -41,6 +44,22 @@ class GameWorld(var name: String, val gameManager: GameManager) {
 
         val creator = WorldCreator(name + if (loadingIntoPlaying) "_playing" else "")
         world = creator.createWorld()!!
+
+        if(!gameManager.gameConfig.get().isConfigurationSection("border")){
+            gameManager.gameConfig.get().set("border", 250.0)
+        }
+        if(!gameManager.gameConfig.get().isConfigurationSection("center")){
+            gameManager.gameConfig.get().set("center.x", 0.5)
+            gameManager.gameConfig.get().set("center.z", 0.5)
+        } else {
+            val centerSection: ConfigurationSection = gameManager.gameConfig.get().getConfigurationSection("center")!!
+            centerSection.set("x", 0.5)
+            centerSection.set("z", 0.5)
+        }
+
+        val border: WorldBorder = world.worldBorder
+        border.setCenter(gameManager.gameConfig.get().getDouble("center.x"), gameManager.gameConfig.get().getDouble("center.z"))
+        border.size = gameManager.gameConfig.get().getDouble("border")
 
         world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false)
         world.setGameRule(GameRule.DISABLE_RAIDS, true)
@@ -56,6 +75,7 @@ class GameWorld(var name: String, val gameManager: GameManager) {
     }
 
     private fun copyFolder(src: File, destination: File){
+        if(src.name == "uid.dat") return
         if(src.isDirectory){
             if(!destination.exists()){
                 destination.mkdir()
@@ -66,9 +86,14 @@ class GameWorld(var name: String, val gameManager: GameManager) {
 
             for (file in list) {
                 val srcFile = File(src, file)
+                if(srcFile.name == "uid.dat") continue
                 val destFile = File(destination, file)
 
-                copyFolder(srcFile, destFile)
+                try {
+                    copyFolder(srcFile, destFile)
+                } catch (ex: Exception){
+                    continue
+                }
             }
         } else {
             val input: InputStream = FileInputStream(src)
@@ -163,36 +188,36 @@ class GameWorld(var name: String, val gameManager: GameManager) {
         }
 
         if(minuteOfGame == 20.0){
-            Bukkit.broadcastMessage("&cALL BEDS DESTRUCTION IN 10 MINUTES")
+            Bukkit.broadcastMessage("&cALL BEDS DESTRUCTION IN 10 MINUTES".colorize())
         }
 
         if(minuteOfGame == 25.0){
-            Bukkit.broadcastMessage("&cALL BEDS DESTRUCTION IN 5 MINUTES")
+            Bukkit.broadcastMessage("&cALL BEDS DESTRUCTION IN 5 MINUTES".colorize())
         }
 
         if(currentSecond == 1795){
-            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 5")
+            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 5".colorize())
         }
 
         if(currentSecond == 1796){
-            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 4")
+            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 4".colorize())
         }
 
         if(currentSecond == 1797){
-            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 3")
+            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 3".colorize())
         }
 
         if(currentSecond == 1798){
-            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 2")
+            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 2".colorize())
         }
 
         if(currentSecond == 1799){
-            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 1")
+            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 1".colorize())
         }
 
         if(currentSecond == 1800){
             islands.forEach {
-                it.bedLocation?.block?.breakNaturally()
+                it.bedLocation?.block?.type = Material.AIR
                 world.spigot().strikeLightningEffect(it.bedLocation!!, false)
                 world.spawnParticle(Particle.EXPLOSION_HUGE, it.bedLocation!!, 1)
                 world.playSound(it.bedLocation!!, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f)
@@ -200,6 +225,10 @@ class GameWorld(var name: String, val gameManager: GameManager) {
                     player.playSound(player.location, Sound.ENTITY_ENDER_DRAGON_DEATH, 1f, 1f)
                 }
             }
+        }
+
+        if(minuteOfGame == 45.0){
+            gameManager.forceEndGame()
         }
 
         Bukkit.getOnlinePlayers().forEach {
@@ -229,4 +258,14 @@ class GameWorld(var name: String, val gameManager: GameManager) {
     private fun secondsToMinutes(seconds: Int): Double{
         return seconds / 60.0
     }
+
+    fun isBlockInProtectedZone(block: Block): Boolean{
+        for(island in islands){
+            if(island.isBlockWithinProtectedZone(block)){
+                return true
+            }
+        }
+        return false
+    }
+
 }

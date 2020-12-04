@@ -27,4 +27,8 @@ object NoFallPlayers {
     fun check(player: Player): Boolean{
         return players.contains(player.uniqueId)
     }
+
+    fun clear(){
+        players.clear()
+    }
 }

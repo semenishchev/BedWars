@@ -3,6 +3,7 @@ package me.mrfunny.api;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
@@ -52,5 +53,12 @@ public class PlayerApi {
 
         Vector dirVec = new Vector(x, y, z).normalize();
         return dirVec;
+    }
+
+    public static void clearInventoryExceptArmor(Player player){
+        ItemStack[] armorContents = player.getInventory().getArmorContents().clone();
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(armorContents);
+        player.updateInventory();
     }
 }

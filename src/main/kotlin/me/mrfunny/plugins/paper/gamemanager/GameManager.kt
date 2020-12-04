@@ -4,9 +4,14 @@ import dev.jcsoftware.jscoreboards.JScoreboard
 import dev.jcsoftware.jscoreboards.JScoreboardOptions
 import dev.jcsoftware.jscoreboards.JScoreboardTabHealthStyle
 import dev.jcsoftware.jscoreboards.exception.JScoreboardException
+import me.mrfunny.api.CustomConfiguration
+import me.mrfunny.api.NPCAPI
 import me.mrfunny.plugins.paper.BedWars
+import me.mrfunny.plugins.paper.BedWars.Companion.colorize
 import me.mrfunny.plugins.paper.config.ConfigurationManager
 import me.mrfunny.plugins.paper.gui.GUIManager
+import me.mrfunny.plugins.paper.messages.MessagesManager
+import me.mrfunny.plugins.paper.players.NoFallPlayers
 import me.mrfunny.plugins.paper.players.PlayerManager
 import me.mrfunny.plugins.paper.setup.SetupWizardManager
 import me.mrfunny.plugins.paper.tasks.GameStartingTask
@@ -16,19 +21,24 @@ import me.mrfunny.plugins.paper.util.TeleportUtil
 import me.mrfunny.plugins.paper.worlds.GameWorld
 import me.mrfunny.plugins.paper.worlds.Island
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.boss.BarColor
 import org.bukkit.boss.BarStyle
 import org.bukkit.boss.BossBar
 import org.bukkit.entity.Player
 import java.util.*
 
-class GameManager(var plugin: BedWars) {
+class GameManager(val plugin: BedWars) {
 
-    var scoreboard: JScoreboard = JScoreboard(JScoreboardOptions("&a&lBedWars", JScoreboardTabHealthStyle.NUMBER, true))
-    var setupWizardManager: SetupWizardManager = SetupWizardManager
-    var configurationManager: ConfigurationManager = ConfigurationManager(this)
-    var guiManager: GUIManager = GUIManager
+    val scoreboard: JScoreboard = JScoreboard(JScoreboardOptions("&c&lBedWars", JScoreboardTabHealthStyle.NUMBER, true))
+    val setupWizardManager: SetupWizardManager = SetupWizardManager
+    val configurationManager: ConfigurationManager = ConfigurationManager(this)
+    val guiManager: GUIManager = GUIManager
+    val npcApi: NPCAPI = NPCAPI()
+    val gameConfig = CustomConfiguration("gameconfig", plugin)
+    val messagesConfig = CustomConfiguration("messages", plugin)
 
+    var messages: MessagesManager
     val playerManager: PlayerManager = PlayerManager(this)
 
     lateinit var world: GameWorld
@@ -38,8 +48,8 @@ class GameManager(var plugin: BedWars) {
     val bossBar: BossBar = Bukkit.createBossBar("Game starting in 20...", BarColor.GREEN, BarStyle.SEGMENTED_20)
 
     init {
-
-        configurationManager.loadWorld(configurationManager.randomMapName()) { world: GameWorld ->
+        // todo: fix bug
+        configurationManager.loadWorld("Lighthouse") { world: GameWorld ->
             this.world = world
             state = GameState.LOBBY
 
@@ -52,6 +62,7 @@ class GameManager(var plugin: BedWars) {
                 }
             }
         }
+        messages = MessagesManager(this)
     }
     var state: GameState = GameState.PRELOBBY
     set(value) {
@@ -65,18 +76,16 @@ class GameManager(var plugin: BedWars) {
 
                 playerManager.giveAllTeamSelector()
             }
-
             GameState.STARTING -> {
                 updateScoreboard()
                 gameStartingTask = GameStartingTask(this)
                 gameStartingTask.runTaskTimer(plugin, 0, 20)
             }
-
             GameState.ACTIVE -> {
                 gameStartingTask.cancel()
                 this.gameTickTask = GameTickTask(this)
                 this.gameTickTask.runTaskTimer(plugin, 0, 20)
-                TeleportUtil.nofallPlayers.clear()
+                NoFallPlayers.clear()
 
                 for(player: Player in Bukkit.getOnlinePlayers()) {
                     val island: Island? = world.getIslandForPlayer(player)
@@ -107,7 +116,13 @@ class GameManager(var plugin: BedWars) {
             }
             GameState.WON -> {
                 this.gameTickTask.cancel()
-                val finalIsland: Optional<Island> = world.getActiveIslands().stream().findFirst()
+                val finalIsland: Optional<Island> = if(world.getActiveIslands().size > 1){
+                    println("random winner")
+                    world.getActiveIslands().stream().max(Comparator.comparingInt(Island::calculateStat))
+                } else {
+                    world.getActiveIslands().stream().findFirst()
+                }
+
                 if(!finalIsland.isPresent){
                     Bukkit.broadcastMessage(Colorize.c("&fDRAW"))
                 } else {
@@ -159,32 +174,50 @@ class GameManager(var plugin: BedWars) {
         state = GameState.WON
     }
 
+    fun forceEndGame(){
+        if(state != GameState.ACTIVE) return
+
+        state = GameState.WON
+    }
+
     fun updateScoreboard(){
             val lines = arrayListOf<String>()
             if(state == GameState.LOBBY || state == GameState.STARTING){
                 lines.add("&fКарта: ${world.world.name.replace("_playing", "")}")
                 lines.add("&fИгроков: &a${Bukkit.getOnlinePlayers().size}/${world.maxTeamSize * world.islands.size}")
             } else {
-
+                lines.add("")
+                val currentMinute = (gameTickTask.currentSecond % 3600) / 60
+                val currentSecond = gameTickTask.currentSecond % 60
+                lines.add("Time: ${if(currentMinute < 10)"0$currentMinute" else currentMinute}:${if(currentSecond < 10)"0$currentSecond" else currentSecond}")
+                lines.add("")
+                lines.add("Teams: ")
                 for (island: Island in world.islands){
                     if(island.players.size == 0) continue
                     val builder: StringBuilder = StringBuilder()
 
-                    builder.append("&").append(island.color.getChatColor().char).append(island.color.formattedName()[0]).append(" &f")
-                    builder.append(island.color.formattedName()).append(": ")
+                    builder.append("  ").append(island.color.getChatColor()).append("&l")
 
                     if(island.isBedPlaced()){
-                        builder.append("&a✓")
+                        builder.append("🛡")
                     } else {
                         if(island.alivePlayerCount() == 0){
-                            builder.append("&c✘")
+                            builder.append("&c⚔")
                         } else {
-                            builder.append("&a" + island.alivePlayerCount())
+                            builder.append("&6" + island.alivePlayerCount())
                         }
                     }
 
+                    builder.append(" &r&${island.color.getChatColor().char}${island.color.formattedName()}")
+
                     lines.add(builder.toString())
                 }
+
+                lines.add("")
+                lines.add("Event:")
+                lines.add("  Ruby II: 10:10")
+                lines.add("")
+                lines.add("${ChatColor.RED}rubynex.net")
 
                 if(lines.isEmpty()){
                     lines.add("")

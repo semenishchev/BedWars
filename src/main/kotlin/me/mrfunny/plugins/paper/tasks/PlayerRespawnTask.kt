@@ -17,7 +17,7 @@ class PlayerRespawnTask(private var player: Player, var playerIsland: Island, pr
 
     override fun run() {
         if(tick == 5){
-            player.sendTitle(Colorize.c("&aRespawned"), null, 20, 20, 20)
+            player.sendTitle(Colorize.c("&aRespawned"), "", 20, 20, 20)
             playerIsland.absolutelyAlive.remove(player.uniqueId)
             player.gameMode = GameMode.SURVIVAL
             player.teleport(playerIsland.spawnLocation!!)
@@ -25,7 +25,9 @@ class PlayerRespawnTask(private var player: Player, var playerIsland: Island, pr
             return
         }
 
-        player.sendTitle(Colorize.c("&cYOU DIED"), Colorize.c("&aRespawn at ${5 - tick}..."), 0, 30, 30)
+        if(5 - tick != 0){
+            player.sendTitle(Colorize.c("&cYOU DIED"), Colorize.c("&aRespawn at ${5 - tick}..."), 0, 30, 30)
+        }
 
         tick++
     }

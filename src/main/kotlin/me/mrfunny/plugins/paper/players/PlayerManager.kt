@@ -76,7 +76,8 @@ class PlayerManager(private val gameManager: GameManager) {
         }
 
         player.inventory.clear()
-        player.inventory.addItem(ItemBuilder(woolMaterial).setName("Select team").toItemStack())
+        player.inventory.setItem(4, ItemBuilder(woolMaterial).setName("&aSelect team").toItemStack())
+        player.inventory.setItem(8, ItemBuilder(Material.BARRIER).setName("&cLeave to hub").toItemStack())
     }
 
     fun getIronCount(player: Player): Int{

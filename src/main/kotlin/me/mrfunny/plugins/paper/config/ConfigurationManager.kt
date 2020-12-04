@@ -98,7 +98,11 @@ class ConfigurationManager(var gameManager: GameManager) {
 
     fun randomMapName(): String {
         val mapNames = configuration.getKeys(false).toTypedArray()
-        return "Lighthouse"
+        return if(mapNames.size == 1){
+            mapNames[0]
+        } else {
+            mapNames[Random.nextInt(0, mapNames.size)]
+        }
     }
 
     @Suppress("UNCHECKED_CAST")

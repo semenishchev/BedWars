@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.event.weather.WeatherChangeEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
+import org.bukkit.inventory.meta.ItemMeta
 
 
 object ItemListener: Listener {
@@ -35,22 +36,41 @@ object ItemListener: Listener {
         if (event.state == PlayerFishEvent.State.IN_GROUND || event.state == PlayerFishEvent.State.CAUGHT_ENTITY) {
             val pull: Location = event.hook.location
             if(event.player.inventory.itemInMainHand.type == Material.FISHING_ROD){
-                event.player.inventory.itemInMainHand.itemMeta.isUnbreakable = false
-                if((event.player.inventory.itemInMainHand.itemMeta as Damageable).damage >= 32){
-                    (event.player.inventory.itemInMainHand.itemMeta as Damageable).damage = 64
+                if(!event.player.inventory.itemInMainHand.hasItemMeta()) return
+                val meta: ItemMeta = event.player.inventory.itemInMainHand.itemMeta
+                if(!meta.displayName.contains("Hook")) return
+                if((meta as Damageable).damage < 61){
+                    meta.damage = 62
                 } else {
-                    (event.player.inventory.itemInMainHand.itemMeta as Damageable).damage = 32
+                    meta.damage++
                 }
+                if(meta.damage == 64){
+                    event.player.inventory.removeItem(event.player.inventory.itemInMainHand)
+                    pullEntityToLocation(event.player, pull)
+                    return
+                }
+                event.player.inventory.itemInMainHand.itemMeta = meta
+                pullEntityToLocation(event.player, pull)
             } else if(event.player.inventory.itemInOffHand.type == Material.FISHING_ROD){
-                event.player.inventory.itemInOffHand.itemMeta.isUnbreakable = false
-                if((event.player.inventory.itemInOffHand.itemMeta as Damageable).damage == 32){
-                    (event.player.inventory.itemInOffHand.itemMeta as Damageable).damage = 64
+//                if(!event.player.inventory.itemInOffHand.hasItemMeta()) return
+                val meta: ItemMeta = event.player.inventory.itemInOffHand.itemMeta
+                if(!meta.displayName.contains("Hook")) return
+                if((meta as Damageable).damage < 61){
+                    meta.damage = 61
                 } else {
-                    (event.player.inventory.itemInOffHand.itemMeta as Damageable).damage = 32
+                    meta.damage++
                 }
+                if(meta.damage == 64){
+                    event.player.inventory.removeItem(event.player.inventory.itemInOffHand)
+                    pullEntityToLocation(event.player, pull)
+                    return
+                }
+                event.player.inventory.itemInOffHand.itemMeta = meta
+                pullEntityToLocation(event.player, pull)
             }
-            pullEntityToLocation(event.player, pull)
-
+            return
+        } else if(event.state == PlayerFishEvent.State.CAUGHT_FISH){
+            event.isCancelled = true
         }
     }
 

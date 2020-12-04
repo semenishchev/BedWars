@@ -1,5 +1,6 @@
 package me.mrfunny.plugins.paper.gui.shops.shop
 
+import me.mrfunny.plugins.paper.BedWars.Companion.colorize
 import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.util.ItemBuilder
 import org.bukkit.Material
@@ -15,8 +16,11 @@ class ShopItem(val price: Int, val currencyMaterial: Material, val category: Sho
 
         output.add(Colorize.c("&7Стоимость:&f $price"))
         output.add("")
-        description.forEach {
-            output.add(Colorize.c(it))
+
+        for(i in description.indices){
+            if(i != 0){
+                output.add(description[i])
+            }
         }
 
         output.add("")
@@ -29,7 +33,11 @@ class ShopItem(val price: Int, val currencyMaterial: Material, val category: Sho
     }
 
     fun getShopItemstack(player: Player): ItemStack {
-        return ItemBuilder(item.type, item.amount).setLore(getLore(player)).toItemStack()
+        val itemBuilder: ItemBuilder = ItemBuilder(item.type, item.amount).setLore(getLore(player))
+        if(description.isNotEmpty()){
+            itemBuilder.setName(description[0])
+        }
+        return itemBuilder.toItemStack()
     }
 
     fun canBuy(player: Player): Boolean{

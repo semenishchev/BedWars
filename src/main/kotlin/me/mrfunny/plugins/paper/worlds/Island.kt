@@ -1,6 +1,7 @@
 package me.mrfunny.plugins.paper.worlds
 
 import me.mrfunny.plugins.paper.gui.shops.teamupgrades.UpgradeItem
+import me.mrfunny.plugins.paper.players.PlayerData
 import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.worlds.generators.Generator
 import me.mrfunny.plugins.paper.worlds.generators.GeneratorType
@@ -27,13 +28,12 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
     var spawnLocation: Location? = null
 
     var totalSouls: Int = 0
-
+    
     var islandGenerators = arrayListOf<Generator>()
     set(value) {
         field = value
 
         islandGenerators.forEach {
-            println(it.type)
             if(it.type != GeneratorType.EMERALD){
                 it.activated = true
             }
@@ -42,11 +42,18 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
 
     var players = arrayListOf<Player>()
     var absolutelyAlive = arrayListOf<UUID>()
+    var leavedPlayers = hashMapOf<UUID, Location>()
 
     val upgrades = arrayListOf<UpgradeItem>()
 
     fun isMember(player: Player): Boolean{
         return players.contains(player)
+    }
+
+    fun rejoin(uuid: UUID){
+        if(leavedPlayers.contains(uuid)){
+            players.add(Bukkit.getPlayer(uuid)!!)
+        }
     }
 
     fun spawnShops(){
@@ -97,6 +104,19 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
         }
 
         return blocks
+    }
+
+    fun calculateStat(): Int{
+        var result = 0
+        for(it in players) {
+            if(PlayerData.PLAYERS[it.uniqueId]?.totalDeaths!! == 0){
+                result += PlayerData.PLAYERS[it.uniqueId]?.totalKills!!
+                continue
+            }
+            result += PlayerData.PLAYERS[it.uniqueId]?.totalKills!! / PlayerData.PLAYERS[it.uniqueId]?.totalDeaths!!
+        }
+        println(result)
+        return result
     }
 
     fun isBedPlaced(): Boolean{

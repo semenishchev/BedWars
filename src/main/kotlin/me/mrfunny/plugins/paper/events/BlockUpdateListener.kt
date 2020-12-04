@@ -2,6 +2,8 @@ package me.mrfunny.plugins.paper.events
 
 import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.gamemanager.GameState
+import me.mrfunny.plugins.paper.messages.MessageUser
+import me.mrfunny.plugins.paper.messages.MessagesManager.Companion.message
 import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.worlds.Island
 import org.bukkit.*
@@ -17,7 +19,7 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.metadata.FixedMetadataValue
 
-class BlockUpdateListener(private val gameManager: GameManager) : Listener {
+class BlockUpdateListener(val gameManager: GameManager) : Listener {
 
     @EventHandler
     fun onBreak(event: BlockBreakEvent){
@@ -26,7 +28,6 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
             event.isCancelled = true 
             return
         }
-
 
         val player: Player = event.player
         val type: Material = event.block.type
@@ -39,7 +40,7 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
             if(!island.isMember(player)){
                 event.isDropItems = false
                 island.players.forEach {
-                    it.sendTitle(Colorize.c("&cYOU BED HAS BEEN BROKEN"), Colorize.c("&aYOU WILL NO LONGER RESPAWN"), 0, 40, 0)
+                    it.sendTitle(message("bed-destruction-title", gameManager), message("bed-destruction-subtitle", gameManager), 0, 40, 0)
                 }
 
                 location.world.spigot().strikeLightningEffect(location, false)
@@ -48,9 +49,10 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
                     it.playSound(it.location, Sound.ENTITY_WITHER_DEATH, 1f, 1f)
                 }
 
-                Bukkit.broadcastMessage(Colorize.c("&fBED DESTRUCTION> ${island.color.getChatColor()}${island.color.formattedName()}&f bed has been destroyed by ${gameManager.world.getIslandForPlayer(player)!!.color.getChatColor()}${player.name}"))
+                Bukkit.broadcastMessage(message("bed-destruction-all", gameManager).replace("{island}", "${island.color.getChatColor()}${island.color.formattedName()}")
+                    .replace("{player-island}", gameManager.world.getIslandForPlayer(player)?.color?.getChatColor().toString()).replace("{player}", player.name))
             } else {
-                player.sendMessage("${ChatColor.RED}Вы не можете сломать свою кровать...")
+                player.sendMessage("${ChatColor.RED}You cannot break your bed...")
                 event.isCancelled = true
             }
             return
@@ -76,7 +78,8 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
 
         while(blockIterator.hasNext()){
             try{
-                if(!blockIterator.next().hasMetadata("placed") || blockIterator.next().type.name.contains("GLASS") || blockIterator.next().type.name.contains("BED")){
+                val block: Block = blockIterator.next()
+                if(!block.hasMetadata("placed") || block.type.name.contains("GLASS") || block.type.name.contains("BED")){
                     blockIterator.remove()
                 }
             } catch (ex: Exception){
@@ -91,7 +94,8 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
 
         while(blockIterator.hasNext()){
             try{
-                if(!blockIterator.next().hasMetadata("placed") || blockIterator.next().type.name.contains("GLASS") || blockIterator.next().type.name.contains("BED")){
+                val block: Block = blockIterator.next()
+                if(!block.hasMetadata("placed") || block.type.name.contains("GLASS") || block.type.name.contains("BED")){
                     blockIterator.remove()
                 }
             } catch (ex: Exception){
@@ -122,8 +126,6 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
             }
         }
 
-        event.block.setMetadata("placed", FixedMetadataValue(gameManager.plugin, "block"))
-
         if(event.blockPlaced.type == Material.TNT) {
             event.isCancelled = true
             val location = event.blockPlaced.location
@@ -138,6 +140,8 @@ class BlockUpdateListener(private val gameManager: GameManager) : Listener {
             event.player.updateInventory()
             return
         }
+
+        event.block.setMetadata("placed", FixedMetadataValue(gameManager.plugin, "block"))
 
     }
 }

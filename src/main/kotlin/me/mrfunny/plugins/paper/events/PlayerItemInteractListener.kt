@@ -74,7 +74,7 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
 
         val itemName: String? = ChatColor.stripColor(event.item?.itemMeta?.displayName).toLowerCase()
 
-        if(itemName == "select team" && gameManager.state == GameState.LOBBY || gameManager.state == GameState.STARTING){
+        if(itemName == "select team" && (gameManager.state == GameState.LOBBY || gameManager.state == GameState.STARTING)){
             val teamPickerGUI = TeamPickerGUI(gameManager, event.player)
             gameManager.guiManager.setGUI(player, teamPickerGUI)
             event.isCancelled = true
@@ -169,6 +169,5 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
             else -> return
         }
         event.isCancelled = true
-
     }
 }

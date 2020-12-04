@@ -31,7 +31,6 @@ public class JScoreboard {
 
         if (this.scoreboard == null) {
             ScoreboardManager scoreboardManager = Bukkit.getServer().getScoreboardManager();
-            if (scoreboardManager == null) return;
 
             scoreboard = scoreboardManager.getNewScoreboard();
 

@@ -40,9 +40,9 @@ class ItemShopGUI(private val gameManager: GameManager, private val player: Play
 
         // todo:
         items = arrayOf(
-            ShopItem(20, Material.GHAST_TEAR, ShopCategory.UTILITY, ItemBuilder(Material.SNOWBALL).setName("&aSwapping snowball").toItemStack(), 1),
-            ShopItem(4, Material.GHAST_TEAR, ShopCategory.BLOCKS, ItemBuilder(island.color.woolMaterial(), 16).toItemStack(), 19, "&aНеплохие блоки, чтобы строится"),
-            ShopItem(6, Material.GOLD_NUGGET, ShopCategory.BLOCKS, ItemBuilder(Material.OAK_PLANKS, 12).toItemStack(), 28, "Неплох для застройки кровати"),
+            ShopItem(20, Material.GHAST_TEAR, ShopCategory.UTILITY, ItemBuilder(Material.SNOWBALL).setName("&aBuilding Snowball").toItemStack(), 1, "&aBuilding Snowball", "&aBuilds a bridge due to trajectory"),
+            ShopItem(4, Material.GHAST_TEAR, ShopCategory.BLOCKS, ItemBuilder(island.color.woolMaterial(), 16).toItemStack(), 19, "&${island.color.getChatColor().char}Wool"),
+            ShopItem(6, Material.GOLD_NUGGET, ShopCategory.BLOCKS, ItemBuilder(Material.OAK_PLANKS, 12).toItemStack(), 28,),
             ShopItem(24, Material.GHAST_TEAR, ShopCategory.BLOCKS, ItemBuilder(Material.END_STONE, 16).toItemStack(), 37, "Защитит кровать от почти всех взрывов"),
 
             ShopItem(10, Material.GHAST_TEAR, ShopCategory.MELEE, ItemBuilder(Material.IRON_SWORD).toItemStack(), 20),
@@ -121,6 +121,7 @@ class ItemShopGUI(private val gameManager: GameManager, private val player: Play
 
             player.inventory.removeItem(itemStackToRemove)
             player.sendMessage(Colorize.c("&aYou purchased &6${shopItem.item.i18NDisplayName}"))
+            player.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1f)
         } else {
             player.sendMessage(Colorize.c("&cYou didn't have enough ${shopItem.currencyMaterial}"))
         }

@@ -14,6 +14,7 @@ import org.bukkit.event.player.*
 import org.bukkit.scheduler.BukkitTask
 import java.util.*
 
+@Suppress("")
 class PlayerLoginEventListener(private val gameManager: GameManager) : Listener {
 
     @EventHandler

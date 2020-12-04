@@ -9,6 +9,7 @@ import me.mrfunny.plugins.paper.gamemanager.GameState
 import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.players.PlayerData
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.plugin.java.JavaPlugin
 
 
@@ -18,6 +19,15 @@ class BedWars : JavaPlugin() {
     lateinit var instance: BedWars
 
     override fun onEnable() {
+        Bukkit.getConsoleSender().sendMessage("\n${ChatColor.RED} ____           ___          __            \n" +
+                "|  _ \\         | \\ \\        / /            \n" +
+                "| |_) | ___  __| |\\ \\  /\\  / /_ _ _ __ ___ \n" +
+                "|  _ < / _ \\/ _` | \\ \\/  \\/ / _` | '__/ __|\n" +
+                "| |_) |  __/ (_| |  \\  /\\  / (_| | |  \\__ \\\n" +
+                "|____/ \\___|\\__,_|   \\/  \\/ \\__,_|_|  |___/\n\n" +
+                "${ChatColor.GREEN}---///||| Bedwars 1.0 By MisterFunny01 for Rubynex |||\\\\\\---\n" +
+                "${ChatColor.GOLD}Code name: ${ChatColor.RED}ruby")
+
         instance = this
         gameManager = GameManager(this)
 
@@ -27,16 +37,15 @@ class BedWars : JavaPlugin() {
             )
         }
 
-        Bukkit.getWorlds().forEach{
-            println(it)
-        }
-
         getCommand("setup")?.setExecutor(SetupWizardCommand(gameManager))
         getCommand("start")?.setExecutor(StartCommand(gameManager))
         getCommand("forcestart")?.setExecutor(ForcestartCommand(gameManager))
 
         server.onlinePlayers.forEach {
-            PlayerData.PLAYERS[it.uniqueId] = PlayerData(it.uniqueId)
+            val addPlayerData = PlayerData(it.uniqueId)
+            addPlayerData.health = it.health
+            addPlayerData.lastCombat = 0L
+            PlayerData.PLAYERS[it.uniqueId] = addPlayerData
             gameManager.scoreboard.addPlayer(it)
         }
 
@@ -49,18 +58,18 @@ class BedWars : JavaPlugin() {
         server.pluginManager.registerEvents(PlayerDeathListener(gameManager), this)
         server.pluginManager.registerEvents(HungerListener(gameManager), this)
         server.pluginManager.registerEvents(ChatListeners(gameManager), this)
+        server.pluginManager.registerEvents(PotionListener(gameManager), this)
         server.pluginManager.registerEvents(ItemListener, this)
         server.pluginManager.registerEvents(MobSpawnListener, this)
-        server.pluginManager.registerEvents(PotionListener(gameManager), this)
-    }
+}
 
 
 
-    override fun onDisable() {
-        gameManager = GameManager(instance)
-        gameManager.scoreboard.destroy()
-        gameManager.world.resetWorld()
-    }
+override fun onDisable() {
+    gameManager.scoreboard.destroy()
+    gameManager.world.resetWorld()
+    PlayerData.disable()
+}
 
     companion object {
         fun String.colorize() = Colorize.c(this)
