@@ -1,17 +1,15 @@
 package me.mrfunny.plugins.paper.worlds
 
+import me.mrfunny.api.NPC
+import me.mrfunny.plugins.paper.BedWars.Companion.colorize
 import me.mrfunny.plugins.paper.gui.shops.teamupgrades.UpgradeItem
 import me.mrfunny.plugins.paper.players.PlayerData
 import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.worlds.generators.Generator
 import me.mrfunny.plugins.paper.worlds.generators.GeneratorType
-import org.bukkit.Bukkit
-import org.bukkit.GameMode
-import org.bukkit.Location
-import org.bukkit.OfflinePlayer
+import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import org.bukkit.entity.Skeleton
 import org.bukkit.entity.Villager
 import java.util.*
 import java.util.stream.Collectors
@@ -42,9 +40,24 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
 
     var players = arrayListOf<Player>()
     var absolutelyAlive = arrayListOf<UUID>()
-    var leavedPlayers = hashMapOf<UUID, Location>()
+    var leavedPlayers = hashMapOf<UUID, NPC>()
 
     val upgrades = arrayListOf<UpgradeItem>()
+
+    fun hasUpgrade(name: String): Boolean{
+        for(upgrade in upgrades){
+            return upgrade.id == name
+        }
+        return false
+    }
+
+    fun addMember(player: Player){
+        players.add(player)
+    }
+
+    fun removeMember(player: Player){
+        players.remove(player)
+    }
 
     fun isMember(player: Player): Boolean{
         return players.contains(player)
@@ -63,7 +76,7 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
         itemShopEntity.isCustomNameVisible = true
         itemShopEntity.setAI(false)
 
-        val teamUpgradeShop: Skeleton = upgradeEntityLocation!!.world.spawn(upgradeEntityLocation!!, Skeleton::class.java)
+        val teamUpgradeShop: Villager = upgradeEntityLocation!!.world.spawn(upgradeEntityLocation!!, Villager::class.java)
         teamUpgradeShop.customName = Colorize.c("&eTeam upgrades")
         teamUpgradeShop.isCustomNameVisible = true
         teamUpgradeShop.setAI(false)
@@ -75,6 +88,15 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
                 it.activated = true
             }
         }
+    }
+
+    fun getUpgrade(id: String): UpgradeItem?{
+        upgrades.forEach {
+            if(it.id == id){
+                return it
+            }
+        }
+        return null
     }
 
     fun isBlockWithinProtectedZone(block: Block): Boolean{
@@ -115,7 +137,6 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
             }
             result += PlayerData.PLAYERS[it.uniqueId]?.totalKills!! / PlayerData.PLAYERS[it.uniqueId]?.totalDeaths!!
         }
-        println(result)
         return result
     }
 
@@ -168,5 +189,4 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
         }
         return count
     }
-
 }

@@ -23,6 +23,8 @@ import java.util.stream.Collectors
  * *Please do credit me if you do use this in one of your projects.*
  * @author NonameSL, edit MrFunny
  */
+
+@Suppress("DEPRECATION")
 class ItemBuilder {
 
     private var `is`: ItemStack
@@ -72,13 +74,6 @@ class ItemBuilder {
      */
     fun setDurability(dur: Short): ItemBuilder {
         `is`.durability = dur
-        return this
-    }
-    fun setPotion(type: PotionEffectType, duration: Int, amplifier: Int): ItemBuilder{
-        `is`.type = Material.POTION
-        val pm: PotionMeta = `is`.itemMeta as PotionMeta
-        pm.addCustomEffect(PotionEffect(PotionEffectType.INVISIBILITY, duration, amplifier, false, true), true)
-        `is`.itemMeta = pm
         return this
     }
     /**

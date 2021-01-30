@@ -2,6 +2,7 @@ package me.mrfunny.plugins.paper.worlds
 
 import org.bukkit.ChatColor
 import org.bukkit.Color
+import org.bukkit.DyeColor
 import org.bukkit.Material
 
 enum class IslandColor {
@@ -32,7 +33,7 @@ enum class IslandColor {
 
     fun getColor(): Color{
         return when(this){
-            GREEN -> Color.GREEN
+            GREEN -> Color.LIME
             RED -> Color.RED
             BLUE -> Color.BLUE
             YELLOW -> Color.YELLOW
@@ -45,18 +46,48 @@ enum class IslandColor {
         }
     }
 
+    fun dyeColor(): DyeColor{
+        return when(this){
+            GREEN -> DyeColor.LIME
+            RED -> DyeColor.RED
+            BLUE -> DyeColor.BLUE
+            YELLOW -> DyeColor.YELLOW
+            AQUA -> DyeColor.LIGHT_BLUE
+            WHITE -> DyeColor.WHITE
+            GRAY -> DyeColor.GRAY
+            BLACK -> DyeColor.BLACK
+            ORANGE -> DyeColor.ORANGE
+            PINK -> DyeColor.PINK
+        }
+    }
+
     fun woolMaterial(): Material{
         return when(this){
             GREEN -> Material.LIME_WOOL
             RED -> Material.RED_WOOL
             BLUE -> Material.BLUE_WOOL
             YELLOW -> Material.YELLOW_WOOL
-            AQUA -> Material.CYAN_WOOL
+            AQUA -> Material.LIGHT_BLUE_WOOL
             WHITE -> Material.WHITE_WOOL
             GRAY -> Material.GRAY_WOOL
             BLACK -> Material.BLACK_WOOL
             ORANGE -> Material.ORANGE_WOOL
             PINK -> Material.PINK_WOOL
+        }
+    }
+
+    fun glassMaterial(): Material{
+        return when(this){
+            GREEN -> Material.LIME_STAINED_GLASS
+            RED -> Material.RED_STAINED_GLASS
+            BLUE -> Material.BLUE_STAINED_GLASS
+            YELLOW -> Material.YELLOW_STAINED_GLASS
+            AQUA -> Material.LIGHT_BLUE_STAINED_GLASS
+            WHITE -> Material.WHITE_STAINED_GLASS
+            GRAY -> Material.LIME_STAINED_GLASS
+            BLACK -> Material.BLACK_STAINED_GLASS
+            ORANGE -> Material.ORANGE_STAINED_GLASS
+            PINK -> Material.PINK_STAINED_GLASS
         }
     }
 

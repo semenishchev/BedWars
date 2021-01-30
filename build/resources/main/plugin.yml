@@ -5,8 +5,6 @@ main: me.mrfunny.plugins.paper.BedWars
 
 commands:
   setup:
-    aliases: [cococo, funnyglek]
   start:
-    aliases: [mrfunnytop, mrfunny, funny, funnytop, bwstart, kartoplya]
-  forcestart:
-    
+    aliases: [bwstart, startgame, game]
+  resetgame:

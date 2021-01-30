@@ -1,13 +1,18 @@
 package me.mrfunny.plugins.paper.worlds.generators
 
+import me.mrfunny.plugins.paper.gamemanager.GameManager
+import me.mrfunny.plugins.paper.players.PlayerData
 import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.util.ItemBuilder
+import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Item
 import org.bukkit.inventory.ItemStack
+import kotlin.random.Random
 
 class Generator(var location: Location, var type: GeneratorType, val isIslandGenerator: Boolean) {
 
@@ -57,6 +62,7 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
     }
 
     fun spawn(){
+        // todo: bonuses
         if(type == GeneratorType.DIAMOND) return // забанить нафиг возможность спавнить алмазы на базе (защита от дурака)
 
         if(!activated){
@@ -98,7 +104,18 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
             }
         }
 
-        location.world.dropItem(location, ItemBuilder(resourceType).setName(name).toItemStack())
+        val playersCount = GameManager.getNearbyPlayers(location, 2.0).size
+
+        if(playersCount > 0){
+            if (!GameManager.isLagged){
+                for(player in GameManager.getNearbyPlayers(location, 2.0)){
+                    player.inventory.addItem(ItemBuilder(resourceType, if(PlayerData.PLAYERS[player.uniqueId]!!.isGeneratorMultiplier) 2 else 1).setName(name).toItemStack())
+                    player.playSound(player.location, Sound.ENTITY_ITEM_PICKUP, 1f, 1f)
+                }
+            }
+        } else {
+            location.world.dropItem(location, ItemBuilder(resourceType, 1).setName(name).toItemStack())
+        }
     }
 
     private fun getArmorstandName(): String{
@@ -106,10 +123,10 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
         if(timeLeft == 0){
             timeLeft = getActivationTime()
         }
-//        val typeName: String = type.name.toLowerCase().capitalize()
+
         val pluralize: String = if(timeLeft == 1) "" else "s"
         val colorCode: String = if(type == GeneratorType.EMERALD) "&4" else if (type == GeneratorType.DIAMOND) "&b" else ""
-        return "${colorCode}Ruby at $timeLeft second$pluralize..." //todo: same color code as material color
+        return "${colorCode}Ruby at $timeLeft second$pluralize..."
     }
 
     private fun getActivationTime(): Int {
@@ -156,21 +173,21 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
             GeneratorType.EMERALD -> {
                 if(isIslandGenerator){
                     if (currentTier == GeneratorTier.ONE) {
-                        return 60
+                        return 35
                     }
                     else if (currentTier == GeneratorTier.TWO) {
-                        return 20
+                        return 15
                     }
                 } else {
                     return when (currentTier) {
                         GeneratorTier.ONE -> {
-                            40
-                        }
-                        GeneratorTier.TWO -> {
                             30
                         }
+                        GeneratorTier.TWO -> {
+                            25
+                        }
                         else -> {
-                            15
+                            20
                         }
                     }
                 }
@@ -180,7 +197,7 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
     }
 
     companion object{
-        fun getItemStack(type: GeneratorType): Material {
+        fun getMaterialByGeneratorType(type: GeneratorType): Material {
             return when (type) {
                 GeneratorType.IRON -> {
                     Material.GHAST_TEAR
@@ -194,6 +211,24 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
                 GeneratorType.EMERALD -> {
                     Material.FERMENTED_SPIDER_EYE
                 }
+            }
+        }
+
+        fun getGeneratorTypeByMaterial(material: Material): String{
+            return when(material){
+                Material.GHAST_TEAR -> "Iron"
+                Material.GOLD_NUGGET -> "Gold"
+                Material.FERMENTED_SPIDER_EYE -> "Rubies"
+                else -> ""
+            }
+        }
+
+        fun getColorByGenerator(material: Material): ChatColor{
+            return when(material){
+                Material.GHAST_TEAR -> ChatColor.WHITE
+                Material.GOLD_NUGGET -> ChatColor.GOLD
+                Material.FERMENTED_SPIDER_EYE -> ChatColor.DARK_RED
+                else -> ChatColor.WHITE
             }
         }
     }

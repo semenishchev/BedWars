@@ -1,7 +1,10 @@
 package me.mrfunny.plugins.paper.worlds
 
+import me.mrfunny.api.PlayerApi
 import me.mrfunny.plugins.paper.BedWars.Companion.colorize
+import me.mrfunny.plugins.paper.gamemanager.GameEvent
 import me.mrfunny.plugins.paper.gamemanager.GameManager
+import me.mrfunny.plugins.paper.messages.MessagesManager.Companion.message
 import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.worlds.generators.Generator
 import me.mrfunny.plugins.paper.worlds.generators.GeneratorTier
@@ -11,6 +14,7 @@ import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.entity.Monster
 import org.bukkit.entity.Player
 import java.io.*
 import java.util.*
@@ -26,8 +30,8 @@ class GameWorld(var name: String, val gameManager: GameManager) {
     lateinit var lobbyPosition: Location
     lateinit var destinationWorldFolder: File
 
-    val maxTeamSize: Int = 1
-    val maxComands: Int = 8
+    var maxTeamSize: Int = 0
+    var maxTeams: Int = 0
 
     var diamondTier: GeneratorTier = GeneratorTier.ONE
     var emeraldTier: GeneratorTier = GeneratorTier.ONE
@@ -42,30 +46,57 @@ class GameWorld(var name: String, val gameManager: GameManager) {
             ex.printStackTrace()
         }
 
-        val creator = WorldCreator(name + if (loadingIntoPlaying) "_playing" else "")
-        world = creator.createWorld()!!
+        println(sourceFolder.path)
+        println(destinationWorldFolder.path)
 
-        if(!gameManager.gameConfig.get().isConfigurationSection("border")){
+        val creator = WorldCreator(name + if (loadingIntoPlaying) "_playing" else "")
+        world = if(Bukkit.getWorld(name + if (loadingIntoPlaying) "_playing" else "") == null)creator.createWorld()!! else Bukkit.getWorld(name + if (loadingIntoPlaying) "_playing" else "")!!
+        println(world.name)
+
+//        println("\n\n\n${gameManager.gameConfig.get().isConfigurationSection("max-teams")} ${gameManager.gameConfig.get().isConfigurationSection("max-team-size")}\n\n\n")
+
+        if(!gameManager.gameConfig.get().contains("border")){
             gameManager.gameConfig.get().set("border", 250.0)
         }
-        if(!gameManager.gameConfig.get().isConfigurationSection("center")){
+        if(!gameManager.gameConfig.get().contains("center")){
             gameManager.gameConfig.get().set("center.x", 0.5)
             gameManager.gameConfig.get().set("center.z", 0.5)
-        } else {
-            val centerSection: ConfigurationSection = gameManager.gameConfig.get().getConfigurationSection("center")!!
-            centerSection.set("x", 0.5)
-            centerSection.set("z", 0.5)
+        }
+        if(!gameManager.gameConfig.get().contains("max-team-size")){
+            gameManager.gameConfig.get().set("max-team-size", 1)
         }
 
-        val border: WorldBorder = world.worldBorder
-        border.setCenter(gameManager.gameConfig.get().getDouble("center.x"), gameManager.gameConfig.get().getDouble("center.z"))
-        border.size = gameManager.gameConfig.get().getDouble("border")
+        if(!gameManager.gameConfig.get().contains("max-teams")){
+            gameManager.gameConfig.get().set("max-teams", -1)
+        }
+
+        if(!gameManager.gameConfig.get().contains("percentage-to-start")){
+            gameManager.gameConfig.get().set("percentage-to-start", 80)
+        }
+
+        gameManager.gameConfig.save()
+
+        world.worldBorder.reset()
+
+        maxTeams = if(gameManager.gameConfig.get().getInt("max-teams") == -1) Byte.MAX_VALUE.toInt() else gameManager.gameConfig.get().getInt("max-teams")
+        maxTeamSize = gameManager.gameConfig.get().getInt("max-team-size")
 
         world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false)
         world.setGameRule(GameRule.DISABLE_RAIDS, true)
         world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false)
         world.setGameRule(GameRule.DO_WEATHER_CYCLE, false)
+        world.setGameRule(GameRule.RANDOM_TICK_SPEED, 0)
+        world.setGameRule(GameRule.DO_FIRE_TICK, false)
         world.difficulty = Difficulty.NORMAL
+        world.setStorm(false)
+        world.isThundering = false
+
+        world.entities.forEach {
+            if(it is Monster && !it.hasMetadata("protected")){
+                it.remove()
+                it.damage(100000.0)
+            }
+        }
 
         runnable.run()
     }
@@ -128,6 +159,20 @@ class GameWorld(var name: String, val gameManager: GameManager) {
         }
     }
 
+    fun resetWorld(unload: Boolean, save: Boolean){
+        val worldName: String = world.name
+
+        if(unload){
+            Bukkit.unloadWorld(world, save)
+        }
+
+        if(delete(destinationWorldFolder)){
+            println("[BedWars] Reset map $worldName")
+        } else {
+            println("[BedWard] Failed to delete $worldName")
+        }
+    }
+
     private fun delete(toDelete: File): Boolean {
 
         toDelete.listFiles()?.forEach {
@@ -175,44 +220,52 @@ class GameWorld(var name: String, val gameManager: GameManager) {
     }
 
     fun tick(currentSecond: Int) {
+        gameManager.secondsTimer--
         val minuteOfGame: Double = secondsToMinutes(currentSecond)
 
         if(minuteOfGame == 5.0){
-            Bukkit.broadcastMessage(Colorize.c("&4Ruby&f generators has been upgraded to level II"))
-            emeraldTier = GeneratorTier.TWO
+            Bukkit.getOnlinePlayers().forEach{
+                it.sendMessage(message("ruby-two", gameManager, it))
+            }
+            emeraldTier = GeneratorTier.THREE
+            gameManager.currentEvent = GameEvent.RUBY_THREE
         }
 
         if(minuteOfGame == 10.0){
-            Bukkit.broadcastMessage(Colorize.c("&4Ruby&f generators has been upgraded to level III"))
-            diamondTier = GeneratorTier.THREE
+            Bukkit.getOnlinePlayers().forEach{ it.sendMessage(message("ruby-three", gameManager, it)) }
+            emeraldTier = GeneratorTier.THREE
+            gameManager.currentEvent = GameEvent.ALL_BEDS_DESTRUCTION
         }
 
         if(minuteOfGame == 20.0){
-            Bukkit.broadcastMessage("&cALL BEDS DESTRUCTION IN 10 MINUTES".colorize())
+            Bukkit.getOnlinePlayers().forEach {
+                gameManager.bossBar.addPlayer(it)
+                it.sendMessage(message("all-bed-destruction", gameManager, it).replace("{time}", "10m"))
+            }
         }
 
         if(minuteOfGame == 25.0){
-            Bukkit.broadcastMessage("&cALL BEDS DESTRUCTION IN 5 MINUTES".colorize())
+            Bukkit.getOnlinePlayers().forEach { it.sendMessage(message("all-bed-destruction", gameManager, it).replace("{time}", "5m")) }
         }
 
         if(currentSecond == 1795){
-            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 5".colorize())
+            Bukkit.getOnlinePlayers().forEach{ it.sendMessage(message("all-bed-destruction", gameManager, it).replace("{time}", "5")) }
         }
 
         if(currentSecond == 1796){
-            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 4".colorize())
+            Bukkit.getOnlinePlayers().forEach{ it.sendMessage(message("all-bed-destruction", gameManager, it).replace("{time}", "4")) }
         }
 
         if(currentSecond == 1797){
-            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 3".colorize())
+            Bukkit.getOnlinePlayers().forEach{ it.sendMessage(message("all-bed-destruction", gameManager, it).replace("{time}", "3")) }
         }
 
         if(currentSecond == 1798){
-            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 2".colorize())
+            Bukkit.getOnlinePlayers().forEach{ it.sendMessage(message("all-bed-destruction", gameManager, it).replace("{time}", "2")) }
         }
 
         if(currentSecond == 1799){
-            Bukkit.broadcastMessage("&c&lALL BEDS DESTRUCTION IN 1".colorize())
+            Bukkit.getOnlinePlayers().forEach{ it.sendMessage(message("all-bed-destruction", gameManager, it).replace("{time}", "1")) }
         }
 
         if(currentSecond == 1800){
@@ -225,6 +278,11 @@ class GameWorld(var name: String, val gameManager: GameManager) {
                     player.playSound(player.location, Sound.ENTITY_ENDER_DRAGON_DEATH, 1f, 1f)
                 }
             }
+
+            Bukkit.getOnlinePlayers().forEach{ it.sendMessage(message("all-bed-destroyed", gameManager, it)) }
+            Bukkit.getOnlinePlayers().forEach{ it.sendMessage(message("game-ending", gameManager, it).replace("{time}", "15 MINUTES")) }
+
+            gameManager.currentEvent = GameEvent.GAME_END
         }
 
         if(minuteOfGame == 45.0){
@@ -232,8 +290,12 @@ class GameWorld(var name: String, val gameManager: GameManager) {
         }
 
         Bukkit.getOnlinePlayers().forEach {
-
-            it.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent("&7${gameManager.playerManager.getIronCount(it)} iron &f• &6${gameManager.playerManager.getGoldCount(it)} gold &f• &4${gameManager.playerManager.getRubyCount(it)} ruby &f• &b${getIslandForPlayer(it)?.totalSouls} souls".colorize()))
+            if(it.gameMode != GameMode.SPECTATOR){
+                if(PlayerApi.getNearestPlayerFromOtherTeam(it, gameManager) != null){
+                    it.compassTarget = PlayerApi.getNearestPlayerFromOtherTeam(it, gameManager)!!.location
+                }
+                it.sendActionBar("&f${gameManager.playerManager.getIronCount(it)} iron &f• &6${gameManager.playerManager.getGoldCount(it)} gold &f• &4${gameManager.playerManager.getRubyCount(it)} ruby &f• &b${getIslandForPlayer(it)?.totalSouls} souls".colorize())
+            }
         }
 
         for(island: Island in islands){
@@ -253,6 +315,7 @@ class GameWorld(var name: String, val gameManager: GameManager) {
             }
             it.spawn()
         }
+        gameManager.updateScoreboard()
     }
 
     private fun secondsToMinutes(seconds: Int): Double{
@@ -267,5 +330,4 @@ class GameWorld(var name: String, val gameManager: GameManager) {
         }
         return false
     }
-
 }

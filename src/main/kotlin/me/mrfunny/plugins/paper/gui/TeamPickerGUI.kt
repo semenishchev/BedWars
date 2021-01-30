@@ -63,7 +63,10 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
         val playerIsland: Optional<Island> = gameManager.world.islands.stream().filter { island -> island.isMember(player) }.findFirst()
 
         playerIsland.ifPresent{ island ->
-            island.players.remove(player)
+            island.removeMember(player)
+            if(findPlayerTeam(player) != null){
+                findPlayerTeam(player)!!.removePlayer(player)
+            }
             gameManager.scoreboard.findTeam(island.color.formattedName()).get().addPlayer(player)
             gameManager.updateScoreboard()
         }
@@ -76,9 +79,12 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
                 player.sendMessage(Colorize.c("&cThat team is full"))
             } else {
                 try{
+                    if(findPlayerTeam(player) != null){
+                        findPlayerTeam(player)!!.removePlayer(player)
+                    }
                     gameManager.scoreboard.findTeam(island.color.formattedName()).get().addPlayer(player)
                 } catch (ignore: JScoreboardException) {}
-                island.players.add(player)
+                island.addMember(player)
             }
         }
 
@@ -90,7 +96,12 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
         return null
     }
 
-    override fun isInventory(view: InventoryView): Boolean {
-        return view.title == name
+    private fun findPlayerTeam(player: Player): JScoreboardTeam? {
+        for(team in gameManager.scoreboard.teams) {
+            if(team.isOnTeam(player.uniqueId)){
+                return team
+            }
+        }
+        return null
     }
 }

@@ -9,5 +9,7 @@ interface GUI {
     val inventory: Inventory
     val name: String
     fun handleClick(player: Player, itemStack: ItemStack, view: InventoryView): GUI?
-    fun isInventory(view: InventoryView): Boolean
+    fun isInventory(view: InventoryView): Boolean {
+        return view.title == name
+    }
 }

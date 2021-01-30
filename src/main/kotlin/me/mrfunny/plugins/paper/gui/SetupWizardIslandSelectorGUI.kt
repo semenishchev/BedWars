@@ -49,8 +49,4 @@ class SetupWizardIslandSelectorGUI(var gameManager: GameManager) : GUI {
 
         return null
     }
-
-    override fun isInventory(view: InventoryView): Boolean {
-        return view.title == name
-    }
 }

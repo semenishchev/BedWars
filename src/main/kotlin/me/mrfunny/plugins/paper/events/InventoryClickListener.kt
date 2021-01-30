@@ -3,26 +3,24 @@ package me.mrfunny.plugins.paper.events
 import me.mrfunny.plugins.paper.gui.GUI
 import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.gamemanager.GameState
-import me.mrfunny.plugins.paper.gui.ItemShopGUI
+import me.mrfunny.plugins.paper.gui.Cancelled
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
-import org.bukkit.block.Chest
-import org.bukkit.block.EnderChest
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.inventory.InventoryCloseEvent
-import org.bukkit.event.inventory.InventoryType
+import org.bukkit.event.inventory.*
+import org.bukkit.inventory.PlayerInventory
 
-class InventoryClickListener(private val gameManager: GameManager) : Listener {
+class InventoryClickListener(private val gameManager: GameManager): Listener {
 
     @EventHandler
     fun onClick(event: InventoryClickEvent){
-        if(gameManager.state == GameState.LOBBY && event.whoClicked.gameMode != GameMode.CREATIVE) event.isCancelled = true
-        if(event.inventory.holder is Chest || event.inventory.holder is EnderChest) return
-        if(event.currentItem == null) return
-
+        if(event.currentItem == null) {
+            event.isCancelled = true
+            return
+        }
         val materialName: String = event.currentItem!!.type.name
         if(materialName.contains("HELMET")
             || materialName.contains("CHESTPLATE")
@@ -30,14 +28,20 @@ class InventoryClickListener(private val gameManager: GameManager) : Listener {
             || materialName.contains("BOOTS")){
             event.isCancelled = true
         }
+        if(event.clickedInventory == null) return
+        if(event.clickedInventory is PlayerInventory) return
+        if(event.clickedInventory!!.holder != null) return
+//        if(event.currentItem!!.type == Material.AIR) event.isCancelled = true
 
-
-        if(!event.currentItem!!.hasItemMeta()) return
-        if(event.currentItem == null) return
+        event.isCancelled = true
 
         val player: Player = event.whoClicked as Player
 
         val gui: GUI? = gameManager.guiManager.getOpenGui(player)
+        if(gui is Cancelled){
+            event.isCancelled = true
+            return
+        }
         if(gui == null){
             event.view.close()
             event.whoClicked.closeInventory()
@@ -51,11 +55,11 @@ class InventoryClickListener(private val gameManager: GameManager) : Listener {
             player.closeInventory()
             return
         }
-        if(gui.handleClick(player, event.currentItem!!, event.view) == null){
+        val newGUI: GUI? = gui.handleClick(player, event.currentItem!!, event.view)
+        if(newGUI is Cancelled){
             event.isCancelled = true
             return
         }
-        val newGUI: GUI = gui.handleClick(player, event.currentItem!!, event.view)!!
 
         gameManager.guiManager.setGUI(player, newGUI)
 
@@ -64,8 +68,17 @@ class InventoryClickListener(private val gameManager: GameManager) : Listener {
     @EventHandler
     fun onClose(event: InventoryCloseEvent){
         val player: Player = event.player as Player
-        if(event.view.title == "Change island"){
+        if(event.view.title.contains("island") || event.view.title.contains("shop") || event.view.title.contains("upgrades")){
             gameManager.guiManager.clear(player)
         }
     }
+
+    @EventHandler
+    fun onDrag(event: InventoryDragEvent){
+        if(gameManager.guiManager.getOpenGui(event.whoClicked as Player) == null) return else event.isCancelled = true
+    }
+
+    @Deprecated("Now it does nothing")
+    fun create(){}
+
 }

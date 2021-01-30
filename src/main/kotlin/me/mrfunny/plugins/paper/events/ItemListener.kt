@@ -3,6 +3,7 @@ package me.mrfunny.plugins.paper.events
 import me.mrfunny.plugins.paper.util.TeleportUtil.pullEntityToLocation
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.PrepareItemCraftEvent
@@ -19,8 +20,16 @@ object ItemListener: Listener {
     @EventHandler
     fun onItemDamage(event: PlayerItemDamageEvent){
         if(event.item.type != Material.SHIELD || event.item.type != Material.FISHING_ROD){
-            event.item.itemMeta.isUnbreakable = false
-            event.isCancelled = true
+            if(event.item.type != Material.BOW){
+                event.isCancelled = true
+                return
+            }
+        } else if(event.item.type == Material.BOW){
+            if(event.item.itemMeta.hasEnchant(Enchantment.ARROW_INFINITE)){
+                return
+            }
+        } else if(event.item.type.name.contains("AXE")){
+            return
         }
     }
 
@@ -38,7 +47,6 @@ object ItemListener: Listener {
             if(event.player.inventory.itemInMainHand.type == Material.FISHING_ROD){
                 if(!event.player.inventory.itemInMainHand.hasItemMeta()) return
                 val meta: ItemMeta = event.player.inventory.itemInMainHand.itemMeta
-                if(!meta.displayName.contains("Hook")) return
                 if((meta as Damageable).damage < 61){
                     meta.damage = 62
                 } else {

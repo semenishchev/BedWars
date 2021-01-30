@@ -15,8 +15,8 @@ object GUIManager {
             player.closeInventory()
             return
         }
+        clear(player)
         playerToGUIMap[player] = gui
-        player.closeInventory()
         player.openInventory(gui.inventory)
     }
 

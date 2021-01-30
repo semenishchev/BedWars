@@ -13,13 +13,20 @@ public class CustomConfiguration {
     private YamlConfiguration config;
 
     public CustomConfiguration(String name, JavaPlugin plugin){
+        if(!plugin.getDataFolder().exists()){
+            if(!plugin.getDataFolder().mkdirs()){
+                plugin.getLogger().severe("Data folder " + name);
+            }
+        }
         this.file = new File(plugin.getDataFolder(), name + ".yml");
 
         if(!file.exists()){
             try {
-                file.createNewFile();
+                if(!file.createNewFile()){
+                    plugin.getLogger().severe("Error while init config file " + name);
+                }
             } catch (IOException e) {
-                plugin.getLogger().severe("[BedWars] Could't init config file with " + name);
+                plugin.getLogger().severe("Error while init config file with " + name);
             }
         }
 

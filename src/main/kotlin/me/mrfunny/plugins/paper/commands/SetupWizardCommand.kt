@@ -22,8 +22,7 @@ class SetupWizardCommand(var gameManager: GameManager) : CommandExecutor {
 
             val mapName: String = args[0]
             if(mapName.equals("exit", true)){
-                gameManager.setupWizardManager.removeFromWizard(player)
-//                player.teleport(gameManager.setupWizardMana)
+                gameManager.setupWizardManager.removeFromWizard(player, gameManager)
                 return true
             }
             player.sendMessage("Loading world, one moment...")

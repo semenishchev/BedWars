@@ -21,9 +21,9 @@ class ChatListeners(private val gameManager: GameManager): Listener {
 
         val island: Island? = gameManager.world.getIslandForPlayer(player)
 
-        if(event.message.startsWith("!") && event.player.gameMode != GameMode.SPECTATOR || gameManager.world.isSolo() || gameManager.state == GameState.STARTING || gameManager.state == GameState.LOBBY){
+        if(event.message.startsWith("!")){
             if(player.gameMode == GameMode.SPECTATOR){
-                Bukkit.broadcastMessage("$&8Spectator &7${player.name}&8: &7${event.message}".colorize())
+                Bukkit.broadcastMessage("&8Spectator &7${player.name}&8: &7${event.message}".colorize())
                 return
             }
 
@@ -42,13 +42,12 @@ class ChatListeners(private val gameManager: GameManager): Listener {
             } else if(!event.message.startsWith("!") && gameManager.state == GameState.ACTIVE) {
                 Bukkit.getOnlinePlayers().forEach {
                     if(it.gameMode == GameMode.SPECTATOR){
-                        it.sendMessage("${if(player.gameMode == GameMode.SPECTATOR) "&8Spectator" else ""} &7${player.name}&8: &7${event.message}".colorize())
+                        it.sendMessage("${if(player.gameMode == GameMode.SPECTATOR) "&8Spectator" else ""} &7${player.name}&8: &7${event.message.substring(1)}".colorize())
                     }
                 }
-            } else if(!event.message.startsWith("!") && (gameManager.state == GameState.STARTING || gameManager.state == GameState.LOBBY)){
+            } else {
                 Bukkit.broadcastMessage("&3${player.name}&8: &7${event.message}".colorize())
                 return
-            } else {
             }
         }
 

@@ -1,5 +1,8 @@
 package me.mrfunny.plugins.paper.setup
 
+import com.google.common.io.ByteArrayDataOutput
+import com.google.common.io.ByteStreams
+import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.worlds.IslandColor
 import me.mrfunny.plugins.paper.util.ItemBuilder
 import me.mrfunny.plugins.paper.worlds.GameWorld
@@ -9,9 +12,11 @@ import org.bukkit.entity.Player
 
 object SetupWizardManager {
 
-    private var playerToIslandMap = hashMapOf<Player, Island>()
-    private var playerToGameWorldMap = hashMapOf<Player, GameWorld>()
-    private var playerToStartLocationMap = hashMapOf<Player, Location>()
+    private val playerToIslandMap = hashMapOf<Player, Island>()
+    private val playerToGameWorldMap = hashMapOf<Player, GameWorld>()
+    private val playerToStartLocationMap = hashMapOf<Player, Location>()
+    private val playersInWizard = arrayListOf<Player>()
+
 
     fun isInWizard(player: Player): Boolean {
         return playerToGameWorldMap.containsKey(player)
@@ -21,6 +26,8 @@ object SetupWizardManager {
         player.inventory.clear()
         player.gameMode = GameMode.CREATIVE
         player.teleport(Location(world.world, 0.0, 77.0, 0.0))
+
+        playersInWizard.add(player)
 
         worldSetupWizard(player, world)
     }
@@ -38,6 +45,9 @@ object SetupWizardManager {
         )
         player.inventory.addItem(
             ItemBuilder(Material.STICK).setName("&aChange island").toItemStack()
+        )
+        player.inventory.addItem(
+            ItemBuilder(Material.RED_BANNER).setName("&aSet map centre").toItemStack()
         )
 
         playerToGameWorldMap[player] = world
@@ -88,9 +98,20 @@ object SetupWizardManager {
         return playerToIslandMap[player]
     }
 
-    fun removeFromWizard(player: Player) {
+    fun removeFromWizard(player: Player, gameManager: GameManager) {
         if(playerToStartLocationMap[player] != null){
-            player.teleport(playerToStartLocationMap[player]!!)
+            playersInWizard.forEach {
+                val out: ByteArrayDataOutput = ByteStreams.newDataOutput()
+                out.writeUTF("Connect")
+                out.writeUTF("hub-1")
+
+                it.sendPluginMessage(gameManager.plugin, "BungeeCord", out.toByteArray())
+                it.kickPlayer("Setup loading")
+                it.inventory.clear()
+            }
+            gameManager.world.resetWorld(unload = true, save = false)
+            Bukkit.unloadWorld(playerToGameWorldMap[player]!!.world, true)
+            Bukkit.shutdown()
         } else {
             player.sendMessage("${ChatColor.RED}You are not in wizard")
         }

@@ -3,9 +3,15 @@
     <words>
       <w>bedwars</w>
       <w>damager</w>
+      <w>forcestart</w>
       <w>gameconfig</w>
+      <w>itemstack</w>
+      <w>netherite</w>
+      <w>pickaxe</w>
+      <w>respawned</w>
       <w>rubynex</w>
       <w>teleport</w>
+      <w>teleported</w>
     </words>
   </dictionary>
 </component>

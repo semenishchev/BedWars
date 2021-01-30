@@ -1,6 +1,7 @@
 package me.mrfunny.plugins.paper.config
 
 import me.mrfunny.plugins.paper.gamemanager.GameManager
+import me.mrfunny.plugins.paper.gui.shops.teamupgrades.UpgradeItem
 import me.mrfunny.plugins.paper.worlds.IslandColor
 import me.mrfunny.plugins.paper.worlds.GameWorld
 import me.mrfunny.plugins.paper.worlds.Island
@@ -18,7 +19,7 @@ import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 class ConfigurationManager(var gameManager: GameManager) {
-    var configuration: ConfigurationSection
+    private var configuration: ConfigurationSection
 
     init {
         if(gameManager.plugin.config.isConfigurationSection("maps")) {
@@ -29,6 +30,7 @@ class ConfigurationManager(var gameManager: GameManager) {
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun loadWorld(mapName: String, consumer: Consumer<GameWorld>){
         val gameWorld = GameWorld(mapName, gameManager)
         gameWorld.loadWorld(gameManager, true){
@@ -36,8 +38,11 @@ class ConfigurationManager(var gameManager: GameManager) {
             var totalTeams = 0
             for(sectionColor: String in section.getKeys(false)){
                 if(EnumUtils.isValidEnum(IslandColor::class.java, sectionColor)) {
-                    if (totalTeams < gameWorld.maxComands) {
+                    if (totalTeams < gameWorld.maxTeams) {
                         val island: Island = loadIsland(gameWorld, section.getConfigurationSection(sectionColor)!!)
+                        gameManager.upgrades.forEach {
+                            island.upgrades.add(UpgradeItem(it.position, it.id, it.description, it.displayItem, it.maxLevel, *it.prices))
+                        }
                         totalTeams++
                         gameWorld.islands.add(island)
                     }

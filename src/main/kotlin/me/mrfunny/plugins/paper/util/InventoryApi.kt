@@ -9,9 +9,9 @@ import java.util.*
 
 object InventoryApi {
     fun clearInventoryExceptArmor(player: Player) {
-        val armorContents = player.inventory.armorContents.clone() //Clone instance of ItemStack[]
-        player.inventory.clear() //Clear inventory
-        player.inventory.setArmorContents(armorContents) //Set armor using the clone instance.
+        val armorContents = player.inventory.armorContents.clone()
+        player.inventory.clear()
+        player.inventory.setArmorContents(armorContents)
         player.updateInventory()
     }
 

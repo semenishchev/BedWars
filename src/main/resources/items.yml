@@ -1,0 +1,60 @@
+rescue-platform:
+  en:
+    name: "&aRescue Platform"
+    lore:
+      - "&fSpawns platform below you"
+      - "&fAfter 15 seconds platform disappears"
+  ru:
+    name: "&aСпасательная платформа"
+    lore:
+      - "&fСпавнит платформу под вами"
+      - "&fЧерез 15 секунд она пропадает"
+home-teleporter:
+  en:
+    name: "&aTeleport to home"
+    lore:
+      - "&fTeleports you to home"
+      - "&You have not move 6 seconds to teleport"
+  ru:
+    name: "&aТелепортер домой"
+    lore:
+grappling-hook:
+  en:
+    name: "&aGrappling hook"
+    lore:
+      - "&fThe hook should catch on the block"
+      - "&fAfter you click it"
+      - "it will throw you in the place where the hook is hooked"
+  ru:
+    name: "&aАбордажный крюк"
+    lore:
+      - "1"
+building-snowball:
+  en:
+    name: "&aBuilding snowball"
+    lore:
+      - "&aBuilds a bridge due to trajectory"
+  ru:
+    name: "&aСнежок-строитель"
+    lore:
+      - "1"
+flying-tnt:
+  en:
+    name: "&aFlying TNT"
+    lore:
+      - "On click it throws TNT"
+      - "If you place it, it throws up"
+  ru:
+    name: "&aЛетающий динамит"
+    lore:
+      - "1"
+gps-tracker:
+  en:
+    name: "&aGPS Tracker"
+    lore:
+      - "Tracks your enemies"
+      - "Needs \"Player Targeting\" upgrade for proper work"
+  ru:
+    name: "&aGPS Трекер"
+    lore:
+      - "1"
