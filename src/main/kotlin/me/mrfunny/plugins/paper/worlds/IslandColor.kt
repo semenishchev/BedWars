@@ -76,6 +76,21 @@ enum class IslandColor {
         }
     }
 
+    fun concreteMaterial(): Material {
+        return when(this){
+            GREEN -> Material.LIME_CONCRETE
+            RED -> Material.RED_CONCRETE
+            BLUE -> Material.BLUE_CONCRETE
+            YELLOW -> Material.YELLOW_CONCRETE
+            AQUA -> Material.LIGHT_BLUE_CONCRETE
+            WHITE -> Material.WHITE_CONCRETE
+            GRAY -> Material.GRAY_CONCRETE
+            BLACK -> Material.BLACK_CONCRETE
+            ORANGE -> Material.ORANGE_CONCRETE
+            PINK -> Material.PINK_CONCRETE
+        }
+    }
+
     fun glassMaterial(): Material{
         return when(this){
             GREEN -> Material.LIME_STAINED_GLASS

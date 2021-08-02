@@ -4,6 +4,7 @@ import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.util.InventoryApi
 import me.mrfunny.plugins.paper.util.ItemBuilder
 import me.mrfunny.plugins.paper.worlds.Island
+import me.mrfunny.plugins.paper.worlds.generators.GeneratorType
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Material
@@ -81,7 +82,7 @@ class PlayerManager(private val gameManager: GameManager) {
         var count = 0
         for(item in player.inventory){
             if(item == null) continue
-            if(item.type == Material.GOLD_NUGGET){
+            if(item.type == GeneratorType.GOLD.getMaterial()){
                 count += item.amount
             }
         }

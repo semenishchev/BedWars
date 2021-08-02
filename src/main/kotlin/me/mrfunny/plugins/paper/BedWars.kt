@@ -3,10 +3,8 @@ package me.mrfunny.plugins.paper
 import com.google.common.io.ByteArrayDataOutput
 import com.google.common.io.ByteStreams
 import com.ruverq.rubynex.economics.Main
-import me.mrfunny.plugins.paper.commands.ForcestartCommand
-import me.mrfunny.plugins.paper.commands.ResetGameCommand
-import me.mrfunny.plugins.paper.commands.SetupWizardCommand
-import me.mrfunny.plugins.paper.commands.StartCommand
+import me.mrfunny.api.UuidKick
+import me.mrfunny.plugins.paper.commands.*
 import me.mrfunny.plugins.paper.events.*
 import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.gamemanager.GameState
@@ -36,8 +34,9 @@ class BedWars : JavaPlugin() {
 
         getCommand("setup")?.setExecutor(SetupWizardCommand(gameManager))
         getCommand("start")?.setExecutor(StartCommand(gameManager))
-//        getCommand("forcestart")?.setExecutor(ForcestartCommand(gameManager))
+        getCommand("assign")?.setExecutor(AssignCommand(gameManager))
         getCommand("resetgame")?.setExecutor(ResetGameCommand())
+        getCommand("forcekick")?.setExecutor(UuidKick())
 
         server.onlinePlayers.forEach {
             val addPlayerData = PlayerData(it.uniqueId, gameManager)
@@ -81,20 +80,6 @@ class BedWars : JavaPlugin() {
         Bukkit.getScheduler().cancelTasks(this)
     }
 
-//    fun sendPluginMessage(vararg values: Any){
-//        val out: ByteArrayDataOutput = ByteStreams.newDataOutput()
-//        values.forEach {
-//            when (it) {
-//                is String -> out.writeUTF(it)
-//                is Int -> out.writeInt(it)
-//                is Boolean -> out.writeBoolean(it)
-//                is Float -> out.writeFloat(it)
-//                is Double -> out.writeDouble(it)
-//            }
-//
-//        }
-//        Bukkit.getServer().sendPluginMessage(this, "selector:bedwars", out.toByteArray())
-//    }
 
     fun sendPluginMessage(channel: String, vararg values: Any){
         val out: ByteArrayDataOutput = ByteStreams.newDataOutput()

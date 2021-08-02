@@ -1,6 +1,7 @@
 package me.mrfunny.plugins.paper.util
 
 import me.mrfunny.plugins.paper.BedWars.Companion.colorize
+import me.mrfunny.plugins.paper.worlds.generators.GeneratorType
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
@@ -22,11 +23,11 @@ object InventoryApi {
         for(item in from.inventory){
             if(item == null) continue
             when(item.type){
-                Material.GHAST_TEAR -> {
+                GeneratorType.IRON.getMaterial() -> {
                     ironCount += item.amount
                     to.inventory.addItem(item)
                 }
-                Material.GOLD_NUGGET -> {
+                GeneratorType.GOLD.getMaterial() -> {
                     goldCount += item.amount
                     to.inventory.addItem(item)
                 }

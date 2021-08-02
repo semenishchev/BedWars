@@ -18,6 +18,7 @@ public class CustomConfiguration {
                 plugin.getLogger().severe("Data folder " + name);
             }
         }
+
         this.file = new File(plugin.getDataFolder(), name + ".yml");
 
         if(!file.exists()){

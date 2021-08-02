@@ -42,7 +42,7 @@ object ItemListener: Listener {
 
     @EventHandler
     fun onFishingRodUse(event: PlayerFishEvent){
-        if (event.state == PlayerFishEvent.State.IN_GROUND || event.state == PlayerFishEvent.State.CAUGHT_ENTITY) {
+        if (event.state == PlayerFishEvent.State.IN_GROUND || event.state == PlayerFishEvent.State.REEL_IN || event.state == PlayerFishEvent.State.CAUGHT_ENTITY) {
             val pull: Location = event.hook.location
             if(event.player.inventory.itemInMainHand.type == Material.FISHING_ROD){
                 if(!event.player.inventory.itemInMainHand.hasItemMeta()) return

@@ -30,6 +30,7 @@ import me.mrfunny.plugins.paper.util.ItemBuilder
 import me.mrfunny.plugins.paper.util.Reflect
 import me.mrfunny.plugins.paper.worlds.GameWorld
 import me.mrfunny.plugins.paper.worlds.Island
+import me.mrfunny.plugins.paper.worlds.IslandColor
 import org.apache.commons.lang.StringUtils
 import org.bukkit.*
 import org.bukkit.boss.BarColor
@@ -89,7 +90,6 @@ class GameManager(val plugin: BedWars, version: Double) {
             )
         }, {}),
     )
-
     val upgrades: Array<UpgradeItem> = arrayOf(
         UpgradeItem(
             11, "armor", "", ItemBuilder(Material.DIAMOND_CHESTPLATE).setName("&aArmor protection").setLore(
@@ -107,15 +107,18 @@ class GameManager(val plugin: BedWars, version: Double) {
             4,
             8
         ),
-//        UpgradeItem(
-//            13,
-//            "compass",
-//            "",
-//            ItemBuilder(Material.COMPASS).setName("&aPlayer targeting").toItemStack(),
-//            MaxLevel.ONE,
-//            3
-//        )
     )
+
+    fun getIslandByColor(color: IslandColor): Island{
+        for (island in world.islands){
+            if(island.color == color){
+                return island
+            }
+        }
+
+        return world.islands.first()
+    }
+
 
     var secondsTimer = 5 * 60
 

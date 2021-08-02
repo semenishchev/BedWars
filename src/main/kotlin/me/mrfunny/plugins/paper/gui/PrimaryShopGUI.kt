@@ -15,6 +15,7 @@ import me.mrfunny.plugins.paper.gui.shops.teamupgrades.MaxLevel
 import me.mrfunny.plugins.paper.gui.shops.teamupgrades.UpgradeItem
 import me.mrfunny.plugins.paper.players.PlayerData
 import me.mrfunny.plugins.paper.worlds.generators.Generator
+import me.mrfunny.plugins.paper.worlds.generators.GeneratorType
 import org.bukkit.*
 import org.bukkit.block.Banner
 import org.bukkit.block.banner.Pattern
@@ -24,6 +25,8 @@ import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 open class PrimaryShopGUI(private val gameManager: GameManager, private val player: Player, val items: Array<ShopItem>) : GUI{
     private val data: PlayerData = PlayerData.PLAYERS[player.uniqueId]!!
@@ -56,10 +59,10 @@ open class PrimaryShopGUI(private val gameManager: GameManager, private val play
         val currencyMaterial: Material = shopItem.currencyMaterial
 
         val itemStackToRemove: ItemStack = when(currencyMaterial){
-            Material.GHAST_TEAR -> ItemBuilder(currencyMaterial, price).setName("&fIron").toItemStack()
-            Material.GOLD_NUGGET -> ItemBuilder(currencyMaterial, price).setName("&6Gold").toItemStack()
-            Material.FERMENTED_SPIDER_EYE -> ItemBuilder(currencyMaterial, price).setName("&4Ruby").toItemStack()
-            else -> ItemBuilder(currencyMaterial, price).setName("&4Ruby").toItemStack()
+            GeneratorType.IRON.getMaterial() -> ItemBuilder(currencyMaterial, price).setName(GeneratorType.IRON.getName()).toItemStack()
+            GeneratorType.GOLD.getMaterial() -> ItemBuilder(currencyMaterial, price).setName(GeneratorType.GOLD.getName()).toItemStack()
+            Material.FERMENTED_SPIDER_EYE -> ItemBuilder(currencyMaterial, price).setName(GeneratorType.EMERALD.getName()).toItemStack()
+            else -> ItemBuilder(currencyMaterial, price).setName("&bPepega").toItemStack()
         }
 
         if(player.inventory.contains(currencyMaterial, price)){

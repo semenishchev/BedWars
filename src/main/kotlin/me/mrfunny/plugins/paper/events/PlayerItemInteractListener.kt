@@ -58,6 +58,13 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
 
         val player: Player = event.player
 
+        if(event.clickedBlock != null && event.action == Action.RIGHT_CLICK_BLOCK){
+            if(event.clickedBlock!!.type == Material.ENDER_CHEST){
+                event.isCancelled = true
+                return
+            }
+        }
+
         if (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK) {
             if (event.item!!.type == Material.FIRE_CHARGE) {
                 event.isCancelled = true

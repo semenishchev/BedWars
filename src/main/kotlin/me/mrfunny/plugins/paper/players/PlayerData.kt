@@ -20,6 +20,7 @@ class PlayerData(uuid: UUID, val gameManager: GameManager) {
 //    var axeIter: ListIterator<ToolLevel> = ToolLevel.values().iterator() as ListIterator<ToolLevel>
 //    var pickIter: ListIterator<ToolLevel> = ToolLevel.values().iterator() as ListIterator<ToolLevel>
 
+
     var totalKills: Int = 0
     var totalDeaths: Int = 0
     var lastAttacker: UUID? = null

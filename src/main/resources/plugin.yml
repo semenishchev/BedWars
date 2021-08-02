@@ -8,3 +8,5 @@ commands:
   start:
     aliases: [bwstart, startgame, game]
   resetgame:
+  assign:
+  forcekick:

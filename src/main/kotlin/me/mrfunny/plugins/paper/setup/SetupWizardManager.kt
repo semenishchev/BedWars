@@ -17,7 +17,6 @@ object SetupWizardManager {
     private val playerToStartLocationMap = hashMapOf<Player, Location>()
     private val playersInWizard = arrayListOf<Player>()
 
-
     fun isInWizard(player: Player): Boolean {
         return playerToGameWorldMap.containsKey(player)
     }
@@ -39,6 +38,9 @@ object SetupWizardManager {
         )
         player.inventory.addItem(
             ItemBuilder(Material.EMERALD).setName("&aSet emerald generator").toItemStack()
+        )
+        player.inventory.addItem(
+            ItemBuilder(Material.GOLD_BLOCK).setName("&aSet gold generator").toItemStack()
         )
         player.inventory.addItem(
             ItemBuilder(Material.COAL).setName("&aSet lobby spawn").toItemStack()
@@ -67,7 +69,7 @@ object SetupWizardManager {
             ItemBuilder(Material.EGG).setName("&aSet shop location").toItemStack()
         )
         player.inventory.addItem(
-            ItemBuilder(Material.IRON_INGOT).setName("&aSet generator location").toItemStack()
+            ItemBuilder(Material.IRON_INGOT).setName("&aSet all generators location").toItemStack()
         )
         player.inventory.addItem(
             ItemBuilder(Material.DIAMOND_SWORD).setName("&aSet Team Upgrade location").toItemStack()

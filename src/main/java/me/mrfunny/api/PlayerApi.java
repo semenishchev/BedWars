@@ -1,16 +1,22 @@
 package me.mrfunny.api;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import me.mrfunny.plugins.paper.gamemanager.GameManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.util.Vector;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Objects;
+import java.util.UUID;
 
 public class PlayerApi {
 
@@ -54,8 +60,7 @@ public class PlayerApi {
         double y = Math.sin(pitch);
         double z = -Math.sin(yaw) * Math.cos(pitch);
 
-        Vector dirVec = new Vector(x, y, z).normalize();
-        return dirVec;
+        return new Vector(x, y, z).normalize();
     }
 
     public static void clearInventoryExceptArmor(Player player){
@@ -94,7 +99,5 @@ public class PlayerApi {
         return closestp;
     }
 
-    public static boolean isMoved(Location loc1, Location loc2){
-        return !(loc1.getX() == loc2.getX() && loc1.getY() == loc2.getY() && loc1.getZ() == loc2.getZ());
-    }
+
 }

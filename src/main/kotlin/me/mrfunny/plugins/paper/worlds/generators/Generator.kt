@@ -47,10 +47,10 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
     fun getItemStack(): Material {
         return when (type) {
             GeneratorType.IRON -> {
-                Material.GHAST_TEAR
+                GeneratorType.IRON.getMaterial()
             }
             GeneratorType.GOLD -> {
-                Material.GOLD_NUGGET
+                GeneratorType.GOLD.getMaterial()
             }
             GeneratorType.DIAMOND -> {
                 Material.DIAMOND
@@ -83,26 +83,9 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
         if(secondsSinceActivation < getActivationTime()) return
 
         secondsSinceActivation = 0
-        var name = ""
+        val name = type.getName()
 
-        val resourceType: Material = when(type){
-            GeneratorType.IRON -> {
-                name = "&fIron"
-                Material.GHAST_TEAR
-            }
-            GeneratorType.GOLD -> {
-                name = "&6Gold"
-                Material.GOLD_NUGGET
-            }
-            GeneratorType.DIAMOND -> {
-                name = "&4Lol"
-                Material.DIAMOND
-            }
-            GeneratorType.EMERALD -> {
-                name = "&4Ruby"
-                Material.FERMENTED_SPIDER_EYE
-            }
-        }
+        val resourceType: Material = type.getMaterial()
 
         val playersCount = GameManager.getNearbyPlayers(location, 2.0).size
 
@@ -200,10 +183,10 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
         fun getMaterialByGeneratorType(type: GeneratorType): Material {
             return when (type) {
                 GeneratorType.IRON -> {
-                    Material.GHAST_TEAR
+                    GeneratorType.IRON.getMaterial()
                 }
                 GeneratorType.GOLD -> {
-                    Material.GOLD_NUGGET
+                    GeneratorType.GOLD.getMaterial()
                 }
                 GeneratorType.DIAMOND -> {
                     Material.DIAMOND

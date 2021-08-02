@@ -17,7 +17,7 @@ public class MySQLManager {
             String database = plugin.getConfig().getString("mysql.database");
             String user = plugin.getConfig().getString("mysql.username");
             String password = plugin.getConfig().getString("mysql.password");
-            this.connection = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + "?useSSL=false", user, password);
+            this.connection = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + "?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true", user, password);
             this.connection.prepareStatement("CREATE TABLE IF NOT EXISTS lang(`id` int(16) not null auto_increment,`uuid` varchar(100),`locale` varchar(10),PRIMARY KEY(`id`))")
                     .executeUpdate();
 //            this.connection.prepareStatement("CREATE TABLE IF NOT EXISTS bedwars(`id` int(16) not null auto_increment,`uuid` varchar(100),`kills` unsigned int default 0, `beds` unsigned int, `quits` unsigned int," +
@@ -72,6 +72,6 @@ public class MySQLManager {
         if(rs.next()){
             return rs.getString("locale");
         }
-        return "";
+        return "ru_ru";
     }
 }

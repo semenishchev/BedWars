@@ -50,14 +50,10 @@ class PlayerLoginEventListener(private val gameManager: GameManager): Listener {
             gameManager.setupWizardManager.activateSetupWizard(event.player, gameManager.world)
             return
         }
+
         PlayerData.PLAYERS[event.player.uniqueId] = PlayerData(event.player.uniqueId, gameManager)
-        gameManager.scoreboard.addPlayer(event.player)
-        gameManager.updateScoreboard()
-        gameManager.bossBar.addPlayer(event.player)
-        gameManager.endGameIfNeeded()
 
         if (gameManager.state == GameState.ACTIVE) {
-            // todo: make reconnect work
             gameManager.playerManager.setSpectatorMode(event.player)
         } else if (gameManager.state == GameState.LOBBY || gameManager.state == GameState.STARTING) {
             event.player.gameMode = GameMode.ADVENTURE
@@ -75,6 +71,10 @@ class PlayerLoginEventListener(private val gameManager: GameManager): Listener {
 //            gameManager.playerToLocaleMap[event.player] = (event.player as CraftPlayer).handle.locale
             event.joinMessage = "${event.player.name} connected (${Bukkit.getOnlinePlayers().size}/${gameManager.world.maxTeamSize * gameManager.world.islands.size})".colorize()
         }
+        gameManager.scoreboard.addPlayer(event.player)
+        gameManager.updateScoreboard()
+        gameManager.bossBar.addPlayer(event.player)
+        gameManager.endGameIfNeeded()
     }
 
 
