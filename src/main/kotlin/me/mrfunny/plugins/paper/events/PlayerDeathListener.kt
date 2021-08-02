@@ -155,8 +155,6 @@ class PlayerDeathListener(private val gameManager: GameManager): Listener {
 
             playerData.lastAttacker = damager.uniqueId
         }
-
-
     }
 
     @EventHandler

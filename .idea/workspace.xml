@@ -5,20 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e0ce07aa-a0b8-408d-997a-898b1c930cd0" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/me/mrfunny/api/UuidKick.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/commands/AssignCommand.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/6.3/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/6.3/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/6.3/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/6.3/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/6.3/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/6.3/fileHashes/fileHashes.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/6.3/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/6.3/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/checksums/checksums.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/checksums/md5-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/checksums/md5-checksums.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/checksums/sha1-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/checksums/sha1-checksums.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules/untitled1.main.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/untitled1.main.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/build-history.bin" beforeDir="false" afterPath="$PROJECT_DIR$/build/kotlin/compileKotlin/build-history.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/caches-jvm/inputs/source-to-output.tab" beforeDir="false" afterPath="$PROJECT_DIR$/build/kotlin/compileKotlin/caches-jvm/inputs/source-to-output.tab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/caches-jvm/inputs/source-to-output.tab.keystream" beforeDir="false" afterPath="$PROJECT_DIR$/build/kotlin/compileKotlin/caches-jvm/inputs/source-to-output.tab.keystream" afterDir="false" />
@@ -79,34 +74,11 @@
       <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/caches-jvm/lookups/lookups.tab.values.at" beforeDir="false" afterPath="$PROJECT_DIR$/build/kotlin/compileKotlin/caches-jvm/lookups/lookups.tab.values.at" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/caches-jvm/lookups/lookups.tab_i" beforeDir="false" afterPath="$PROJECT_DIR$/build/kotlin/compileKotlin/caches-jvm/lookups/lookups.tab_i" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/last-build.bin" beforeDir="false" afterPath="$PROJECT_DIR$/build/kotlin/compileKotlin/last-build.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/kotlin/untitled1jar-classes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/build/kotlin/untitled1jar-classes.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/resources/main/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/build/resources/main/plugin.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/mrfunny/api/CustomConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/mrfunny/api/CustomConfiguration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/mrfunny/api/MySQLManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/mrfunny/api/MySQLManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/me/mrfunny/api/PlayerApi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/mrfunny/api/PlayerApi.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/BedWars.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/BedWars.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/events/ItemListener.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/events/ItemListener.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/events/PlayerDeathListener.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/events/PlayerDeathListener.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/events/PlayerItemInteractListener.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/events/PlayerItemInteractListener.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/events/PlayerLoginEventListener.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/events/PlayerLoginEventListener.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/gamemanager/GameManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/gamemanager/GameManager.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/gui/PrimaryShopGUI.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/gui/PrimaryShopGUI.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/gui/shops/shop/categories/ArmorCategoryGUI.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/gui/shops/shop/categories/ArmorCategoryGUI.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/gui/shops/shop/categories/BlockCategoryGUI.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/gui/shops/shop/categories/BlockCategoryGUI.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/gui/shops/shop/categories/MeleeCategoryGUI.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/gui/shops/shop/categories/MeleeCategoryGUI.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/gui/shops/shop/categories/RandedCategoryGUI.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/gui/shops/shop/categories/RandedCategoryGUI.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/gui/shops/shop/categories/ToolsCategoryGUI.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/gui/shops/shop/categories/ToolsCategoryGUI.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/gui/shops/shop/categories/UtilsCategoryGUI.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/gui/shops/shop/categories/UtilsCategoryGUI.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/players/PlayerData.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/players/PlayerData.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/players/PlayerManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/players/PlayerManager.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/setup/SetupItemType.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/setup/SetupWizardManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/setup/SetupWizardManager.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/util/InventoryApi.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/util/InventoryApi.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/util/TeleportUtil.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/util/TeleportUtil.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/worlds/IslandColor.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/worlds/IslandColor.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/worlds/generators/Generator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/worlds/generators/Generator.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/worlds/generators/GeneratorType.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/worlds/generators/GeneratorType.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/plugin.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/tasks/PlayerRespawnTask.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/tasks/PlayerRespawnTask.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/util/SignGUI.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/worlds/GameWorld.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/me/mrfunny/plugins/paper/worlds/GameWorld.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -364,7 +336,7 @@
       <workItem from="1627727314643" duration="1177000" />
       <workItem from="1627730892396" duration="594000" />
       <workItem from="1627842346762" duration="700000" />
-      <workItem from="1627891785449" duration="2415000" />
+      <workItem from="1627891785449" duration="5396000" />
     </task>
     <task id="LOCAL-00001" summary="Team picker item">
       <created>1605109412334</created>
@@ -378,6 +350,17 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Team picker item" />

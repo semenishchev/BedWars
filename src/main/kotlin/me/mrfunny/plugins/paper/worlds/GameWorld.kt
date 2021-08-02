@@ -20,6 +20,7 @@ import java.io.*
 import java.util.*
 import java.util.stream.Collectors
 import kotlin.collections.ArrayList
+import kotlin.math.round
 
 class GameWorld(var name: String, val gameManager: GameManager) {
     lateinit var world: World
@@ -291,10 +292,15 @@ class GameWorld(var name: String, val gameManager: GameManager) {
 
         Bukkit.getOnlinePlayers().forEach {
             if(it.gameMode != GameMode.SPECTATOR){
-                if(PlayerApi.getNearestPlayerFromOtherTeam(it, gameManager) != null){
-                    it.compassTarget = PlayerApi.getNearestPlayerFromOtherTeam(it, gameManager)!!.location
+                val closestPlayer: Player? = PlayerApi.getNearestPlayerFromOtherTeam(it, gameManager)
+                var possibleAddition = ""
+                if(closestPlayer != null){
+                    it.compassTarget = closestPlayer.location
+                    if(it.inventory.itemInMainHand.type == Material.COMPASS || it.inventory.itemInOffHand.type == Material.COMPASS){
+                        possibleAddition = "&l${getIslandForPlayer(closestPlayer)!!.color.getChatColor()}${closestPlayer.name}&7 — &a${round(closestPlayer.location.distance(it.location))}M &f• "
+                    }
                 }
-                it.sendActionBar("&f${gameManager.playerManager.getIronCount(it)} iron &f• &6${gameManager.playerManager.getGoldCount(it)} gold &f• &4${gameManager.playerManager.getRubyCount(it)} ruby &f• &b${getIslandForPlayer(it)?.totalSouls} souls".colorize())
+                it.sendActionBar(possibleAddition.colorize() + "&f${gameManager.playerManager.getIronCount(it)} iron &f• &6${gameManager.playerManager.getGoldCount(it)} gold &f• &4${gameManager.playerManager.getRubyCount(it)} ruby &f• &b${getIslandForPlayer(it)?.totalSouls} souls".colorize())
             }
         }
 

@@ -25,9 +25,9 @@ class PlayerRespawnTask(private var player: Player, var playerIsland: Island) : 
             player.sendTitle(Colorize.c("&a${if(PlayerData.PLAYERS[player.uniqueId]!!.isRussian()) "ВОЗРОЖДЁН" else "RESPAWNED"}!"), "", 20, 20, 20)
             playerIsland.absolutelyAlive.remove(player.uniqueId)
             player.teleport(playerIsland.spawnLocation!!)
-            player.gameMode = GameMode.SURVIVAL
             PlayerData.PLAYERS[player.uniqueId]!!.lastRespawn = System.currentTimeMillis()
             player.addPotionEffect(PotionEffect(PotionEffectType.INCREASE_DAMAGE, 15 * 20, 0))
+            player.gameMode = GameMode.SURVIVAL
             return
         }
 

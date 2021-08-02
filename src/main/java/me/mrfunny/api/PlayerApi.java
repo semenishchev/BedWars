@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import me.mrfunny.plugins.paper.gamemanager.GameManager;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -80,23 +81,25 @@ public class PlayerApi {
     @Nullable
     public static Player getNearestPlayerFromOtherTeam(Player player, GameManager gameManager){
         double max = gameManager.getWorld().world.getWorldBorder().getSize();
-        Player closestp = null;
+        Player closestPlayer = null;
         try {
             for(Player iterPlayer : Bukkit.getOnlinePlayers()){
                 if(GameManager.Companion.isLagged()) continue;
+                if(player == iterPlayer) continue;
+                if(iterPlayer.getGameMode() == GameMode.SPECTATOR) continue;
                 if(iterPlayer.getLocation().getWorld().equals(player.getLocation().getWorld())){
                     double dist = iterPlayer.getLocation().distance(player.getLocation());
-                    if (max == Double.MAX_VALUE || dist < max){
+                    if (dist < max){
                         max = dist;
                         if(!Objects.equals(gameManager.getWorld().getIslandForPlayer(iterPlayer), gameManager.getWorld().getIslandForPlayer(player))){
-                            closestp = iterPlayer;
+                            closestPlayer = iterPlayer;
                         }
                     }
                 }
             }
         }catch (Exception ignored){}
 
-        return closestp;
+        return closestPlayer;
     }
 
 
