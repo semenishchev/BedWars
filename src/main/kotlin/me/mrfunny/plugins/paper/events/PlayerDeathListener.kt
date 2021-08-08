@@ -192,14 +192,13 @@ class PlayerDeathListener(private val gameManager: GameManager): Listener {
             return
         }
 
-        if((player.inventory.itemInOffHand.type == Material.TOTEM_OF_UNDYING || player.inventory.itemInMainHand.type == Material.TOTEM_OF_UNDYING) && event.cause != EntityDamageEvent.DamageCause.VOID){
-            player.health = 20.0;
-            player.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 5, 2, false, true))
-            player.addPotionEffect(PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 5, 1, false, true))
-            return
-        }
-
         if(event.finalDamage >= player.health){
+            if((player.inventory.itemInOffHand.type == Material.TOTEM_OF_UNDYING || player.inventory.itemInMainHand.type == Material.TOTEM_OF_UNDYING) && event.cause != EntityDamageEvent.DamageCause.VOID){
+                player.health = 20.0;
+                player.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 5, 2 * 20, false, true))
+                player.addPotionEffect(PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 5 * 20, 1, false, true))
+                return
+            }
             gameManager.endGameIfNeeded()
             event.isCancelled = true
             player.closeInventory()
