@@ -8,7 +8,10 @@ import me.mrfunny.plugins.paper.worlds.Island
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.OfflinePlayer
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer
+import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Damageable
+import org.bukkit.entity.Monster
+import org.bukkit.entity.Wither
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.*
@@ -41,7 +44,21 @@ class PlayerLoginEventListener(private val gameManager: GameManager): Listener {
     }
 
     @EventHandler
+    fun onPostLogin(event: PlayerLoginEvent){
+    }
+
+    @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
+        event.player.world.entities.forEach {
+            if(it is Monster && !it.hasMetadata("protected")){
+                it.remove()
+            } else if(it is Wither){
+                it.remove()
+            } else if(it is ArmorStand){
+                it.remove()
+            }
+        }
+        event.player.isCollidable = true
         event.player.activePotionEffects.forEach {
             event.player.removePotionEffect(it.type)
         }
@@ -66,13 +83,15 @@ class PlayerLoginEventListener(private val gameManager: GameManager): Listener {
             val percentage: Double = (Bukkit.getOnlinePlayers().size.toDouble() / maxPlayers.toDouble()) * 100.0
             println("$maxPlayers $maxPercentage $percentage")
             if(percentage >= maxPercentage.toDouble()){
-                gameManager.state = GameState.STARTING
+                if(gameManager.state != GameState.STARTING){
+                    gameManager.state = GameState.STARTING
+                }
             }
 //            gameManager.playerToLocaleMap[event.player] = (event.player as CraftPlayer).handle.locale
             event.joinMessage = "${event.player.name} connected (${Bukkit.getOnlinePlayers().size}/${gameManager.world.maxTeamSize * gameManager.world.islands.size})".colorize()
         }
         gameManager.scoreboard.addPlayer(event.player)
-        gameManager.updateScoreboard()
+        gameManager.updateScoreboard(true)
         gameManager.bossBar.addPlayer(event.player)
         gameManager.endGameIfNeeded()
     }
@@ -83,7 +102,6 @@ class PlayerLoginEventListener(private val gameManager: GameManager): Listener {
         event.quitMessage = null
         PlayerData.PLAYERS.remove(event.player.uniqueId)
         gameManager.scoreboard.removePlayer(event.player)
-        gameManager.updateScoreboard()
         event.player.activePotionEffects.forEach {
             event.player.removePotionEffect(it.type)
         }
@@ -104,6 +122,7 @@ class PlayerLoginEventListener(private val gameManager: GameManager): Listener {
             }
             return
         }
+        gameManager.updateScoreboard(true)
     }
 
     @EventHandler

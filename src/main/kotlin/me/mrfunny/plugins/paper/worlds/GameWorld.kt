@@ -14,8 +14,10 @@ import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.entity.Damageable
 import org.bukkit.entity.Monster
 import org.bukkit.entity.Player
+import org.bukkit.entity.Wither
 import java.io.*
 import java.util.*
 import java.util.stream.Collectors
@@ -88,6 +90,7 @@ class GameWorld(var name: String, val gameManager: GameManager) {
         world.setGameRule(GameRule.DO_WEATHER_CYCLE, false)
         world.setGameRule(GameRule.RANDOM_TICK_SPEED, 0)
         world.setGameRule(GameRule.DO_FIRE_TICK, false)
+        world.setGameRule(GameRule.REDUCED_DEBUG_INFO, true)
         world.difficulty = Difficulty.NORMAL
         world.setStorm(false)
         world.isThundering = false
@@ -95,7 +98,8 @@ class GameWorld(var name: String, val gameManager: GameManager) {
         world.entities.forEach {
             if(it is Monster && !it.hasMetadata("protected")){
                 it.remove()
-                it.damage(100000.0)
+            } else if(it is Wither){
+                it.remove()
             }
         }
 
@@ -306,7 +310,7 @@ class GameWorld(var name: String, val gameManager: GameManager) {
 
         for(island: Island in islands){
             island.islandGenerators.forEach {
-                it.spawn()
+                it.spawn(gameManager)
             }
         }
 
@@ -319,9 +323,9 @@ class GameWorld(var name: String, val gameManager: GameManager) {
             if(it.type == GeneratorType.EMERALD){
                 it.currentTier = emeraldTier
             }
-            it.spawn()
+            it.spawn(gameManager)
         }
-        gameManager.updateScoreboard()
+        gameManager.updateScoreboard(false)
     }
 
     private fun secondsToMinutes(seconds: Int): Double{

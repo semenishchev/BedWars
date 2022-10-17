@@ -55,7 +55,7 @@ class BedWars : JavaPlugin() {
         server.pluginManager.registerEvents(HungerListener(gameManager), this)
         server.pluginManager.registerEvents(ChatListeners(gameManager), this)
         server.pluginManager.registerEvents(PotionListener(gameManager), this)
-        server.pluginManager.registerEvents(ItemListener, this)
+        server.pluginManager.registerEvents(ItemListener(gameManager), this)
         server.pluginManager.registerEvents(MobSpawnListener, this)
 
         server.messenger.registerOutgoingPluginChannel(this, "BungeeCord")

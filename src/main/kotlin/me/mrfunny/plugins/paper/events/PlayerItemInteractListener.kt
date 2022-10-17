@@ -15,8 +15,12 @@ import me.mrfunny.plugins.paper.worlds.generators.Generator
 import me.mrfunny.plugins.paper.worlds.generators.GeneratorType
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit
+import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.block.Container
+import org.bukkit.block.Furnace
+import org.bukkit.block.Smoker
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Fireball
 import org.bukkit.entity.Player
@@ -27,6 +31,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.inventory.ItemStack
 import kotlin.math.abs
 import kotlin.math.floor
@@ -35,6 +40,10 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
 
     @EventHandler
     fun onInteractWithShop(event: PlayerInteractEntityEvent){
+        if(event.player.gameMode == GameMode.SPECTATOR){
+            event.isCancelled = true
+            return
+        }
         val name: String = ChatColor.stripColor(event.rightClicked.name.toLowerCase())
 
         if(name == "item shop") {
@@ -51,19 +60,32 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
 
     @EventHandler
     fun onInteract(event: PlayerInteractEvent){
+        if(event.clickedBlock != null){
+            val type = event.clickedBlock!!.type
+            if(type == Material.CRAFTING_TABLE || type == Material.ENDER_CHEST){
+                event.isCancelled = true
+                return
+            }
+            if(event.clickedBlock!!.state is Container && gameManager.state != GameState.ACTIVE){
+                event.isCancelled = true
+                return
+            }
+        }
+        if(event.action == Action.LEFT_CLICK_BLOCK  && event.item != null){
+            if(event.item!!.type == Material.BARRIER){
+                event.isCancelled = true
+                return
+            }
+        }
+        if(gameManager.state != GameState.ACTIVE){
+            event.isCancelled = true
+        }
         if(!event.hasItem()) return
 
         if(event.item == null) return
         if(event.item!!.itemMeta == null) return
 
         val player: Player = event.player
-
-        if(event.clickedBlock != null && event.action == Action.RIGHT_CLICK_BLOCK){
-            if(event.clickedBlock!!.type == Material.ENDER_CHEST){
-                event.isCancelled = true
-                return
-            }
-        }
 
         if (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK) {
             if (event.item!!.type == Material.FIRE_CHARGE) {
@@ -81,10 +103,10 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
                     fireball.velocity.multiply(2)
                     return
                 }
-            } else if(event.item!!.type == Material.BARRIER){
+            } else if(event.item!!.type == Material.RED_BED){
                 val out: ByteArrayDataOutput = ByteStreams.newDataOutput()
                 out.writeUTF("Connect")
-                out.writeUTF("hub-1")
+                out.writeUTF("hub")
                 player.sendPluginMessage(gameManager.plugin, "BungeeCord", out.toByteArray())
             }
         }
@@ -97,7 +119,7 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
             }
         }
 
-        val itemName: String? = ChatColor.stripColor(event.item?.itemMeta?.displayName).toLowerCase()
+        val itemName: String = ChatColor.stripColor(event.item?.itemMeta?.displayName).toLowerCase()
         val current: Location = player.location
         val clicked: Location = if(event.clickedBlock != null) event.clickedBlock!!.location else player.location
         if((itemName == "select team" || itemName == "выбрать команду") && (gameManager.state == GameState.LOBBY || gameManager.state == GameState.STARTING)){
@@ -114,6 +136,7 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
             event.isCancelled = true
             return
         }
+
         if(gameManager.state == GameState.ACTIVE && (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK)){
             val currentIsland: Island = gameManager.world.getIslandForPlayer(player)!!
 
@@ -124,7 +147,7 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
                     location.x += 0.5
                     location.y += 0.5
                     location.z += 0.5
-                    val tnt: TNTPrimed = (player.location.world.spawnEntity(player.location.clone().add(player.location.direction.normalize().multiply(0.2)), EntityType.PRIMED_TNT) as TNTPrimed)
+                    val tnt: TNTPrimed = (player.location.world!!.spawnEntity(player.location.clone().add(player.location.direction.normalize().multiply(0.2)), EntityType.PRIMED_TNT) as TNTPrimed)
                     tnt.fuseTicks = 60
                     event.item!!.amount--
                     event.player.updateInventory()
@@ -174,6 +197,7 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
                 for(it in locations) {
                     if(it.block.type != Material.AIR) continue
                     it.block.type = currentIsland.color.glassMaterial()
+//                    it.clone().add(.0, 3.0, .0).block.typ
                 }
 
                 val teleportTask = PlatformWaitTask(player, *locations)
@@ -285,5 +309,18 @@ class PlayerItemInteractListener(var gameManager: GameManager) : Listener {
             else -> return
         }
         event.isCancelled = true
+    }
+
+    @EventHandler
+    fun onMove(event: PlayerMoveEvent){
+        if(event.player.world != gameManager.world.world && gameManager.state == GameState.ACTIVE){
+            val playerIsland: Island? = gameManager.world.getIslandForPlayer(event.player)
+
+            event.player.teleport(if(playerIsland == null){
+                gameManager.world.lobbyPosition
+            } else {
+                playerIsland.spawnLocation!!
+            })
+        }
     }
 }

@@ -71,7 +71,7 @@ class ItemShopGUI(private val gameManager: GameManager, private val clickPlayer:
     override fun handleClick(player: Player, itemStack: ItemStack, view: InventoryView): GUI? {
         if(!isInventory(view)) return null
         if(player != clickPlayer) return null
-        return when(ChatColor.stripColor(itemStack.itemMeta.displayName)!!.toLowerCase()){
+        return when(ChatColor.stripColor(itemStack.itemMeta!!.displayName)!!.toLowerCase()){
             "blocks" -> BlockCategoryGUI(gameManager, player, gameManager.world.getIslandForPlayer(player)!!)
             "armor" -> ArmorCategoryGUI(gameManager, player)
             "melee" -> MeleeCategoryGUI(gameManager, player, ironSword, diamondSword, netheriteSword)

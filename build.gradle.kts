@@ -1,21 +1,25 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm") version "1.4.10"
 }
 
 repositories {
-    jcenter()
+    mavenLocal()
     maven("https://papermc.io/repo/repository/maven-public/")
-    maven("https://gitlab.com/XjCyan1de/maven-repo/-/raw/master/")
-    maven("https://jitpack.io/")
-    maven("https://maven.enginehub.org/repo/")
-    maven ("https://repo.dmulloy2.net/nexus/repository/public/" )
+    mavenCentral()
 }
 
 dependencies {
-    compileOnly("com.destroystokyo.paper", "paper-api", "1.16.4-R0.1-SNAPSHOT")
-    compileOnly("com.destroystokyo.paper", "paper", "1.16.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper:1.17.1-R0.1-SNAPSHOT")
     compileOnly("com.googlecode.json-simple", "json-simple", "1.1")
     testImplementation(kotlin("test-junit"))
+    implementation(kotlin("stdlib-jdk8"))
+}
+tasks.withType<Jar>() {
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 tasks {
     compileKotlin { kotlinOptions.jvmTarget = "1.8" }
@@ -31,4 +35,12 @@ tasks {
         }
         exclude("META-INF/MANIFEST.MF", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
     }
+}
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    jvmTarget = "1.8"
+}
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "1.8"
 }

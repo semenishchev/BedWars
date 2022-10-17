@@ -1,5 +1,6 @@
 package me.mrfunny.plugins.paper.util
 
+import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.players.NoFallPlayers
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -9,7 +10,7 @@ object TeleportUtil {
 
     const val gravity: Double = -0.08
 
-    fun pullEntityToLocation(entity: Player, loc: Location) {
+    fun pullEntityToLocation(gameManager: GameManager, entity: Player, loc: Location) {
         NoFallPlayers.add(entity)
         val entityLoc = entity.location
         entityLoc.y = entityLoc.y + 0.5

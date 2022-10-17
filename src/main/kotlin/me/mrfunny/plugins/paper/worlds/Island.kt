@@ -1,7 +1,5 @@
 package me.mrfunny.plugins.paper.worlds
 
-import me.mrfunny.api.NPC
-import me.mrfunny.plugins.paper.BedWars.Companion.colorize
 import me.mrfunny.plugins.paper.gui.shops.teamupgrades.UpgradeItem
 import me.mrfunny.plugins.paper.players.PlayerData
 import me.mrfunny.plugins.paper.util.Colorize
@@ -40,7 +38,7 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
 
     var players = arrayListOf<Player>()
     var absolutelyAlive = arrayListOf<UUID>()
-    var leavedPlayers = hashMapOf<UUID, NPC>()
+//    var leftPlayers = hashMapOf<UUID, NPC>()
 
     val upgrades = arrayListOf<UpgradeItem>()
 
@@ -63,20 +61,20 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
         return players.contains(player)
     }
 
-    fun rejoin(uuid: UUID){
-        if(leavedPlayers.contains(uuid)){
-            players.add(Bukkit.getPlayer(uuid)!!)
-        }
-    }
+//    fun rejoin(uuid: UUID){
+//        if(leavedPlayers.contains(uuid)){
+//            players.add(Bukkit.getPlayer(uuid)!!)
+//        }
+//    }
 
     fun spawnShops(){
-        val itemShopEntity: Villager = shopEntityLocation!!.world.spawn(shopEntityLocation!!, Villager::class.java)
+        val itemShopEntity: Villager = shopEntityLocation!!.world!!.spawn(shopEntityLocation!!, Villager::class.java)
         itemShopEntity.profession = Villager.Profession.BUTCHER
         itemShopEntity.customName = Colorize.c("&eItem shop")
         itemShopEntity.isCustomNameVisible = true
         itemShopEntity.setAI(false)
 
-        val teamUpgradeShop: Villager = upgradeEntityLocation!!.world.spawn(upgradeEntityLocation!!, Villager::class.java)
+        val teamUpgradeShop: Villager = upgradeEntityLocation!!.world!!.spawn(upgradeEntityLocation!!, Villager::class.java)
         teamUpgradeShop.customName = Colorize.c("&eTeam upgrades")
         teamUpgradeShop.isCustomNameVisible = true
         teamUpgradeShop.setAI(false)
@@ -120,7 +118,7 @@ class Island(var gameWorld: GameWorld, var color: IslandColor) {
         for (x in bottomBlockX..topBlockX){
             for(y in bottomBlockY..topBlockY) {
                 for (z in bottomBlockZ..topBlockZ) {
-                    blocks.add(loc1.world.getBlockAt(x, y, z).location)
+                    blocks.add(loc1.world!!.getBlockAt(x, y, z).location)
                 }
             }
         }

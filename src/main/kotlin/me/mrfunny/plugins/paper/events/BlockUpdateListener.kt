@@ -39,11 +39,12 @@ class BlockUpdateListener(val gameManager: GameManager) : Listener {
             val island: Island = gameManager.world.getIslandForBedLocation(location)!!
 
             if(!island.isMember(player)){
+                gameManager.updateScoreboard(true)
                 island.players.forEach {
                     it.sendTitle(message("bed-destruction-title", gameManager, it), message("bed-destruction-subtitle", gameManager, it), 0, 40, 0)
                 }
 
-                location.world.spigot().strikeLightningEffect(location, false)
+                location.world!!.spigot().strikeLightningEffect(location, false)
 
                 Bukkit.getOnlinePlayers().forEach {
                     it.playSound(it.location, Sound.ENTITY_WITHER_DEATH, 1f, 1f)
@@ -89,7 +90,7 @@ class BlockUpdateListener(val gameManager: GameManager) : Listener {
             }
         }
         for(entity in GameManager.getNearbyPlayers(event.entity.location, 6.0)){
-            entity.velocity = Vector((event.entity.location.x - entity.location.x)/5, 1.0, (event.entity.location.z - entity.location.z)/5)
+            entity.velocity = Vector((entity.location.x - event.entity.location.x)/5, 1.0, (entity.location.z - event.entity.location.z)/5)
         }
     }
 

@@ -24,14 +24,14 @@ public class JPerPlayerScoreboard extends JScoreboard {
      * Call this when the contents of the scoreboard should change in some way.
      * @throws JScoreboardException
      */
-    public void updateScoreboard() throws JScoreboardException {
+    public void updateScoreboard(boolean updateObjective) throws JScoreboardException {
         for (UUID playerUUID : activePlayers) {
             Player player = Bukkit.getPlayer(playerUUID);
             if (player == null) continue;
 
             List<String> lines = this.generateLinesFunction.apply(player);
             Collections.reverse(lines);
-            updateScoreboard(player.getScoreboard(), lines);
+            updateScoreboard(player.getScoreboard(), lines, updateObjective);
         }
     }
 
@@ -48,7 +48,7 @@ public class JPerPlayerScoreboard extends JScoreboard {
         playerScoreboardMap.put(player, scoreboard);
 
         try {
-            updateScoreboard();
+            updateScoreboard(true);
         } catch (JScoreboardException e) {
             e.printStackTrace();
         }

@@ -4,10 +4,7 @@ import me.mrfunny.plugins.paper.gamemanager.GameManager
 import me.mrfunny.plugins.paper.players.PlayerData
 import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.util.ItemBuilder
-import org.bukkit.ChatColor
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.Sound
+import org.bukkit.*
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Item
@@ -28,7 +25,7 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
 
         if(isIslandGenerator) return
 
-        armorStand = location.world.spawn(location.add(0.0, 1.0, 0.0), ArmorStand::class.java)
+        armorStand = location.world!!.spawn(location.add(0.0, 1.0, 0.0), ArmorStand::class.java)
 
         if(!value && armorStand != null){
             armorStand?.remove()
@@ -61,15 +58,13 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
         }
     }
 
-    fun spawn(){
-        // todo: bonuses
-        if(type == GeneratorType.DIAMOND) return // забанить нафиг возможность спавнить алмазы на базе (защита от дурака)
+    fun spawn(gameManager: GameManager){
+        if(type == GeneratorType.DIAMOND) return // забанить нафиг возможность спавнить алмазы (защита от граша)
 
         if(!activated){
             if(armorStand != null){
                 armorStand?.isCustomNameVisible = false
             }
-
             return
         }
 
@@ -92,12 +87,13 @@ class Generator(var location: Location, var type: GeneratorType, val isIslandGen
         if(playersCount > 0){
             if (!GameManager.isLagged){
                 for(player in GameManager.getNearbyPlayers(location, 2.0)){
+                    if(player.gameMode == GameMode.SPECTATOR || gameManager.deadPlayers.contains(player.uniqueId)) continue
                     player.inventory.addItem(ItemBuilder(resourceType, if(PlayerData.PLAYERS[player.uniqueId]!!.isGeneratorMultiplier) 2 else 1).setName(name).toItemStack())
                     player.playSound(player.location, Sound.ENTITY_ITEM_PICKUP, 1f, 1f)
                 }
             }
         } else {
-            location.world.dropItem(location, ItemBuilder(resourceType, 1).setName(name).toItemStack())
+            location.world!!.dropItem(location, ItemBuilder(resourceType, 1).setName(name).toItemStack())
         }
     }
 

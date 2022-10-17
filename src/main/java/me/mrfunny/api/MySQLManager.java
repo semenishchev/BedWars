@@ -8,15 +8,20 @@ import java.util.UUID;
 public class MySQLManager {
 
     private Connection connection;
+    String database;
+    String user;
+    String password;
+    String hostname;
+    int port;
 
     public MySQLManager(JavaPlugin plugin){
         try{
             Class.forName("com.mysql.jdbc.Driver");
-            String hostname = plugin.getConfig().getString("mysql.hostname");
-            int port = plugin.getConfig().getInt("mysql.port");
-            String database = plugin.getConfig().getString("mysql.database");
-            String user = plugin.getConfig().getString("mysql.username");
-            String password = plugin.getConfig().getString("mysql.password");
+            hostname = plugin.getConfig().getString("mysql.hostname");
+            port = plugin.getConfig().getInt("mysql.port");
+            database = plugin.getConfig().getString("mysql.database");
+            user = plugin.getConfig().getString("mysql.username");
+            password = plugin.getConfig().getString("mysql.password");
             this.connection = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + "?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true", user, password);
             this.connection.prepareStatement("CREATE TABLE IF NOT EXISTS lang(`id` int(16) not null auto_increment,`uuid` varchar(100),`locale` varchar(10),PRIMARY KEY(`id`))")
                     .executeUpdate();
@@ -31,27 +36,57 @@ public class MySQLManager {
     }
 
     public void execute(String sql, Object... args) throws SQLException {
-        PreparedStatement ps = this.connection.prepareStatement(sql);
-        if (args != null) {
-            for (int i = 1; i <= args.length; i++) {
-                ps.setObject(i, args[i - 1]);
-                if (i - 1 == args.length - 1)
-                    break;
+        if(connection.isClosed()){
+            this.connection = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + "?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true", user, password);
+        }
+        try(PreparedStatement ps = this.connection.prepareStatement(sql)) {
+            if (args != null) {
+                for (int i = 1; i <= args.length; i++) {
+                    ps.setObject(i, args[i - 1]);
+                    if (i - 1 == args.length - 1)
+                        break;
+                }
+            }
+            ps.executeUpdate();
+        } catch (SQLException e){
+            try(PreparedStatement ps = this.connection.prepareStatement(sql)) {
+                if (args != null) {
+                    for (int i = 1; i <= args.length; i++) {
+                        ps.setObject(i, args[i - 1]);
+                        if (i - 1 == args.length - 1)
+                            break;
+                    }
+                }
+                ps.executeUpdate();
             }
         }
-        ps.executeUpdate();
     }
 
     public ResultSet executeQuery(String sql, Object... args) throws SQLException {
-        PreparedStatement ps = this.connection.prepareStatement(sql);
-        if (args != null)
-            for (int i = 1; i <= args.length; i++) {
-                ps.setObject(i, args[i - 1]);
-                if (i - 1 == args.length - 1)
-                    break;
-            }
+        if(connection.isClosed()){
+            this.connection = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + "?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true", user, password);
+        }
+        try(PreparedStatement ps = this.connection.prepareStatement(sql)) {
+            if (args != null)
+                for (int i = 1; i <= args.length; i++) {
+                    ps.setObject(i, args[i - 1]);
+                    if (i - 1 == args.length - 1)
+                        break;
+                }
 
-        return ps.executeQuery();
+            return ps.executeQuery();
+        }catch (SQLException exception){
+            try(PreparedStatement ps = this.connection.prepareStatement(sql)) {
+                if (args != null)
+                    for (int i = 1; i <= args.length; i++) {
+                        ps.setObject(i, args[i - 1]);
+                        if (i - 1 == args.length - 1)
+                            break;
+                    }
+
+                return ps.executeQuery();
+            }
+        }
     }
 
     public void insert(UUID uuid) throws SQLException {
@@ -68,10 +103,10 @@ public class MySQLManager {
     }
 
     public String getLocale(UUID uuid) throws SQLException {
-        ResultSet rs = executeQuery("SELECT `locale` FROM `lang` WHERE `uuid`=?", uuid.toString());
-        if(rs.next()){
-            return rs.getString("locale");
-        }
+//        ResultSet rs = executeQuery("SELECT `locale` FROM `lang` WHERE `uuid`=?", uuid.toString());
+//        if(rs.next()){
+//            return rs.getString("locale");
+//        }
         return "ru_ru";
     }
 }

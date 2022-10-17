@@ -28,6 +28,7 @@ class PlayerRespawnTask(private var player: Player, var playerIsland: Island) : 
             PlayerData.PLAYERS[player.uniqueId]!!.lastRespawn = System.currentTimeMillis()
             player.addPotionEffect(PotionEffect(PotionEffectType.INCREASE_DAMAGE, 15 * 20, 0))
             player.gameMode = GameMode.SURVIVAL
+            playerIsland.gameWorld.gameManager.deadPlayers.remove(player.uniqueId)
             return
         }
 

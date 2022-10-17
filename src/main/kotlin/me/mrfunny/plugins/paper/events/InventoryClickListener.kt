@@ -21,6 +21,7 @@ class InventoryClickListener(private val gameManager: GameManager): Listener {
             event.isCancelled = true
             return
         }
+        if(gameManager.state != GameState.ACTIVE) event.isCancelled = true
         val materialName: String = event.currentItem!!.type.name
         if(materialName.contains("HELMET")
             || materialName.contains("CHESTPLATE")
@@ -48,7 +49,12 @@ class InventoryClickListener(private val gameManager: GameManager): Listener {
             return
         }
 
-        if(event.clickedInventory == player.inventory) return
+        if(event.clickedInventory == player.inventory) {
+            if (gameManager.state == GameState.LOBBY || gameManager.state == GameState.STARTING) {
+                event.isCancelled = true
+            }
+            return
+        }
 
         event.isCancelled = true
         if(ChatColor.stripColor(event.currentItem?.itemMeta?.displayName)!!.toLowerCase() == "exit") {

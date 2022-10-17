@@ -15,7 +15,6 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.block.Block
 import org.bukkit.entity.*
 import org.bukkit.event.EventHandler
-import me.mrfunny.api.NPC
 import me.mrfunny.api.PlayerApi
 import me.mrfunny.plugins.paper.tasks.TeleportTask
 import me.mrfunny.plugins.paper.util.ItemBuilder
@@ -31,6 +30,7 @@ import org.bukkit.scheduler.BukkitTask
 import org.bukkit.inventory.meta.Damageable
 import org.bukkit.potion.PotionEffect
 import org.bukkit.util.Vector
+import java.lang.NullPointerException
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.util.*
@@ -47,13 +47,6 @@ class PlayerDeathListener(private val gameManager: GameManager): Listener {
             event.entity.remove()
             (event.entity as Monster).damage(100000.0)
         }
-        if(gameManager.getNPC(event.entity.uniqueId) != null){
-            val npc: NPC = gameManager.getNPC(event.entity.uniqueId)!!
-            npc.isTouched = true
-            npc.despawn()
-            event.damager.sendMessage("")
-            return
-        }
 
         if(event.damager is Arrow || event.damager is SpectralArrow || event.damager is Fireball){
 
@@ -65,6 +58,7 @@ class PlayerDeathListener(private val gameManager: GameManager): Listener {
                 return
             }
             val player: Player = event.entity as Player
+
             val playerData: PlayerData = PlayerData.PLAYERS[player.uniqueId]!!
             val damagerData: PlayerData = PlayerData.PLAYERS[damager.uniqueId]!!
             if((System.currentTimeMillis() - playerData.lastRespawn) <= 10000L){
@@ -129,16 +123,16 @@ class PlayerDeathListener(private val gameManager: GameManager): Listener {
                 player.clearActiveItem()
                 player.setCooldown(Material.SHIELD, 20 * 7)
                 val shield: ItemStack = if(player.inventory.itemInMainHand.type == Material.SHIELD) player.inventory.itemInMainHand else player.inventory.itemInOffHand
-                val shieldMeta: ItemMeta = shield.itemMeta
+                val shieldMeta: ItemMeta = shield.itemMeta!!
                 (shieldMeta as Damageable).damage = (shieldMeta as Damageable).damage + 15
-                if((shieldMeta as Damageable).damage >= 336){
+                if(shieldMeta.damage >= 336){
                     player.inventory.remove(shield)
                 } else {
                     shield.setItemMeta(shieldMeta)
                 }
             } else if(player.isBlocking && damager.inventory.itemInMainHand.type.name.contains("AXE")){
                 val shield: ItemStack = if(player.inventory.itemInMainHand.type == Material.SHIELD) player.inventory.itemInMainHand else player.inventory.itemInOffHand
-                val shieldMeta: ItemMeta = shield.itemMeta
+                val shieldMeta: ItemMeta = shield.itemMeta!!
                 (shieldMeta as Damageable).damage = (shieldMeta as Damageable).damage + 15
                 if((shieldMeta as Damageable).damage >= 336){
                     player.inventory.remove(shield)
@@ -194,45 +188,66 @@ class PlayerDeathListener(private val gameManager: GameManager): Listener {
 
         if(event.finalDamage >= player.health){
             if((player.inventory.itemInOffHand.type == Material.TOTEM_OF_UNDYING || player.inventory.itemInMainHand.type == Material.TOTEM_OF_UNDYING) && event.cause != EntityDamageEvent.DamageCause.VOID){
-                player.health = 20.0;
+                player.health = 20.0
                 player.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 5, 2 * 20, false, true))
                 player.addPotionEffect(PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 5 * 20, 1, false, true))
+                if(player.inventory.itemInOffHand.type == Material.TOTEM_OF_UNDYING){
+                    player.inventory.setItemInOffHand(ItemStack(Material.AIR))
+                } else {
+                    player.inventory.setItemInMainHand(ItemStack(Material.AIR))
+                }
+                event.entity.world.playSound(event.entity.location, Sound.ITEM_TOTEM_USE,1f, 1f)
+                val runnable: BukkitRunnable = object : BukkitRunnable() {
+                    var counter = 0
+                    override fun run() {
+                        counter++
+                        if(counter >= 60){
+                            cancel()
+                        }
+                        event.entity.world.spawnParticle(Particle.TOTEM, event.entity.location.clone().add(.0, .5, .0), 20)
+                    }
+                }
+                runnable.runTaskTimer(gameManager.plugin, 0, 1)
                 return
             }
             gameManager.endGameIfNeeded()
+            gameManager.deadPlayers.add(player.uniqueId)
             event.isCancelled = true
             player.closeInventory()
             player.activePotionEffects.forEach {
                 player.removePotionEffect(it.type)
             }
+            val data = PlayerData.PLAYERS[player.uniqueId]!!
             if((System.currentTimeMillis() - PlayerData.PLAYERS[player.uniqueId]!!.lastCombat) <= 10000L){
-                if(PlayerData.PLAYERS[player.uniqueId]!!.lastAttacker == null){ return }
-                val lastAttacker: UUID = PlayerData.PLAYERS[player.uniqueId]!!.lastAttacker!!
-                val attackerIsland: Island? = gameManager.world.getIslandForPlayer(Bukkit.getPlayer(lastAttacker)!!)
-                Bukkit.getPlayer(PlayerData.PLAYERS[player.uniqueId]?.lastAttacker!!)!!.sendMessage("&aYou killed ${ChatColor.GOLD}${player.name}".colorize())
+                if(data.lastAttacker == null){ return }
+//                val lastAttacker: UUID = data.lastAttacker!!
+                val lastAttacker = PlayerData.PLAYERS[data.lastAttacker!!]!!
+                val attackerIsland: Island = gameManager.world.getIslandForPlayer(lastAttacker.player) ?: return
+                lastAttacker.player.sendMessage("&aYou killed ${ChatColor.GOLD}${player.name}".colorize())
                 InventoryApi.giveAllResourcesFromPlayerToPlayer(
                     player,
-                    Bukkit.getPlayer(PlayerData.PLAYERS[player.uniqueId]?.lastAttacker!!)!!
+                    lastAttacker.player
                 )
-                attackerIsland?.totalSouls = attackerIsland?.totalSouls!! + 1
-                Bukkit.getPlayer(PlayerData.PLAYERS[player.uniqueId]?.lastAttacker!!)!!.sendMessage("${ChatColor.AQUA}+1 soul")
-                Bukkit.getPlayer(PlayerData.PLAYERS[player.uniqueId]?.lastAttacker!!)!!.playSound(Bukkit.getPlayer(PlayerData.PLAYERS[player.uniqueId]?.lastAttacker!!)!!.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
-                PlayerData.PLAYERS[PlayerData.PLAYERS[player.uniqueId]!!.lastAttacker]?.totalKills = PlayerData.PLAYERS[PlayerData.PLAYERS[player.uniqueId]!!.lastAttacker]?.totalKills!! + 1
+                attackerIsland.totalSouls += 1
+                lastAttacker.player.sendMessage("${ChatColor.AQUA}+1 soul")
+                lastAttacker.player.playSound(lastAttacker.player.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
+                lastAttacker.totalKills += 1
 //                gameManager.plugin.sendPluginMessage("coins:in", player, "7wZk8c5J3mgvFgUbK", player.uniqueId, "silver", 5)
                 try{
-                    Main.managerBank.addValueToPlayer(Bukkit.getPlayer(lastAttacker)!!.name, 5, "silver")
-                    Bukkit.getPlayer(PlayerData.PLAYERS[player.uniqueId]?.lastAttacker!!)!!.sendMessage("${ChatColor.GRAY}+5 silver (Kill)")
-                } catch (ex: Exception){
+                    Main.managerBank.addValueToPlayer(lastAttacker.player.name, 5, "silver")
+                    lastAttacker.player.sendMessage("${ChatColor.GRAY}+5 silver (Kill)")
+                } catch (ignored: NullPointerException){} catch (ex: Exception){
                     ex.printStackTrace()
                 }
 
-                Bukkit.broadcastMessage("${playerIsland.color.getChatColor()}${player.name}&f was killed by ${attackerIsland.color.getChatColor()}${Bukkit.getPlayer(lastAttacker)!!.name}".colorize())
+                Bukkit.broadcastMessage("${playerIsland.color.getChatColor()}${player.name}&7 was killed by ${attackerIsland.color.getChatColor()}${lastAttacker.player.name}".colorize())
             } else {
-                Bukkit.broadcastMessage("${playerIsland.color.getChatColor()}${player.name}&f dead".colorize())
+                Bukkit.broadcastMessage("${playerIsland.color.getChatColor()}${player.name}&7 dead".colorize())
             }
-            PlayerData.PLAYERS[player.uniqueId]?.totalDeaths = PlayerData.PLAYERS[player.uniqueId]?.totalDeaths!! + 1
+            data.totalDeaths = data.totalDeaths + 1
             player.health = player.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
             player.activePotionEffects.clear()
+            projectileToBukkitTaskMap[event.entity]?.cancel()
             gameManager.playerManager.setSpectatorMode(player)
             if(playerIsland.isBedPlaced()){
                 val task: BukkitTask = Bukkit.getScheduler().runTaskTimer(
@@ -242,16 +257,15 @@ class PlayerDeathListener(private val gameManager: GameManager): Listener {
                         )!!
                     ), 0, 20
                 )
-                Bukkit.getScheduler().runTaskLater(gameManager.plugin, task::cancel, 20 * 6)
+                Bukkit.getScheduler().runTaskLater(gameManager.plugin, task::cancel, 20L * 6L)
             } else {
                 player.sendTitle(Colorize.c("&cYOU DIED"), null, 0, 20, 20)
 
                 if(!gameManager.world.getActiveIslands().contains(playerIsland)){
-                    Bukkit.broadcastMessage("TEAM DESTRUCTION> ${playerIsland.color.formattedName()}&f is destroyed".colorize())
+                    Bukkit.broadcastMessage("TEAM DESTRUCTION> ${playerIsland.color.getChatColor()}${playerIsland.color.formattedName()}&7 is destroyed".colorize())
                 }
 
             }
-            player.teleport(gameManager.world.lobbyPosition)
         }
     }
 
@@ -274,7 +288,12 @@ class PlayerDeathListener(private val gameManager: GameManager): Listener {
                 val island: Island? = gameManager.world.getIslandForPlayer(player)
                 val woolMaterial: Material = island?.color?.concreteMaterial() ?: Material.WHITE_CONCRETE
                 projectileToBukkitTaskMap[event.entity] = object : BukkitRunnable() {
+                    var timer = 0
                     override fun run() {
+                        timer++
+                        if(timer >= 200){
+                            cancel()
+                        }
                         val targetBlock: Block = event.entity.world.getBlockAt(event.entity.location.clone().add(Random.nextInt(-1, 1).toDouble(), -1.5, Random.nextInt(-1, 1).toDouble()))
                         targetBlock.setMetadata("placed", FixedMetadataValue(gameManager.plugin, "block"))
                         if(!(targetBlock.type.name.contains("BED") || gameManager.world.isBlockInProtectedZone(targetBlock) || (!targetBlock.hasMetadata("placed") || targetBlock.type != Material.AIR))){
@@ -314,13 +333,13 @@ class PlayerDeathListener(private val gameManager: GameManager): Listener {
     }
 
 
-    fun roundOffDecimal(number: Double): Double {
+    private fun roundOffDecimal(number: Double): Double {
         val df = DecimalFormat("#.##")
         df.roundingMode = RoundingMode.FLOOR
         return df.format(number).toDouble()
     }
 
-    fun playerMoved(from: Vector, to: Vector?): Boolean {
-        return from.distance(to!!) > 0
+    private fun playerMoved(from: Vector, to: Vector?): Boolean {
+        return roundOffDecimal(from.x) == roundOffDecimal(to!!.x) && roundOffDecimal(from.y) == roundOffDecimal(to.y) && roundOffDecimal(from.z) == roundOffDecimal(to.z)
     }
 }

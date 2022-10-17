@@ -3,6 +3,7 @@ package me.mrfunny.plugins.paper.gui
 import dev.jcsoftware.jscoreboards.JScoreboardTeam
 import dev.jcsoftware.jscoreboards.exception.JScoreboardException
 import me.mrfunny.plugins.paper.gamemanager.GameManager
+import me.mrfunny.plugins.paper.players.PlayerData
 import me.mrfunny.plugins.paper.util.Colorize
 import me.mrfunny.plugins.paper.util.ItemBuilder
 import me.mrfunny.plugins.paper.worlds.Island
@@ -28,23 +29,7 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
     override val inventory: Inventory = Bukkit.createInventory(null, 9, name)
 
     init {
-        gameManager.world.islands.forEach {
-            val itemBuilder = ItemBuilder(it.color.woolMaterial())
-                .setName("${it.color.getChatColor()}${it.color.formattedName()}")
-                .addLoreLine(if(it.isMember(player))"&aSelected" else "&cNot selected")
-                .addLoreLine("&a${it.players.size}/${gameManager.world.maxTeamSize} players")
-
-            if(it.isMember(player)){
-                itemBuilder.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1).hideEnchantments()
-            }
-            itemBuilder.addLoreLine("")
-            for (player in it.players) {
-                itemBuilder.addLoreLine("${it.color.getChatColor()}${player.name}")
-            }
-            inventory.addItem(itemBuilder.toItemStack())
-        }
-
-        inventory.addItem(ItemBuilder(Material.BARRIER).setName("&cExit").toItemStack())
+        updateTeamSelector(player, this)
     }
 
     override fun handleClick(player: Player, itemStack: ItemStack, view: InventoryView): GUI? {
@@ -76,7 +61,9 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
         if(selectedIsland.isPresent){
             val island: Island = selectedIsland.get()
             if(island.players.size == gameManager.world.maxTeamSize){
-                player.sendMessage(Colorize.c("&cThat team is full"))
+                val rus = PlayerData.PLAYERS[player.uniqueId]!!.isRussian();
+                player.sendMessage(Colorize.c(if(rus) "Эта команда заполнена" else "&cThat team is full"))
+                return Cancelled
             } else {
                 try{
                     if(findPlayerTeam(player) != null){
@@ -85,6 +72,11 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
                     gameManager.scoreboard.findTeam(island.color.formattedName()).get().addPlayer(player)
                 } catch (ignore: JScoreboardException) {}
                 island.addMember(player)
+                gameManager.guiManager.playerToGUIMap.entries.forEach {
+                    if(it.value is TeamPickerGUI){
+                        updateTeamSelector(it.key, it.value as TeamPickerGUI);
+                    }
+                }
             }
         }
 
@@ -103,5 +95,27 @@ class TeamPickerGUI(private val gameManager: GameManager, private val player: Pl
             }
         }
         return null
+    }
+
+    private fun updateTeamSelector(player: Player, gui: TeamPickerGUI?){
+        if(gui == null) return
+        gui.inventory.clear()
+        gameManager.world.islands.forEach {
+            val itemBuilder = ItemBuilder(it.color.woolMaterial())
+                .setName("${it.color.getChatColor()}${it.color.formattedName()}")
+                .addLoreLine(if(it.isMember(player))"&aSelected" else "&cNot selected")
+                .addLoreLine("&a${it.players.size}/${gameManager.world.maxTeamSize} players")
+
+            if(it.isMember(player)){
+                itemBuilder.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1).hideEnchantments()
+            }
+            itemBuilder.addLoreLine("")
+            for (teamPlayer in it.players) {
+                itemBuilder.addLoreLine("${it.color.getChatColor()}${teamPlayer.name}")
+            }
+            gui.inventory.addItem(itemBuilder.toItemStack())
+        }
+
+        gui.inventory.addItem(ItemBuilder(Material.BARRIER).setName("&cExit").toItemStack())
     }
 }

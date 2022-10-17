@@ -1,18 +1,17 @@
 package me.mrfunny.api;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import me.mrfunny.plugins.paper.gamemanager.GameManager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.util.Vector;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Base64;
@@ -78,7 +77,6 @@ public class PlayerApi {
 //        playerConnection.sendPacket(itemPacket);
 //    }
 
-    @Nullable
     public static Player getNearestPlayerFromOtherTeam(Player player, GameManager gameManager){
         double max = gameManager.getWorld().world.getWorldBorder().getSize();
         Player closestPlayer = null;
@@ -102,5 +100,7 @@ public class PlayerApi {
         return closestPlayer;
     }
 
+    public void test(Block block){
 
+    }
 }

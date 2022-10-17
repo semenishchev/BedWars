@@ -50,7 +50,7 @@ open class PrimaryShopGUI(private val gameManager: GameManager, private val play
     override fun handleClick(player: Player, itemStack: ItemStack, view: InventoryView): GUI? {
         if(!isInventory(view)) return null
         if(!itemStack.hasItemMeta()) return null
-        if(itemStack.itemMeta.displayName.contains("Back")) return ItemShopGUI(gameManager, player)
+        if(itemStack.itemMeta!!.displayName.contains("Back")) return ItemShopGUI(gameManager, player)
         if(isItemToBuy(itemStack)) return null
 
         val shopItem: ShopItem = getShopItemByItemstack(itemStack, player) ?: return PrimaryShopGUI(gameManager, player, items)
@@ -149,7 +149,7 @@ open class PrimaryShopGUI(private val gameManager: GameManager, private val play
 
                 if(shopItem.item.type == Material.SHIELD){
                     val item = ItemStack(Material.SHIELD)
-                    val shieldMeta: ItemMeta = item.itemMeta
+                    val shieldMeta: ItemMeta = item.itemMeta!!
                     val banner: Banner = (shieldMeta as BlockStateMeta).blockState as Banner
                     banner.baseColor = gameManager.world.getIslandForPlayer(player)!!.color.dyeColor()
                     shieldMeta.blockState = banner
@@ -162,9 +162,9 @@ open class PrimaryShopGUI(private val gameManager: GameManager, private val play
 
             player.inventory.removeItem(itemStackToRemove)
             if(isArmor){
-                player.sendMessage("&a${if(data.isRussian())"Вы купили" else "You purchased"} ${ChatColor.stripColor(shopItem.item.i18NDisplayName)!!.split(" ")[0]} броню".colorize())
+                player.sendMessage("&a${if(data.isRussian())"Вы купили" else "You purchased"} ${ChatColor.stripColor(shopItem.item.itemMeta!!.displayName)!!.split(" ")[0]} броню".colorize())
             } else {
-                player.sendMessage(Colorize.c("&a${if(data.isRussian())"Вы купили" else "You purchased"} &6${if(shopItem.item.itemMeta.displayName == "") ChatColor.stripColor(shopItem.item.i18NDisplayName) else ChatColor.stripColor(shopItem.item.itemMeta.displayName) }"))
+                player.sendMessage(Colorize.c("&a${if(data.isRussian())"Вы купили" else "You purchased"} &6${if(shopItem.item.itemMeta!!.displayName == "") ChatColor.stripColor(shopItem.item.i18NDisplayName) else ChatColor.stripColor(shopItem.item.itemMeta.displayName) }"))
             }
             player.playNote(player.location, Instrument.PLING, Note(12))
         } else {

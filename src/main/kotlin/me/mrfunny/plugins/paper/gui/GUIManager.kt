@@ -4,7 +4,7 @@ import org.bukkit.entity.Player
 
 object GUIManager {
 
-    private val playerToGUIMap: HashMap<Player, GUI?> = hashMapOf()
+    val playerToGUIMap: HashMap<Player, GUI?> = hashMapOf()
 
     fun getOpenGui(player: Player): GUI?{
         return playerToGUIMap[player]
@@ -23,5 +23,4 @@ object GUIManager {
     fun clear(player: Player){
         playerToGUIMap.remove(player)
     }
-
 }

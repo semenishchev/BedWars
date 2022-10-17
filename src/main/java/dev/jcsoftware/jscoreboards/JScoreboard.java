@@ -1,6 +1,7 @@
 package dev.jcsoftware.jscoreboards;
 
 import dev.jcsoftware.jscoreboards.exception.*;
+import me.mrfunny.plugins.paper.gamemanager.GameManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -44,9 +45,9 @@ public class JScoreboard {
         }
     }
 
-    protected void updateScoreboard() throws JScoreboardException {
+    protected void updateScoreboard(boolean updateObjective) throws JScoreboardException {
         createBukkitScoreboardIfNull();
-        updateScoreboard(scoreboard, lines);
+        updateScoreboard(scoreboard, lines, updateObjective);
     }
 
     private final Map<Scoreboard, List<String>> previousLinesMap = new HashMap<>();
@@ -55,7 +56,8 @@ public class JScoreboard {
      * Update the scoreboard for all players it is shown to.
      * @throws JScoreboardException If a String within the lines array is over 64 characters, this exception is thrown.
      */
-    protected void updateScoreboard(Scoreboard scoreboard, List<String> lines) throws JScoreboardException {
+    protected void updateScoreboard(Scoreboard scoreboard, List<String> lines, boolean updateObjective) throws JScoreboardException {
+        boolean update = false;
         if (previousLinesMap.containsKey(scoreboard)) {
             if (previousLinesMap.get(scoreboard).equals(lines)) { // Are the lines the same? Don't take up server resources to change absolutely nothing
                 updateTeams(scoreboard); // Update the teams anyway
@@ -63,9 +65,11 @@ public class JScoreboard {
             }
 
             // Size difference means unregister objective to reset and re-register teams correctly
+
             if (previousLinesMap.get(scoreboard).size() != lines.size()) {
                 scoreboard.clearSlot(DisplaySlot.SIDEBAR);
                 scoreboard.getEntries().forEach(scoreboard::resetScores);
+                update = true;
                 scoreboard.getTeams().forEach(team -> {
                     if (team.getName().contains("line")) {
                         team.unregister();
@@ -83,9 +87,11 @@ public class JScoreboard {
         } else {
             objective = scoreboard.getObjective("dummy");
         }
-
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        objective.setDisplayName(color(options.getScoreboardTitle()));
+        //System.out.println("Update scoreboard: " + updateObjective);
+        if(updateObjective || update){
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+            objective.setDisplayName(color(options.getScoreboardTitle()));
+        }
 
         Objective healthObjective = scoreboard.getObjective("tabHealth");
         if (options.getTabHealthStyle() != JScoreboardTabHealthStyle.NONE) {
@@ -180,15 +186,14 @@ public class JScoreboard {
         return colorCodeOptions;
     }
 
-    public void setLines(List<String> lines) throws JScoreboardException {
+    public void setLines(boolean upd, List<String> lines) throws JScoreboardException {
         Collections.reverse(lines);
         this.lines = lines;
-        updateScoreboard();
+        updateScoreboard(upd);
     }
 
-    public void setLines(String... lines) throws JScoreboardException {
-        List<String> linesList = new ArrayList<>(Arrays.asList(lines));
-        setLines(linesList);
+    public void setLines(List<String> lines) throws JScoreboardException {
+        this.setLines(false, lines);
     }
 
     /**
@@ -200,6 +205,11 @@ public class JScoreboard {
 
         createBukkitScoreboardIfNull();
         player.setScoreboard(scoreboard);
+        try {
+            updateScoreboard(true);
+        } catch (JScoreboardException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -215,6 +225,11 @@ public class JScoreboard {
                 team.removePlayer(player);
             }
         });
+        try {
+            updateScoreboard(true);
+        } catch (JScoreboardException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
