@@ -1,7 +1,9 @@
 package dev.jcsoftware.jscoreboards;
 
-import dev.jcsoftware.jscoreboards.exception.*;
-import me.mrfunny.plugins.paper.gamemanager.GameManager;
+import dev.jcsoftware.jscoreboards.exception.DuplicateTeamCreatedException;
+import dev.jcsoftware.jscoreboards.exception.JScoreboardException;
+import dev.jcsoftware.jscoreboards.exception.ScoreboardLineTooLongException;
+import dev.jcsoftware.jscoreboards.exception.ScoreboardTeamNameTooLongException;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

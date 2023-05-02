@@ -3,7 +3,6 @@ package dev.jcsoftware.jscoreboards;
 import dev.jcsoftware.jscoreboards.exception.JScoreboardException;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.*;

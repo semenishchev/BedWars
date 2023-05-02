@@ -1,22 +1,17 @@
 package me.mrfunny.api;
 
-import me.mrfunny.plugins.paper.gamemanager.GameManager;
+import me.mrfunny.bedwars.game.GameManager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.util.Vector;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Objects;
-import java.util.UUID;
 
 public class PlayerApi {
 

@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class CustomConfiguration {
 
-    private File file;
+    private final File file;
     private YamlConfiguration config;
 
     public CustomConfiguration(String name, JavaPlugin plugin){
@@ -31,6 +31,12 @@ public class CustomConfiguration {
             }
         }
 
+        config = YamlConfiguration.loadConfiguration(file);
+    }
+
+    public CustomConfiguration(File file) {
+        if(!file.exists()) throw new RuntimeException("File does not exist");
+        this.file = file;
         config = YamlConfiguration.loadConfiguration(file);
     }
 

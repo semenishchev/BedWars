@@ -1,7 +1,7 @@
 name: BedWars
 version: 1.0
 api-version: 1.16
-main: me.mrfunny.plugins.paper.BedWars
+main: me.mrfunny.bedwars.BedWars
 
 commands:
   setup:
